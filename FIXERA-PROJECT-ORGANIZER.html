@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixera Project Organizer - Interactive Phase Planner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0A0E1A 0%, #1a1f2e 100%);
+            color: #f5f5f5;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(201, 160, 32, 0.1);
+            border-radius: 15px;
+            border: 2px solid #C9A020;
+        }
+
+        h1 {
+            color: #C9A020;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #63B3ED;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #C9A020, #D4B033);
+            color: #0A0E1A;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(201, 160, 32, 0.4);
+        }
+
+        .btn-secondary {
+            background: #63B3ED;
+            color: #0A0E1A;
+        }
+
+        .btn-secondary:hover {
+            background: #4299E1;
+        }
+
+        .btn-success {
+            background: #48BB78;
+            color: #0A0E1A;
+        }
+
+        .phases-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .phase-card {
+            background: rgba(26, 31, 46, 0.9);
+            border: 2px solid #C9A020;
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s;
+            cursor: grab;
+        }
+
+        .phase-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(201, 160, 32, 0.3);
+            background: rgba(26, 31, 46, 1);
+        }
+
+        .phase-card.dragging {
+            opacity: 0.7;
+            cursor: grabbing;
+        }
+
+        .phase-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .phase-title {
+            color: #C9A020;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .phase-time {
+            background: #C9A020;
+            color: #0A0E1A;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .phase-description {
+            color: #63B3ED;
+            font-size: 0.95em;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .task-item {
+            background: rgba(99, 179, 237, 0.1);
+            border-left: 4px solid #63B3ED;
+            padding: 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .task-item:hover {
+            background: rgba(99, 179, 237, 0.2);
+            transform: translateX(5px);
+        }
+
+        .task-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .task-item input[type="checkbox"]:checked + .task-text {
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .task-text {
+            flex: 1;
+            color: #e0e0e0;
+            font-size: 0.95em;
+        }
+
+        .task-track {
+            background: #C9A020;
+            color: #0A0E1A;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            font-weight: bold;
+        }
+
+        .progress-section {
+            background: rgba(26, 31, 46, 0.9);
+            border: 2px solid #63B3ED;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .progress-title {
+            color: #63B3ED;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .progress-item {
+            margin-bottom: 15px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            color: #e0e0e0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 25px;
+            background: rgba(99, 179, 237, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #63B3ED;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #C9A020, #D4B033);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0A0E1A;
+            font-weight: bold;
+            font-size: 0.9em;
+            transition: width 0.3s;
+        }
+
+        .timeline-section {
+            background: rgba(26, 31, 46, 0.9);
+            border: 2px solid #48BB78;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .timeline-title {
+            color: #48BB78;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #C9A020;
+            z-index: 0;
+        }
+
+        .timeline-item {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .timeline-dot {
+            width: 40px;
+            height: 40px;
+            background: #C9A020;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #0A0E1A;
+        }
+
+        .timeline-label {
+            color: #63B3ED;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .timeline-duration {
+            color: #999;
+            font-size: 0.85em;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(26, 31, 46, 0.9);
+            border: 2px solid #C9A020;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            color: #C9A020;
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            color: #63B3ED;
+            margin-top: 5px;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(99, 179, 237, 0.1);
+            border-radius: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .track-a { background: #C9A020; }
+        .track-b { background: #63B3ED; }
+
+        @media (max-width: 768px) {
+            .phases-container {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .timeline::before {
+                left: 20px;
+                top: 0;
+                bottom: 0;
+                width: 2px;
+                height: auto;
+            }
+
+            .timeline-item {
+                text-align: left;
+                padding-left: 60px;
+            }
+
+            .timeline-dot {
+                position: absolute;
+                left: 0;
+                margin: 0;
+            }
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #C9A020;
+            background: transparent;
+            color: #C9A020;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background: #C9A020;
+            color: #0A0E1A;
+        }
+
+        .filter-btn:hover {
+            background: #C9A020;
+            color: #0A0E1A;
+        }
+
+        .footer {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+            border-top: 1px solid #333;
+            margin-top: 40px;
+        }
+
+        .export-data {
+            background: rgba(72, 187, 120, 0.1);
+            border: 2px solid #48BB78;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .export-title {
+            color: #48BB78;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            background: #0A0E1A;
+            color: #C9A020;
+            border: 1px solid #C9A020;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.85em;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏗️ FIXERA PROJECT ORGANIZER</h1>
+            <p class="subtitle">Interactive Phase Planner - Drag, Click & Organize Your Tasks</p>
+        </header>
+
+        <div class="controls">
+            <button class="btn-primary" onclick="resetAll()">🔄 Reset All</button>
+            <button class="btn-secondary" onclick="markAllDone()">✅ Mark All Done</button>
+            <button class="btn-secondary" onclick="clearDone()">🗑️ Clear Completed</button>
+            <button class="btn-success" onclick="exportProgress()">💾 Export Progress</button>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalTasks">23</div>
+                <div class="stat-label">Total Tasks</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="completedTasks">0</div>
+                <div class="stat-label">Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="progressPercent">0%</div>
+                <div class="stat-label">Overall Progress</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalDays">56</div>
+                <div class="stat-label">Total Timeline</div>
+            </div>
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-title">📊 Phase Progress</div>
+
+            <div class="progress-item">
+                <div class="progress-label">
+                    <span>PHASE 1: Super Quick Wins (1-3 Days)</span>
+                    <span id="phase1Percent">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="phase1Bar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="progress-item">
+                <div class="progress-label">
+                    <span>PHASE 2: Medium-Quick Tasks (1-2 Weeks)</span>
+                    <span id="phase2Percent">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="phase2Bar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="progress-item">
+                <div class="progress-label">
+                    <span>PHASE 3: Medium-Length Tasks (2-3 Weeks)</span>
+                    <span id="phase3Percent">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="phase3Bar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="progress-item">
+                <div class="progress-label">
+                    <span>PHASE 4: Longer Tasks (3-6 Weeks)</span>
+                    <span id="phase4Percent">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="phase4Bar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="progress-item">
+                <div class="progress-label">
+                    <span>PHASE 5: Launch & Growth (Weeks 7-8)</span>
+                    <span id="phase5Percent">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="phase5Bar" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="timeline-section">
+            <div class="timeline-title">📅 PROJECT TIMELINE</div>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-dot">1</div>
+                    <div class="timeline-label">WEEK 1</div>
+                    <div class="timeline-duration">Phase 1<br>5-7 days</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot">2</div>
+                    <div class="timeline-label">WEEK 2</div>
+                    <div class="timeline-duration">Phase 2<br>1-2 weeks</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot">3</div>
+                    <div class="timeline-label">WEEKS 3-4</div>
+                    <div class="timeline-duration">Phase 3<br>2-3 weeks</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot">4</div>
+                    <div class="timeline-label">WEEKS 5-6</div>
+                    <div class="timeline-duration">Phase 4<br>3-6 weeks</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot">5</div>
+                    <div class="timeline-label">WEEKS 7-8</div>
+                    <div class="timeline-duration">Phase 5<br>1-2 weeks</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-buttons">
+            <button class="filter-btn active" onclick="filterPhases('all')">📋 All Phases</button>
+            <button class="filter-btn" onclick="filterPhases('phase1')">⚡ Phase 1</button>
+            <button class="filter-btn" onclick="filterPhases('phase2')">⚙️ Phase 2</button>
+            <button class="filter-btn" onclick="filterPhases('phase3')">🔨 Phase 3</button>
+            <button class="filter-btn" onclick="filterPhases('phase4')">🏗️ Phase 4</button>
+            <button class="filter-btn" onclick="filterPhases('phase5')">🚀 Phase 5</button>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color track-a"></div>
+                <span>TRACK A: Technical/App Development</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color track-b"></div>
+                <span>TRACK B: Business/Legal/Marketing</span>
+            </div>
+        </div>
+
+        <div class="phases-container" id="phasesContainer"></div>
+
+        <div class="export-data">
+            <div class="export-title">📥 Export Your Progress</div>
+            <textarea id="exportText" readonly placeholder="Click 'Export Progress' button above to see your data"></textarea>
+            <button class="btn-primary" onclick="copyToClipboard()" style="margin-top: 10px; width: 100%;">📋 Copy to Clipboard</button>
+        </div>
+
+        <div class="footer">
+            <p>💡 Tip: Click checkboxes to mark tasks complete. Drag phase cards to reorder. Your progress is saved automatically!</p>
+            <p style="margin-top: 10px; font-size: 0.85em;">Last updated: <span id="lastUpdate"></span></p>
+        </div>
+    </div>
+
+    <script>
+        const phases = [
+            {
+                id: 'phase1',
+                name: '⚡ PHASE 1: Super Quick Wins',
+                duration: '1-3 Days',
+                description: 'Quick wins you can do TODAY',
+                color: '#C9A020',
+                tasks: [
+                    { id: 1, text: 'Redeploy customer app (15 min)', track: 'A', time: '15 min' },
+                    { id: 2, text: 'Create company registration checklist', track: 'B', time: '1 day' },
+                    { id: 3, text: 'Setup business profiles (GMB, Facebook, Instagram, LinkedIn, WhatsApp)', track: 'B', time: '2-3 days' },
+                    { id: 4, text: 'Create marketing materials specs', track: 'B', time: '1-2 days' },
+                    { id: 5, text: 'Create app testing plan document', track: 'A', time: '1-2 days' },
+                    { id: 6, text: 'Create website integration checklist', track: 'B', time: '1 day' },
+                    { id: 7, text: 'Add water carriers & movers categories', track: 'A', time: '2-3 days' }
+                ]
+            },
+            {
+                id: 'phase2',
+                name: '⚙️ PHASE 2: Medium-Quick Tasks',
+                duration: '1-2 Weeks',
+                description: 'Can start after Phase 1, many run in parallel',
+                color: '#63B3ED',
+                tasks: [
+                    { id: 8, text: 'Add optional login feature (guest access)', track: 'A', time: '3-5 days' },
+                    { id: 9, text: 'Develop water carriers & movers legal docs', track: 'B', time: '5-7 days' },
+                    { id: 10, text: 'Create pricing models (water carriers, movers)', track: 'B', time: '3-5 days' },
+                    { id: 11, text: 'Register domain + SSL (fixera.co.ke)', track: 'B', time: '5 days' },
+                    { id: 12, text: 'Design & order marketing materials', track: 'B', time: '7 days' },
+                    { id: 13, text: 'Create soft launch strategy', track: 'B', time: '5 days' },
+                    { id: 14, text: 'Contact Safaricom M-Pesa', track: 'A', time: '2-3 days' }
+                ]
+            },
+            {
+                id: 'phase3',
+                name: '🔨 PHASE 3: Medium-Length Tasks',
+                duration: '2-3 Weeks',
+                description: 'Start after Safaricom approval',
+                color: '#48BB78',
+                tasks: [
+                    { id: 15, text: 'Build website (homepage, services, pricing, FAQs)', track: 'B', time: 'Weeks 3-4' },
+                    { id: 16, text: 'Setup M-Pesa sandbox testing', track: 'A', time: '2 weeks' },
+                    { id: 17, text: 'Build wallet system (UI, logic, database)', track: 'A', time: '3-4 weeks' }
+                ]
+            },
+            {
+                id: 'phase4',
+                name: '🏗️ PHASE 4: Longer Tasks',
+                duration: '3-6 Weeks',
+                description: 'Run after Phase 3',
+                color: '#FC8181',
+                tasks: [
+                    { id: 18, text: 'Build accounting systems (worker, vendor, supplier, rider)', track: 'A', time: '2-3 weeks' },
+                    { id: 19, text: 'Build email production system (SendGrid/Mailgun)', track: 'A', time: '1 week' },
+                    { id: 20, text: 'Run full testing suite (Unit, Integration, UAT, Load, Security)', track: 'A', time: '2 weeks' }
+                ]
+            },
+            {
+                id: 'phase5',
+                name: '🚀 PHASE 5: Launch & Growth',
+                duration: 'Weeks 7-8',
+                description: 'Final phase - ready for launch',
+                color: '#00D084',
+                tasks: [
+                    { id: 21, text: 'Soft launch with beta cohort (50-100 users)', track: 'B', time: 'Week 7' },
+                    { id: 22, text: 'Launch advertisement (digital, on-ground, organic)', track: 'B', time: 'Week 8' },
+                    { id: 23, text: 'Optimize & monitor (KPIs, feedback, iterations)', track: 'B', time: 'Ongoing' }
+                ]
+            }
+        ];
+
+        let currentFilter = 'all';
+        let taskStates = {};
+
+        function initializeApp() {
+            loadProgress();
+            renderPhases();
+            updateStats();
+            updateLastUpdate();
+        }
+
+        function renderPhases() {
+            const container = document.getElementById('phasesContainer');
+            container.innerHTML = '';
+
+            phases.forEach(phase => {
+                if (currentFilter !== 'all' && phase.id !== currentFilter) {
+                    return;
+                }
+
+                const phaseCard = document.createElement('div');
+                phaseCard.className = 'phase-card';
+                phaseCard.draggable = true;
+                phaseCard.dataset.phaseId = phase.id;
+
+                let tasksHTML = '';
+                phase.tasks.forEach(task => {
+                    const isChecked = taskStates[task.id] || false;
+                    const trackColor = task.track === 'A' ? '#C9A020' : '#63B3ED';
+                    tasksHTML += `
+                        <div class="task-item">
+                            <input type="checkbox" id="task${task.id}"
+                                   ${isChecked ? 'checked' : ''}
+                                   onchange="toggleTask(${task.id})">
+                            <span class="task-text">${task.text}</span>
+                            <span class="task-track" style="background: ${trackColor};">TRACK ${task.track}</span>
+                        </div>
+                    `;
+                });
+
+                phaseCard.innerHTML = `
+                    <div class="phase-header">
+                        <div class="phase-title">${phase.name}</div>
+                        <div class="phase-time">${phase.duration}</div>
+                    </div>
+                    <div class="phase-description">${phase.description}</div>
+                    <div class="tasks-list">
+                        ${tasksHTML}
+                    </div>
+                `;
+
+                phaseCard.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.target.closest('.phase-card').classList.add('dragging');
+                });
+
+                phaseCard.addEventListener('dragend', (e) => {
+                    e.target.closest('.phase-card').classList.remove('dragging');
+                });
+
+                container.appendChild(phaseCard);
+            });
+        }
+
+        function toggleTask(taskId) {
+            taskStates[taskId] = !taskStates[taskId];
+            saveProgress();
+            updateStats();
+            renderPhases();
+        }
+
+        function updateStats() {
+            const total = Object.keys(taskStates).length;
+            const completed = Object.values(taskStates).filter(v => v).length;
+            const percent = total > 0 ? Math.round((completed / 23) * 100) : 0;
+
+            document.getElementById('totalTasks').textContent = '23';
+            document.getElementById('completedTasks').textContent = completed;
+            document.getElementById('progressPercent').textContent = percent + '%';
+
+            updatePhaseProgress();
+        }
+
+        function updatePhaseProgress() {
+            phases.forEach(phase => {
+                const phaseTaskIds = phase.tasks.map(t => t.id);
+                const phaseCompleted = phaseTaskIds.filter(id => taskStates[id]).length;
+                const phasePercent = Math.round((phaseCompleted / phaseTaskIds.length) * 100);
+
+                const barId = `${phase.id}Bar`;
+                const percentId = `${phase.id}Percent`;
+
+                if (document.getElementById(barId)) {
+                    document.getElementById(barId).style.width = phasePercent + '%';
+                    document.getElementById(percentId).textContent = phasePercent + '%';
+                }
+            });
+        }
+
+        function filterPhases(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            renderPhases();
+        }
+
+        function resetAll() {
+            if (confirm('Reset all progress? This cannot be undone!')) {
+                taskStates = {};
+                saveProgress();
+                updateStats();
+                renderPhases();
+            }
+        }
+
+        function markAllDone() {
+            phases.forEach(phase => {
+                phase.tasks.forEach(task => {
+                    taskStates[task.id] = true;
+                });
+            });
+            saveProgress();
+            updateStats();
+            renderPhases();
+        }
+
+        function clearDone() {
+            Object.keys(taskStates).forEach(key => {
+                taskStates[key] = false;
+            });
+            saveProgress();
+            updateStats();
+            renderPhases();
+        }
+
+        function exportProgress() {
+            let exportText = 'FIXERA PROJECT PROGRESS REPORT\n';
+            exportText += '================================\n\n';
+            exportText += `Generated: ${new Date().toLocaleString()}\n\n`;
+
+            phases.forEach(phase => {
+                const completed = phase.tasks.filter(t => taskStates[t.id]).length;
+                const percent = Math.round((completed / phase.tasks.length) * 100);
+
+                exportText += `${phase.name}\n`;
+                exportText += `Progress: ${completed}/${phase.tasks.length} (${percent}%)\n`;
+                exportText += `Duration: ${phase.duration}\n`;
+                exportText += `Status: ${percent === 100 ? '✅ COMPLETE' : percent > 0 ? '⏳ IN PROGRESS' : '❌ NOT STARTED'}\n\n`;
+
+                phase.tasks.forEach(task => {
+                    const checked = taskStates[task.id] ? '✅' : '❌';
+                    exportText += `  ${checked} ${task.text} (TRACK ${task.track})\n`;
+                });
+                exportText += '\n';
+            });
+
+            document.getElementById('exportText').value = exportText;
+        }
+
+        function copyToClipboard() {
+            const text = document.getElementById('exportText');
+            text.select();
+            document.execCommand('copy');
+            alert('Progress copied to clipboard! 📋');
+        }
+
+        function saveProgress() {
+            localStorage.setItem('fixeraProgress', JSON.stringify(taskStates));
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('fixeraProgress');
+            if (saved) {
+                taskStates = JSON.parse(saved);
+            }
+        }
+
+        function updateLastUpdate() {
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleString();
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>

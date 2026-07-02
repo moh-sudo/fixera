@@ -1,0 +1,277 @@
+/* ── Fixera Admin Dashboard Custom Styles ── */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap');
+
+body, .admin-root {
+  font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ── Sidebar ── */
+.admin-sidebar {
+  width: 225px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #1a2744 0%, #0f1a2e 100%);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem 1rem;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.sidebar-divider {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  margin: 0.5rem 1rem;
+}
+
+.sidebar-heading {
+  padding: 0.5rem 1rem;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.13rem;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+}
+
+.sidebar-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 0.35rem;
+  margin: 0.1rem 0.5rem;
+  border: none;
+  background: transparent;
+  width: calc(100% - 1rem);
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.sidebar-nav-link:hover {
+  color: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.08);
+}
+
+.sidebar-nav-link.active {
+  color: #C9A020;
+  background: rgba(201,160,32,0.15);
+  border: 1px solid rgba(201,160,32,0.25);
+}
+
+/* ── Topbar ── */
+.admin-topbar {
+  height: 56px;
+  background: #fff;
+  border-bottom: 1px solid #e3e6f0;
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 0.15rem 1.75rem 0 rgba(58,59,69,.15);
+}
+
+/* ── Stat cards (SB Admin 2 style) ── */
+.border-left-primary   { border-left: 4px solid #4e73df !important; }
+.border-left-success   { border-left: 4px solid #1cc88a !important; }
+.border-left-info      { border-left: 4px solid #36b9cc !important; }
+.border-left-warning   { border-left: 4px solid #f6c23e !important; }
+.border-left-danger    { border-left: 4px solid #e74a3b !important; }
+.border-left-gold      { border-left: 4px solid #C9A020 !important; }
+
+/* ── Content ── */
+.admin-content {
+  flex: 1;
+  overflow-y: auto;
+  background: #f8f9fc;
+}
+
+.admin-container {
+  padding: 1.75rem;
+}
+
+/* ── Typography ── */
+.text-xs        { font-size: 0.7rem !important; }
+.text-gray-800  { color: #3a3b45 !important; }
+.text-gray-600  { color: #6e707e !important; }
+.text-gray-500  { color: #858796 !important; }
+.text-gray-300  { color: #dddfeb !important; }
+.text-gold      { color: #C9A020 !important; }
+
+/* ── Cards ── */
+.admin-card {
+  border: 1px solid #e3e6f0;
+  border-radius: 0.35rem;
+  background: #fff;
+  box-shadow: 0 0.15rem 1.75rem 0 rgba(58,59,69,.1);
+  margin-bottom: 1.5rem;
+}
+
+.admin-card-header {
+  padding: 0.75rem 1.25rem;
+  background: #f8f9fc;
+  border-bottom: 1px solid #e3e6f0;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #4e73df;
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
+}
+
+/* ── Tables ── */
+.admin-table {
+  width: 100%;
+  margin-bottom: 0;
+  font-size: 0.85rem;
+  border-collapse: collapse;
+}
+
+.admin-table th {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05rem;
+  color: #6e707e;
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid #e3e6f0;
+  background: #f8f9fc;
+  white-space: nowrap;
+}
+
+.admin-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e3e6f0;
+  vertical-align: middle;
+  color: #3a3b45;
+}
+
+.admin-table tr:hover td {
+  background: #f8f9fc;
+}
+
+.admin-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* ── Badges ── */
+.sb-badge {
+  display: inline-block;
+  padding: 0.25em 0.6em;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 0.35rem;
+  text-transform: capitalize;
+}
+.sb-badge-success   { background: #d4edda; color: #155724; }
+.sb-badge-warning   { background: #fff3cd; color: #856404; }
+.sb-badge-danger    { background: #f8d7da; color: #721c24; }
+.sb-badge-info      { background: #d1ecf1; color: #0c5460; }
+.sb-badge-secondary { background: #e2e3e5; color: #383d41; }
+.sb-badge-gold      { background: #fef3cd; color: #856404; }
+
+/* ── Buttons ── */
+.btn-gold {
+  background: #C9A020;
+  color: #fff;
+  border: none;
+  font-weight: 700;
+}
+.btn-gold:hover { background: #b8911c; color: #fff; }
+
+/* ── Filter pills ── */
+.filter-pill {
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid #d1d3e2;
+  background: #fff;
+  color: #6e707e;
+  margin-right: 0.3rem;
+  margin-bottom: 0.3rem;
+  transition: all 0.15s;
+}
+.filter-pill.active {
+  background: #C9A020;
+  border-color: #C9A020;
+  color: #fff;
+}
+.filter-pill:hover:not(.active) {
+  background: #f8f9fc;
+}
+
+/* ── Progress bar ── */
+.sb-progress {
+  height: 8px;
+  border-radius: 4px;
+  background: #eaecf4;
+  overflow: hidden;
+}
+.sb-progress-bar {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #C9A020, #D4B033);
+}
+.sb-progress-bar-green {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #1cc88a, #17a673);
+}
+
+/* ── Modal slide-in ── */
+.job-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+}
+.job-modal-panel {
+  width: 440px;
+  background: #fff;
+  height: 100vh;
+  overflow-y: auto;
+  box-shadow: -4px 0 24px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Spinner ── */
+.sb-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #eaecf4;
+  border-top-color: #C9A020;
+  border-radius: 50%;
+  animation: sb-spin 0.8s linear infinite;
+}
+@keyframes sb-spin { to { transform: rotate(360deg); } }
+
+/* ── Page header ── */
+.page-heading {
+  margin-bottom: 1.5rem;
+}
+.page-heading h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #3a3b45;
+  margin-bottom: 0.25rem;
+}
+.page-heading p {
+  font-size: 0.85rem;
+  color: #858796;
+  margin: 0;
+}

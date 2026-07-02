@@ -1,0 +1,15 @@
+export const C = {
+  navy:        '#0A0E1A',
+  navyLight:   'var(--bg-light)',
+  navyMid:     'var(--bg-mid)',
+  navyBorder:  'var(--border)',
+  gold:        '#C9A020',
+  goldLight:   '#D4B033',
+  goldDim:     'rgba(201,160,32,0.12)',
+  textPrimary: 'var(--text-primary)',
+  textSec:     'var(--text-sec)',
+  textMuted:   'var(--text-muted)',
+  green:       '#48BB78',
+  red:         '#FC8181',
+  blue:        '#63B3ED',
+};

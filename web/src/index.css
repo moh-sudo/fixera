@@ -1,0 +1,103 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Theme CSS Variables ── */
+:root {
+  /* Dark mode (default / night) */
+  --bg:           #0A0E1A;
+  --bg-light:     #111827;
+  --bg-mid:       #1A2235;
+  --border:       #1E2D45;
+  --text-primary: #E8E8E8;
+  --text-sec:     #7A8BA0;
+  --text-muted:   #3D4F65;
+  --placeholder:  #3D4F65;
+  --scrollbar-bg: #0A0E1A;
+  --scrollbar-thumb: #1E2D45;
+  --card-shadow:  rgba(0,0,0,0.3);
+  --input-bg:     #1A2235;
+  --gold-dim:     rgba(201,160,32,0.12);
+}
+
+/* Light mode (day: 6am – 6pm) */
+html.light-mode {
+  --bg:           #FFFFFF;
+  --bg-light:     #F8FAFC;
+  --bg-mid:       #F1F5F9;
+  --border:       #E2E8F0;
+  --text-primary: #0F172A;
+  --text-sec:     #475569;
+  --text-muted:   #94A3B8;
+  --placeholder:  #94A3B8;
+  --scrollbar-bg: #F1F5F9;
+  --scrollbar-thumb: #CBD5E0;
+  --card-shadow:  rgba(0,0,0,0.08);
+  --input-bg:     #F1F5F9;
+  --gold-dim:     rgba(201,160,32,0.10);
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+a { text-decoration: none; color: inherit; }
+
+button { font-family: inherit; cursor: pointer; border: none; outline: none; background: none; }
+
+input, textarea {
+  font-family: inherit; outline: none; border: none;
+  background: var(--input-bg); color: var(--text-primary);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+input::placeholder, textarea::placeholder { color: var(--placeholder); }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-bg); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
+
+.fade-in { animation: fadeIn 0.25s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Light mode specific overrides ── */
+html.light-mode {
+  --f-letter-start: #2D3748;
+  --f-letter-mid:   #1A202C;
+  --f-letter-end:   #4A5568;
+}
+
+html.light-mode .fixera-logo-text {
+  background: linear-gradient(135deg, #1A2235 0%, #0F172A 40%, #C9A020 60%, #D4B033 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+html.light-mode .fixera-services-sub {
+  color: #475569 !important;
+}
+
+/* Safety net: any standalone white/silver text in light mode gets darkened */
+html.light-mode [style*="color: rgb(232, 232, 232)"],
+html.light-mode [style*="color:#E8E8E8"],
+html.light-mode [style*="color: #E8E8E8"] {
+  color: var(--text-primary) !important;
+}
+
+/* Smooth theme transitions on all elements */
+*, *::before, *::after {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+/* But don't slow down transforms/opacity (animations feel sluggish) */
+button, a, .svc-card, .cat-card, .worker-card, .recent-card {
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+              color 0.3s ease, transform 0.2s ease,
+              box-shadow 0.2s ease, opacity 0.15s ease !important;
+}

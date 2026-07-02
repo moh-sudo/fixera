@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fixera App — Development Report</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8fafc;
+      color: #0F172A;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    /* ── Cover Page ── */
+    .cover {
+      width: 100%;
+      min-height: 100vh;
+      background: linear-gradient(145deg, #0A0E1A 0%, #111827 60%, #1A2235 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 40px;
+      page-break-after: always;
+      text-align: center;
+    }
+
+    .cover-ring {
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      border: 5px solid #C9A020;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 28px;
+      position: relative;
+    }
+    .cover-ring::before {
+      content: '🏠';
+      font-size: 44px;
+      position: absolute;
+      top: -22px;
+    }
+    .cover-ring .f-letter {
+      font-size: 54px;
+      font-weight: 900;
+      color: #E8E8E8;
+      line-height: 1;
+    }
+
+    .cover h1 {
+      font-size: 52px;
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      background: linear-gradient(135deg, #E8E8E8 0%, #FFFFFF 40%, #C9A020 60%, #D4B033 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+
+    .cover .subtitle {
+      color: #C9A020;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 50px;
+    }
+
+    .cover-meta {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(201,160,32,0.3);
+      border-radius: 16px;
+      padding: 28px 40px;
+      display: flex;
+      gap: 50px;
+      margin-bottom: 40px;
+    }
+
+    .cover-meta-item { text-align: center; }
+    .cover-meta-item .val {
+      color: #C9A020;
+      font-size: 28px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .cover-meta-item .lbl {
+      color: rgba(255,255,255,0.4);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-top: 5px;
+    }
+
+    .cover-date {
+      color: rgba(255,255,255,0.3);
+      font-size: 12px;
+      margin-top: 16px;
+    }
+
+    /* ── Content pages ── */
+    .page {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 48px 40px;
+    }
+
+    @media print {
+      .page { page-break-inside: avoid; }
+      .section { page-break-inside: avoid; }
+    }
+
+    /* ── Section headers ── */
+    .section {
+      margin-bottom: 36px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #E2E8F0;
+    }
+
+    .section-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0F172A;
+    }
+
+    .section-count {
+      margin-left: auto;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    /* ── Feature cards ── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .feature-card {
+      background: #fff;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .feature-card.done { border-left: 3px solid #48BB78; }
+    .feature-card.missing { border-left: 3px solid #FC8181; }
+    .feature-card.partial { border-left: 3px solid #F6AD55; }
+
+    .feature-badge {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .badge-done    { background: #48BB78; color: #fff; }
+    .badge-missing { background: #FC8181; color: #fff; }
+    .badge-partial { background: #F6AD55; color: #fff; }
+
+    .feature-content .title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0F172A;
+      margin-bottom: 2px;
+    }
+
+    .feature-content .desc {
+      font-size: 11px;
+      color: #64748B;
+      line-height: 1.5;
+    }
+
+    /* ── Priority table ── */
+    .priority-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #E2E8F0;
+    }
+
+    .priority-table th {
+      background: #F8FAFC;
+      padding: 11px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px solid #E2E8F0;
+    }
+
+    .priority-table td {
+      padding: 11px 16px;
+      border-bottom: 1px solid #F1F5F9;
+      font-size: 12px;
+      color: #334155;
+      vertical-align: middle;
+    }
+
+    .priority-table tr:last-child td { border-bottom: none; }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .tag-high     { background: #FEE2E2; color: #DC2626; }
+    .tag-medium   { background: #FEF3C7; color: #D97706; }
+    .tag-low      { background: #DCFCE7; color: #16A34A; }
+    .tag-backend  { background: #EDE9FE; color: #7C3AED; }
+    .tag-ui       { background: #DBEAFE; color: #1D4ED8; }
+    .tag-infra    { background: #F0FDF4; color: #15803D; }
+
+    /* ── Progress bar ── */
+    .progress-section {
+      background: #fff;
+      border: 1px solid #E2E8F0;
+      border-radius: 14px;
+      padding: 22px 24px;
+      margin-bottom: 24px;
+    }
+
+    .progress-row {
+      margin-bottom: 14px;
+    }
+
+    .progress-row:last-child { margin-bottom: 0; }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .progress-bar-bg {
+      height: 8px;
+      background: #F1F5F9;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+    }
+
+    /* ── Summary boxes ── */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .summary-box {
+      background: #fff;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 18px 16px;
+      text-align: center;
+    }
+
+    .summary-box .num {
+      font-size: 32px;
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .summary-box .lbl {
+      font-size: 11px;
+      color: #64748B;
+      font-weight: 600;
+    }
+
+    /* ── Tech stack ── */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .tech-card {
+      background: #fff;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .tech-card .tech-category {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #94A3B8;
+      margin-bottom: 10px;
+    }
+
+    .tech-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 7px;
+      font-size: 12px;
+      color: #334155;
+      font-weight: 500;
+    }
+
+    .tech-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── Page title ── */
+    .page-title {
+      font-size: 26px;
+      font-weight: 900;
+      color: #0F172A;
+      margin-bottom: 6px;
+    }
+
+    .page-subtitle {
+      color: #64748B;
+      font-size: 13px;
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #E2E8F0;
+    }
+
+    .gold { color: #C9A020; }
+
+    /* ── Print styles ── */
+    @media print {
+      body { background: #fff; }
+      .cover { min-height: auto; padding: 40px; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════ COVER PAGE ══════════════════ -->
+  <div class="cover">
+    <div class="cover-ring">
+      <span class="f-letter">F</span>
+    </div>
+
+    <h1>FIXERA</h1>
+    <div class="subtitle">Home Services Platform — Development Report</div>
+
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <div class="val">18</div>
+        <div class="lbl">Pages Built</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="val">65%</div>
+        <div class="lbl">UI Complete</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="val">4</div>
+        <div class="lbl">Services</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="val">0%</div>
+        <div class="lbl">Backend Done</div>
+      </div>
+    </div>
+
+    <div class="cover-date">Generated · May 18, 2026 &nbsp;·&nbsp; Prepared for Mohamed Amin &nbsp;·&nbsp; Fixera v1.0.0</div>
+  </div>
+
+  <!-- ══════════════════ PAGE 1 — OVERVIEW ══════════════════ -->
+  <div class="page">
+    <div class="page-title">App Overview</div>
+    <div class="page-subtitle">
+      Fixera is a home services marketplace connecting customers with vetted professionals for
+      Plumbing, Electrical, Cleaning and Painting services across Nairobi, Kenya.
+      This report summarises what has been built, what is missing, and the priority order for next steps.
+    </div>
+
+    <!-- Summary numbers -->
+    <div class="summary-grid">
+      <div class="summary-box">
+        <div class="num" style="color:#48BB78">14</div>
+        <div class="lbl">Screens Done</div>
+      </div>
+      <div class="summary-box">
+        <div class="num" style="color:#FC8181">22</div>
+        <div class="lbl">Features Missing</div>
+      </div>
+      <div class="summary-box">
+        <div class="num" style="color:#F6AD55">8</div>
+        <div class="lbl">Partially Done</div>
+      </div>
+      <div class="summary-box">
+        <div class="num" style="color:#C9A020">4</div>
+        <div class="lbl">Services Listed</div>
+      </div>
+    </div>
+
+    <!-- Progress bars -->
+    <div class="progress-section">
+      <div class="progress-row">
+        <div class="progress-label"><span>UI / Frontend</span><span style="color:#48BB78">65%</span></div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:65%;background:#48BB78"></div></div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label"><span>Backend / API</span><span style="color:#FC8181">0%</span></div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:0%;background:#FC8181"></div></div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label"><span>Authentication</span><span style="color:#F6AD55">20%</span></div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:20%;background:#F6AD55"></div></div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label"><span>Payments (M-Pesa)</span><span style="color:#FC8181">5%</span></div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:5%;background:#FC8181"></div></div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label"><span>Maps / GPS Tracking</span><span style="color:#F6AD55">40%</span></div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:40%;background:#F6AD55"></div></div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label"><span>Notifications</span><span style="color:#FC8181">10%</span></div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:10%;background:#FC8181"></div></div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-label"><span>Worker / Admin Side</span><span style="color:#FC8181">0%</span></div>
+        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:0%;background:#FC8181"></div></div>
+      </div>
+    </div>
+
+    <!-- Tech stack -->
+    <div class="section-header">
+      <div class="section-icon" style="background:#EDE9FE">⚙️</div>
+      <div class="section-title">Current Tech Stack</div>
+    </div>
+
+    <div class="tech-grid">
+      <div class="tech-card">
+        <div class="tech-category">Frontend (Web)</div>
+        <div class="tech-item"><div class="tech-dot" style="background:#61DAFB"></div>React 18 + Vite 5</div>
+        <div class="tech-item"><div class="tech-dot" style="background:#CA4245"></div>React Router DOM v6</div>
+        <div class="tech-item"><div class="tech-dot" style="background:#38B2AC"></div>Leaflet + OpenStreetMap</div>
+        <div class="tech-item"><div class="tech-dot" style="background:#C9A020"></div>CSS Variables (Themes)</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-category">Mobile App</div>
+        <div class="tech-item"><div class="tech-dot" style="background:#61DAFB"></div>React Native</div>
+        <div class="tech-item"><div class="tech-dot" style="background:#000"></div>Expo SDK 54</div>
+        <div class="tech-item"><div class="tech-dot" style="background:#FC8181"></div>Not yet running</div>
+        <div class="tech-item"><div class="tech-dot" style="background:#94A3B8"></div>Android + iOS target</div>
+      </div>
+      <div class="tech-card">
+        <div class="tech-category">Backend (Needed)</div>
+        <div class="tech-item"><div class="tech-dot" style="background:#94A3B8"></div>Node.js / Express (TBD)</div>
+        <div class="tech-item"><div class="tech-dot" style="background:#94A3B8"></div>PostgreSQL / Firebase (TBD)</div>
+        <div class="tech-item"><div class="tech-dot" style="background:#94A3B8"></div>M-Pesa Daraja API</div>
+        <div class="tech-item"><div class="tech-dot" style="background:#94A3B8"></div>Firebase Auth / JWT</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ PAGE 2 — WHAT'S BUILT ══════════════════ -->
+  <div class="page">
+    <div class="page-title">✅ What's Been Built</div>
+    <div class="page-subtitle">All screens and features currently completed in the web app (UI only — no real backend data).</div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#F0FFF4">🔐</div>
+        <div class="section-title">Authentication Screens</div>
+        <div class="section-count" style="background:#DCFCE7;color:#16A34A">3 screens</div>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card done">
+          <div class="feature-badge badge-done">✓</div>
+          <div class="feature-content">
+            <div class="title">Splash / Welcome Screen</div>
+            <div class="desc">Animated dark navy splash with Fixera logo, fades into onboarding</div>
+          </div>
+        </div>
+        <div class="feature-card done">
+          <div class="feature-badge badge-done">✓</div>
+          <div class="feature-content">
+            <div class="title">Onboarding Slides (4 slides)</div>
+            <div class="desc">Track booking, choose professional, location services — with phone mockups</div>
+          </div>
+        </div>
+        <div class="feature-card done">
+          <div class="feature-badge badge-done">✓</div>
+          <div class="feature-content">
+            <div class="title">Login Page</div>
+            <div class="desc">Email + password form with "Forgot Password" link</div>
+          </div>
+        </div>
+        <div class="feature-card done">
+          <div class="feature-badge badge-done">✓</div>
+          <div class="feature-content">
+            <div class="title">Sign Up Page</div>
+            <div class="desc">Name, email, phone, password registration form</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#FFF7ED">🏠</div>
+        <div class="section-title">Main App Screens</div>
+        <div class="section-count" style="background:#DCFCE7;color:#16A34A">10 screens</div>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card done">
+          <div class="feature-badge badge-done">✓</div>
+          <div class="feature-content">
+            <div class="title">Home Page</div>
+            <div class="desc">Greeting, location, search, promo carousel, services grid, top professionals, book again, emergency banner</div>
+          </div>
+        </div>
+        <div class="feature-card done">
+          <div class="feature-badge badge-done">✓</div>
+          <div class="feature-content">
+            <div class="title">Service Category Page</div>
+            <div class="desc">Icon grid of service categories, stats bar, emergency badge</div>
+          </div>
+        </div>
+        <div class="feature-card done">
+          <div class="feature-badge badge-done">✓</div>
+          <div class="feature-content">
+            <div class="title">Sub-Service Page</div>
+            <div class="desc">Service list with pricing badges, duration, Book button</div>
+          </div>
+        </div>
+        <div class="feature-card done">
+          <div class="feature-badge badge-done">✓</div>
+          <div class="feature-content">
+            <div class="title">Booking Form (4-step)</div>
+            <div class="desc">Address + map picker, choose professional, date/time slots, confirm summary</div>
+          </div>
+        </div>
+        <div class="feature-card done">
+          <div class="feature-badge badge-done">✓</div>
+          <div class="feature-content">
+            <div class="title">Booking Confirmation</div>
+            <div class="desc">Success screen with booking reference and summary</div>
+          </div>
+        </div>
+        <div class="feature-card done">
+          <div class="feature-badge badge-done">✓</div>
+          <div class="feature-content">
+            <div class="title">Worker Tracking Page</div>
+            <div class="desc">Live map (OpenStreetMap), status tracker, QR verification, ETA badge</div>
+          </div>
+        </div>
+        <div class="feature-card done">
+          <div class="feature-badge badge-done">✓</div>
+          <div class="feature-content">
+            <div class="title">Payment Page</div>
+            <div class="desc">M-Pesa / card UI, payment summary</div>
+          </div>
+        </div>
+        <div class="feature-card done">
+          <div class="feature-badge badge-done">✓</div>
+          <div class="feature-content">
+            <div class="title">Review Page</div>
+            <div class="desc">Star rating, written review for completed bookings</div>
+          </div>
+        </div>
+        <div class="feature-card done">
+          <div class="feature-badge badge-done">✓</div>
+          <div class="feature-content">
+            <div class="title">Booking History</div>
+            <div class="desc">Past bookings list with status, worker, date, rebook button</div>
+          </div>
+        </div>
+        <div class="feature-card done">
+          <div class="feature-badge badge-done">✓</div>
+          <div class="feature-content">
+            <div class="title">Support Page</div>
+            <div class="desc">Report issue, refund request, live chat options, complaint tracker, FAQ — all clickable</div>
+          </div>
+        </div>
+        <div class="feature-card done">
+          <div class="feature-badge badge-done">✓</div>
+          <div class="feature-content">
+            <div class="title">Profile Page</div>
+            <div class="desc">User card, stats, settings sections, day/night theme toggle, logout</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#EFF6FF">🎨</div>
+        <div class="section-title">Design & UX Features</div>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card done">
+          <div class="feature-badge badge-done">✓</div>
+          <div class="feature-content">
+            <div class="title">Auto Day / Night Mode</div>
+            <div class="desc">Switches automatically at 6am/6pm. Manual toggle in Profile settings</div>
+          </div>
+        </div>
+        <div class="feature-card done">
+          <div class="feature-badge badge-done">✓</div>
+          <div class="feature-content">
+            <div class="title">Fixera Brand Logo</div>
+            <div class="desc">SVG gold ring + house roof + silver F letter, adapts to both themes</div>
+          </div>
+        </div>
+        <div class="feature-card done">
+          <div class="feature-badge badge-done">✓</div>
+          <div class="feature-content">
+            <div class="title">Interactive Maps</div>
+            <div class="desc">Location picker (booking) and live worker tracking map (OpenStreetMap)</div>
+          </div>
+        </div>
+        <div class="feature-card done">
+          <div class="feature-badge badge-done">✓</div>
+          <div class="feature-content">
+            <div class="title">Sidebar Navigation</div>
+            <div class="desc">Fixed sidebar with active state, badges, emergency button, tagline</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ PAGE 3 — WHAT'S MISSING ══════════════════ -->
+  <div class="page">
+    <div class="page-title">❌ What's Missing</div>
+    <div class="page-subtitle">Features and systems that need to be built before Fixera can go live.</div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#FEF2F2">🔧</div>
+        <div class="section-title">Backend & Database</div>
+        <div class="section-count" style="background:#FEE2E2;color:#DC2626">Critical</div>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Server / API</div>
+            <div class="desc">No backend exists. All data is hardcoded. Need Node.js/Express or Firebase server</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Database</div>
+            <div class="desc">No database. Need PostgreSQL or Firebase Firestore to store users, bookings, workers</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Real Authentication</div>
+            <div class="desc">Login/signup does nothing. Need Firebase Auth or JWT-based auth system</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Booking Persistence</div>
+            <div class="desc">Bookings vanish on page refresh. Must be saved to database with real booking IDs</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Worker Assignment Logic</div>
+            <div class="desc">No system to auto-assign or notify workers when a booking is made</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Real Pricing Engine</div>
+            <div class="desc">All prices show "TBD". Need pricing table after market survey</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#FFF7ED">💳</div>
+        <div class="section-title">Payments</div>
+        <div class="section-count" style="background:#FEE2E2;color:#DC2626">Critical</div>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">M-Pesa Integration (Daraja API)</div>
+            <div class="desc">Payment page UI exists but no real M-Pesa STK push integration. Primary payment in Kenya</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Card Payments</div>
+            <div class="desc">Need Stripe or Flutterwave integration for Visa/Mastercard payments</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Payment Receipts / Invoices</div>
+            <div class="desc">No receipt generated after payment. Customers need PDF/email receipt</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Refund Processing</div>
+            <div class="desc">Refund request form exists but no real refund system connected to payment provider</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#F0FDF4">👷</div>
+        <div class="section-title">Worker / Professional Side</div>
+        <div class="section-count" style="background:#FEE2E2;color:#DC2626">Critical</div>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Worker App / Portal</div>
+            <div class="desc">Workers have no app or dashboard. They can't see jobs, accept/reject, or update status</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Worker Registration</div>
+            <div class="desc">No way for professionals to apply, upload documents, or get verified</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Worker Earnings Dashboard</div>
+            <div class="desc">Workers need to see their earnings, completed jobs, and payout history</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Real GPS Location Sharing</div>
+            <div class="desc">Tracking map is demo only. Workers need to share real GPS location during jobs</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#EFF6FF">🔔</div>
+        <div class="section-title">Notifications & Communication</div>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Push Notifications</div>
+            <div class="desc">Bell icon shows but no real notifications. Need Firebase Cloud Messaging (FCM)</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">SMS Confirmations</div>
+            <div class="desc">No SMS sent on booking. Need Africa's Talking or Twilio for SMS in Kenya</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Email Confirmations</div>
+            <div class="desc">No emails sent. Need SendGrid or Nodemailer for booking confirmations</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">In-App Live Chat</div>
+            <div class="desc">Contact support shows chat option but no real chat. Need Stream Chat or Pusher</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#EDE9FE">⚙️</div>
+        <div class="section-title">Profile & Account Features</div>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card partial">
+          <div class="feature-badge badge-partial">~</div>
+          <div class="feature-content">
+            <div class="title">Edit Profile</div>
+            <div class="desc">Button exists but opens nothing. Need form to update name, phone, photo</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Saved Addresses</div>
+            <div class="desc">Listed in settings but not functional. Need to save Home, Work, Other addresses</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Favourite Workers</div>
+            <div class="desc">Listed in settings but not functional. Customers can't save preferred workers</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Notification Settings</div>
+            <div class="desc">Listed but not functional. Need toggles for SMS, email, push notifications</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Terms, Privacy, About</div>
+            <div class="desc">Listed in settings but no content pages built yet</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Forgot Password / Reset</div>
+            <div class="desc">Link shown on login but no password reset flow built</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#FFF7ED">📱</div>
+        <div class="section-title">Mobile App</div>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Expo / React Native App</div>
+            <div class="desc">fixera-app exists but has dependency errors and can't run. Needs full setup</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Android APK Build</div>
+            <div class="desc">No Android build produced yet. Need EAS Build or local Gradle build</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">iOS Build</div>
+            <div class="desc">No iOS build. Requires Apple Developer account ($99/year)</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">App Store / Play Store Listing</div>
+            <div class="desc">No store listings created. Need screenshots, description, privacy policy URL</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon" style="background:#F0FDF4">🛠️</div>
+        <div class="section-title">Admin Dashboard</div>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Admin Panel</div>
+            <div class="desc">No admin dashboard to manage bookings, workers, users, complaints or revenue</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Analytics & Reports</div>
+            <div class="desc">No revenue tracking, booking stats, or worker performance reports</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Worker Verification System</div>
+            <div class="desc">No way to approve/reject worker applications or manage their documents</div>
+          </div>
+        </div>
+        <div class="feature-card missing">
+          <div class="feature-badge badge-missing">✕</div>
+          <div class="feature-content">
+            <div class="title">Promo Code Management</div>
+            <div class="desc">Promo codes shown on home screen (FIXERA1, CLEAN20) but no system to create/validate them</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════ PAGE 4 — PRIORITY PLAN ══════════════════ -->
+  <div class="page">
+    <div class="page-title">🚀 Priority Build Plan</div>
+    <div class="page-subtitle">Recommended order to build the missing features — grouped by impact and dependency.</div>
+
+    <table class="priority-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Feature</th>
+          <th>Why It's Needed</th>
+          <th>Priority</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1</strong></td>
+          <td><strong>Backend API + Database</strong></td>
+          <td>Everything else depends on this</td>
+          <td><span class="tag tag-high">🔴 High</span></td>
+          <td><span class="tag tag-backend">Backend</span></td>
+        </tr>
+        <tr>
+          <td><strong>2</strong></td>
+          <td><strong>Real Authentication</strong></td>
+          <td>Users can't log in or stay logged in</td>
+          <td><span class="tag tag-high">🔴 High</span></td>
+          <td><span class="tag tag-backend">Backend</span></td>
+        </tr>
+        <tr>
+          <td><strong>3</strong></td>
+          <td><strong>M-Pesa Payment (Daraja API)</strong></td>
+          <td>Core revenue. Kenya's primary payment method</td>
+          <td><span class="tag tag-high">🔴 High</span></td>
+          <td><span class="tag tag-backend">Backend</span></td>
+        </tr>
+        <tr>
+          <td><strong>4</strong></td>
+          <td><strong>Worker App / Portal</strong></td>
+          <td>Without workers, no one can complete bookings</td>
+          <td><span class="tag tag-high">🔴 High</span></td>
+          <td><span class="tag tag-ui">UI + Backend</span></td>
+        </tr>
+        <tr>
+          <td><strong>5</strong></td>
+          <td><strong>Real Pricing Table</strong></td>
+          <td>All prices show "TBD" — customers can't see cost</td>
+          <td><span class="tag tag-high">🔴 High</span></td>
+          <td><span class="tag tag-ui">UI + Data</span></td>
+        </tr>
+        <tr>
+          <td><strong>6</strong></td>
+          <td><strong>SMS Notifications (Africa's Talking)</strong></td>
+          <td>Booking confirmations, worker arrival alerts</td>
+          <td><span class="tag tag-medium">🟡 Medium</span></td>
+          <td><span class="tag tag-backend">Backend</span></td>
+        </tr>
+        <tr>
+          <td><strong>7</strong></td>
+          <td><strong>Real GPS Worker Tracking</strong></td>
+          <td>Map shows fake movement. Need live worker location</td>
+          <td><span class="tag tag-medium">🟡 Medium</span></td>
+          <td><span class="tag tag-backend">Backend</span></td>
+        </tr>
+        <tr>
+          <td><strong>8</strong></td>
+          <td><strong>Push Notifications (FCM)</strong></td>
+          <td>Keep customers updated on booking status</td>
+          <td><span class="tag tag-medium">🟡 Medium</span></td>
+          <td><span class="tag tag-infra">Infrastructure</span></td>
+        </tr>
+        <tr>
+          <td><strong>9</strong></td>
+          <td><strong>Edit Profile + Saved Addresses</strong></td>
+          <td>Customers can't update their own info</td>
+          <td><span class="tag tag-medium">🟡 Medium</span></td>
+          <td><span class="tag tag-ui">UI + Backend</span></td>
+        </tr>
+        <tr>
+          <td><strong>10</strong></td>
+          <td><strong>Worker Registration Flow</strong></td>
+          <td>No way to onboard new professionals</td>
+          <td><span class="tag tag-medium">🟡 Medium</span></td>
+          <td><span class="tag tag-ui">UI + Backend</span></td>
+        </tr>
+        <tr>
+          <td><strong>11</strong></td>
+          <td><strong>Admin Dashboard</strong></td>
+          <td>Manage bookings, workers, revenue, complaints</td>
+          <td><span class="tag tag-medium">🟡 Medium</span></td>
+          <td><span class="tag tag-ui">UI + Backend</span></td>
+        </tr>
+        <tr>
+          <td><strong>12</strong></td>
+          <td><strong>Email Confirmations</strong></td>
+          <td>Send booking receipts and confirmation emails</td>
+          <td><span class="tag tag-medium">🟡 Medium</span></td>
+          <td><span class="tag tag-backend">Backend</span></td>
+        </tr>
+        <tr>
+          <td><strong>13</strong></td>
+          <td><strong>Mobile App (Expo)</strong></td>
+          <td>Currently broken. Need working Android/iOS app</td>
+          <td><span class="tag tag-medium">🟡 Medium</span></td>
+          <td><span class="tag tag-ui">Mobile</span></td>
+        </tr>
+        <tr>
+          <td><strong>14</strong></td>
+          <td><strong>Forgot Password Reset</strong></td>
+          <td>Users locked out with no recovery option</td>
+          <td><span class="tag tag-low">🟢 Low</span></td>
+          <td><span class="tag tag-backend">Backend</span></td>
+        </tr>
+        <tr>
+          <td><strong>15</strong></td>
+          <td><strong>In-App Live Chat (Support)</strong></td>
+          <td>Support chat shows but does nothing</td>
+          <td><span class="tag tag-low">🟢 Low</span></td>
+          <td><span class="tag tag-infra">Infrastructure</span></td>
+        </tr>
+        <tr>
+          <td><strong>16</strong></td>
+          <td><strong>Promo Code Validation</strong></td>
+          <td>Codes displayed but never applied to price</td>
+          <td><span class="tag tag-low">🟢 Low</span></td>
+          <td><span class="tag tag-backend">Backend</span></td>
+        </tr>
+        <tr>
+          <td><strong>17</strong></td>
+          <td><strong>Terms, Privacy Policy, About Pages</strong></td>
+          <td>Required for app store approval</td>
+          <td><span class="tag tag-low">🟢 Low</span></td>
+          <td><span class="tag tag-ui">UI</span></td>
+        </tr>
+        <tr>
+          <td><strong>18</strong></td>
+          <td><strong>Analytics Dashboard</strong></td>
+          <td>Revenue tracking, booking stats, worker performance</td>
+          <td><span class="tag tag-low">🟢 Low</span></td>
+          <td><span class="tag tag-ui">UI + Backend</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <br/>
+
+    <!-- Legend -->
+    <div style="display:flex;gap:20px;flex-wrap:wrap;margin-top:8px;padding:16px;background:#fff;border:1px solid #E2E8F0;border-radius:12px;">
+      <div style="font-size:11px;font-weight:700;color:#64748B;margin-right:8px;line-height:2">LEGEND:</div>
+      <div><span class="tag tag-high">🔴 High</span> <span style="font-size:11px;color:#64748B;margin-left:4px">Must have before launch</span></div>
+      <div><span class="tag tag-medium">🟡 Medium</span> <span style="font-size:11px;color:#64748B;margin-left:4px">Important for operations</span></div>
+      <div><span class="tag tag-low">🟢 Low</span> <span style="font-size:11px;color:#64748B;margin-left:4px">Nice to have / post-launch</span></div>
+      <div><span class="tag tag-backend">Backend</span> <span style="font-size:11px;color:#64748B;margin-left:4px">Requires server development</span></div>
+      <div><span class="tag tag-ui">UI</span> <span style="font-size:11px;color:#64748B;margin-left:4px">Frontend work needed</span></div>
+      <div><span class="tag tag-infra">Infrastructure</span> <span style="font-size:11px;color:#64748B;margin-left:4px">Third-party service setup</span></div>
+    </div>
+
+    <!-- Footer -->
+    <div style="margin-top:48px;padding-top:20px;border-top:1px solid #E2E8F0;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-size:13px;font-weight:800;color:#C9A020">FIXERA</div>
+        <div style="font-size:10px;color:#94A3B8;margin-top:2px">One Call. We Fix It All.</div>
+      </div>
+      <div style="font-size:10px;color:#94A3B8;text-align:right">
+        Confidential · May 2026<br/>
+        Mohamed Amin · Nairobi, Kenya
+      </div>
+    </div>
+  </div>
+
+  <!-- Print button (hidden in PDF) -->
+  <div class="no-print" style="position:fixed;bottom:24px;right:24px;">
+    <button onclick="window.print()" style="
+      padding:14px 24px;border-radius:12px;
+      background:linear-gradient(135deg,#C9A020,#D4B033);
+      border:none;color:#0A0E1A;font-size:14px;font-weight:800;
+      cursor:pointer;font-family:Inter,sans-serif;
+      box-shadow:0 4px 20px rgba(201,160,32,0.4);
+    ">🖨️ Save as PDF</button>
+  </div>
+
+</body>
+</html>

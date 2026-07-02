@@ -1,0 +1,329 @@
+================================================================================
+FIXERA COMPREHENSIVE LEGAL DOCUMENTATION PACKAGE - CLEAN VERSION
+================================================================================
+
+FOR LEGAL REVIEW & EXECUTION
+Prepared: June 10, 2026
+Version: 1.1 - CLEAN (6 Partner Types, Updated Commissions & Wallet System)
+
+CONTENTS:
+1. Business Terms & Conditions
+2. Master Partner Agreement
+3. Partner-Specific Agreements (6 types)
+4. IP Protection & Brand Protection Policy
+5. Partner Qualification Checklist - CLEAN VERSION
+
+================================================================================
+SECTION 5: PARTNER ONBOARDING & QUALIFICATION CHECKLIST - CLEAN VERSION
+================================================================================
+
+PARTNER ONBOARDING & QUALIFICATION CHECKLIST
+For use by Fixera compliance team during partner registration
+
+PARTNER TYPE: [ ] Service Worker  [ ] Vendor  [ ] Rider  [ ] Supplier  [ ] Mover  [ ] Water Carrier
+
+PARTNER NAME: ________________  PHONE: _______________  EMAIL: __________________
+
+REGISTRATION DATE: _____________  REGISTRATION ID: _____________
+
+================================================================================
+
+SECTION A: IDENTITY & BASIC VERIFICATION
+
+IDENTITY DOCUMENTS:
+[ ] Valid National ID provided
+[ ] ID expires: _________________
+[ ] ID number verified: _________________
+[ ] Photocopy attached to file
+[ ] ID photocopy date-stamped
+[ ] Partner confirms ID ownership
+[ ] No suspicious/counterfeit indicators
+
+CONTACT VERIFICATION:
+[ ] Phone number verified (SMS OTP)
+[ ] Phone number confirmed belongs to partner
+[ ] Email address verified (email confirmation)
+[ ] Email confirmed belongs to partner
+[ ] Backup contact provided (optional)
+[ ] Partner contactable via primary phone
+[ ] Partner responsive to messages
+
+LOCATION VERIFICATION:
+[ ] Business address provided (for vendors/suppliers)
+[ ] Address proof provided (rental/ownership agreement)
+[ ] Address verified via satellite/street view
+[ ] Address is in Kenya
+[ ] Address valid and accessible
+[ ] Partner confirms address
+
+================================================================================
+
+SECTION B: BUSINESS VERIFICATION (For Vendors, Suppliers, Movers Only)
+
+BUSINESS REGISTRATION:
+[ ] Certificate of Incorporation provided
+[ ] Certificate verified with SPP (not expired)
+[ ] Company name matches application
+[ ] Registration date: ______________
+[ ] Business type confirmed
+[ ] Ownership structure clear
+[ ] Copy attached to file
+
+TAX COMPLIANCE:
+[ ] KRA PIN certificate provided
+[ ] KRA PIN verified (unique, valid)
+[ ] Tax compliance status confirmed
+[ ] No tax evasion history
+[ ] KRA PIN: __________________
+[ ] Copy attached to file
+
+BUSINESS LICENSE:
+[ ] Trading license provided
+[ ] License valid and current
+[ ] License expiry: ______________
+[ ] License matches business
+[ ] Copy attached to file
+
+================================================================================
+
+SECTION C: FINANCIAL VERIFICATION
+
+BANK ACCOUNT:
+[ ] Bank account details provided
+[ ] Account holder name matches partner
+[ ] Bank statement provided (last 3 months)
+[ ] Account appears active and legitimate
+[ ] Account type: [ ] Personal  [ ] Business
+[ ] Bank details verified (test deposit if applicable)
+
+CREDIT CHECK:
+[ ] Credit check performed (if applicable)
+[ ] No adverse credit history
+[ ] No fraud indicators
+[ ] No debt default history
+[ ] Credit score: __________ (if available)
+
+PROOF OF FUNDS:
+[ ] Bank statement shows regular activity
+[ ] Account balance appears adequate
+[ ] No suspicious transactions
+[ ] No high-risk transactions
+[ ] Financial history looks legitimate
+
+================================================================================
+
+SECTION D: BACKGROUND & SAFETY CHECKS
+
+BACKGROUND CHECK:
+[ ] Background check conducted (criminal records)
+[ ] No serious criminal convictions
+[ ] No fraud/theft convictions
+[ ] No violence convictions
+[ ] Acceptable background history
+[ ] Check date: ______________
+[ ] Check results in file
+
+REFERENCE CHECKS:
+[ ] Professional references provided
+[ ] Number of references: _______
+[ ] References contacted
+[ ] References verified positive
+[ ] Reference details documented
+[ ] No red flags from references
+
+SAFETY ASSESSMENT:
+[ ] No safety concerns identified
+[ ] Partner appears trustworthy
+[ ] No history of complaints
+[ ] No civil litigation history
+[ ] Acceptable safety profile
+
+================================================================================
+
+SECTION E: INSURANCE & LIABILITY (Where Applicable)
+
+INSURANCE DOCUMENTS:
+[ ] Insurance certificate provided
+[ ] Insurance type: [ ] Liability  [ ] Vehicle  [ ] Health
+[ ] Coverage amount: KSh _______________
+[ ] Policy expiry: ______________
+[ ] Insurance is active/valid
+[ ] Insurer is reputable
+[ ] Coverage meets requirements
+
+INSURANCE VERIFICATION:
+[ ] Insurance company confirmed
+[ ] Policy number verified
+[ ] Coverage verified with insurer
+[ ] Coverage includes Fixera activities
+[ ] No policy exclusions concerning
+
+VEHICLE DOCUMENTS (For Riders/Movers/Water Carriers):
+[ ] Vehicle registration provided
+[ ] Vehicle ownership confirmed
+[ ] Registration matches vehicle
+[ ] Registration current/valid
+[ ] Vehicle inspection passed
+[ ] Vehicle is safe/roadworthy
+[ ] Insurance covers commercial use
+
+================================================================================
+
+SECTION F: PROFESSIONAL QUALIFICATIONS
+
+REQUIRED CERTIFICATIONS:
+[ ] Trade certification provided (if required)
+[ ] Certification: _______________________
+[ ] Certification valid/current
+[ ] Certification from recognized body
+[ ] Experience documentation provided
+[ ] Experience verified (2+ years)
+[ ] Skills assessment passed
+
+LICENSES & PERMITS:
+[ ] Professional license provided (if required)
+[ ] License type: _____________________
+[ ] License valid/current
+[ ] License expiry: ______________
+[ ] License appropriate for services
+[ ] Copy attached to file
+
+TRAINING & SKILLS:
+[ ] Relevant training documented
+[ ] Training from recognized body
+[ ] Training certificate valid
+[ ] Partner demonstrates competency
+[ ] First aid certified (for safety-critical roles)
+
+================================================================================
+
+SECTION G: EQUIPMENT & SAFETY (Where Applicable)
+
+EQUIPMENT:
+[ ] Required equipment owned/available
+[ ] Equipment list: _____________________
+[ ] Equipment photos provided
+[ ] Equipment appears functional
+[ ] Equipment is safe
+[ ] Equipment meets standards
+
+SAFETY GEAR:
+[ ] Safety equipment available
+[ ] Safety items: _____________________
+[ ] Safety items meet requirements
+[ ] Partner aware of safety protocols
+[ ] Safety awareness confirmed
+
+HEALTH & HYGIENE:
+[ ] Health documentation provided (if required)
+[ ] Health certificate current
+[ ] No communicable diseases indicated
+[ ] Hygiene standards understood
+[ ] Hygiene compliance confirmed
+
+================================================================================
+
+SECTION H: AGREEMENT & COMPLIANCE
+
+TERMS ACCEPTANCE:
+[ ] Terms & Conditions accepted
+[ ] Partner signature/approval obtained
+[ ] Partner confirms understanding
+[ ] Partner-specific agreement accepted
+[ ] Partner signature/approval obtained
+[ ] IP protection clause acknowledged
+[ ] Confidentiality clause acknowledged
+
+KYC COMPLETION:
+[ ] KYC form completed fully
+[ ] All required fields filled
+[ ] Information matches documents
+[ ] Partner signature on KYC form
+[ ] KYC form dated and filed
+
+DEPOSIT PAYMENT:
+[ ] Deposit amount: KSh 500 MINIMUM
+[ ] Deposit payment method: [ ] M-Pesa  [ ] Bank
+[ ] Deposit receipt obtained
+[ ] Deposit confirmed received
+[ ] Deposit date: ______________
+[ ] Payment reference: ______________
+
+WALLET DEPOSIT (Service Workers & Riders ONLY):
+[ ] Wallet deposit amount: KSh 500 minimum (or higher)
+[ ] Additional deposit available for more opportunities
+[ ] Partner informed of job access tiers
+[ ] Wallet payment confirmed received
+[ ] Wallet deposit date: ______________
+
+================================================================================
+
+SECTION I: FINAL APPROVAL & NOTES
+
+COMPLIANCE OFFICER REVIEW:
+[ ] All required documents obtained
+[ ] All verifications completed
+[ ] All checks passed
+[ ] No red flags identified
+[ ] Partner meets all requirements
+[ ] Partner approved for registration
+
+COMPLIANCE OFFICER NAME: ___________________  DATE: ______________
+
+APPROVAL STATUS:
+[ ] APPROVED - Proceed with activation
+[ ] APPROVED WITH CONDITIONS (specify): _______________________________
+[ ] PENDING - More information needed: ________________________________
+[ ] REJECTED - Reason: ________________________________________________
+
+NOTES & COMMENTS:
+_________________________________________________________________
+_________________________________________________________________
+_________________________________________________________________
+
+NEXT STEPS:
+[ ] Account activated on platform
+[ ] Partner notified of approval
+[ ] Onboarding materials sent
+[ ] First-job trial period: 7 days with enhanced monitoring
+[ ] Compliance review scheduled for: ______________
+
+================================================================================
+
+SECTION J: ONGOING MONITORING
+
+PERIODIC REVIEWS:
+[ ] 30-day review scheduled
+[ ] 90-day performance review scheduled
+[ ] 6-month comprehensive review scheduled
+[ ] Annual renewal review scheduled
+
+DOCUMENTATION RENEWAL:
+[ ] ID renewal check scheduled (before expiry)
+[ ] Insurance renewal check scheduled (before expiry)
+[ ] License renewal check scheduled (before expiry)
+[ ] Certification renewal check scheduled (before expiry)
+[ ] Health check renewal (if applicable)
+
+PERFORMANCE METRICS:
+Current Rating: _____ stars
+Completion Rate: _____%
+Complaint Rate: _____%
+Earnings to Date: KSh _______
+Jobs Completed: ______
+
+================================================================================
+
+END OF PARTNER ONBOARDING CHECKLIST
+
+For questions or clarifications: legal@fixera.co.ke
+Last Updated: June 10, 2026 - CLEAN VERSION
+Version: 1.1 - Ready to Copy
+
+KEY FEATURES:
+✓ 6 Partner types (Service Worker, Vendor, Rider, Supplier, Mover, Water Carrier)
+✓ All checkboxes clean and printable [ ]
+✓ 10 comprehensive sections
+✓ All fields clearly labeled
+✓ Easy to print and use
+✓ Professional formatting

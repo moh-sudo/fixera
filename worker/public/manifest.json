@@ -1,0 +1,42 @@
+{
+  "name": "Fixera Partner — Earn With Us",
+  "short_name": "Fixera Partner",
+  "description": "Accept jobs, track earnings, and grow your business with Fixera Partner.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A0E1A",
+  "theme_color": "#C9A020",
+  "scope": "/",
+  "lang": "en-KE",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "/partner-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "View Jobs",
+      "short_name": "Jobs",
+      "description": "See available jobs",
+      "url": "/dashboard",
+      "icons": [{ "src": "/partner-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "My Earnings",
+      "short_name": "Earnings",
+      "url": "/earnings",
+      "icons": [{ "src": "/partner-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Go Online",
+      "short_name": "Online",
+      "url": "/dashboard",
+      "icons": [{ "src": "/partner-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ]
+}

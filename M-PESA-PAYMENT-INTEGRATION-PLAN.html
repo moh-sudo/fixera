@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M-Pesa Payment Integration Plan</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #0A0E1A 0%, #1a1f2e 100%);
+            color: #f5f5f5;
+        }
+        h1 { color: #C9A020; font-size: 2.5em; margin-bottom: 10px; }
+        h2 { color: #C9A020; border-bottom: 2px solid #C9A020; padding-bottom: 10px; margin-top: 30px; }
+        h3 { color: #63B3ED; }
+        .header { background: rgba(10, 14, 26, 0.8); padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        .section { background: rgba(26, 31, 46, 0.8); padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 4px solid #C9A020; }
+        .critical { border-left: 4px solid #FC8181; }
+        .code-block { background: #0A0E1A; padding: 15px; border-radius: 8px; overflow-x: auto; margin: 10px 0; border-left: 3px solid #C9A020; }
+        .code-block code { color: #C9A020; font-family: 'Courier New', monospace; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th { background: #C9A020; color: #0A0E1A; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #333; }
+        tr:nth-child(even) { background: rgba(201, 160, 32, 0.05); }
+        .flow { background: rgba(99, 179, 237, 0.1); padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #63B3ED; }
+        ul { margin: 10px 0; padding-left: 20px; }
+        li { margin: 5px 0; }
+        .check { color: #48BB78; }
+        .warn { color: #ED8936; }
+        .err { color: #FC8181; }
+        .box { background: rgba(99, 179, 237, 0.1); padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #63B3ED; }
+        .timeline { margin: 20px 0; }
+        .phase { background: rgba(72, 187, 120, 0.1); padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #48BB78; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>💳 M-PESA PAYMENT INTEGRATION PLAN</h1>
+        <p><strong>Comprehensive Implementation Guide for Fixera Marketplace</strong></p>
+        <p><strong>Date:</strong> June 5, 2026</p>
+        <p><strong>Status:</strong> Detailed Specification Ready</p>
+        <p><strong>Timeline:</strong> 6-8 weeks (including testing & compliance)</p>
+        <p><strong>Priority:</strong> ⭐⭐⭐ CRITICAL - Blocking feature for launch</p>
+    </div>
+
+    <div class="section">
+        <h2>📋 EXECUTIVE SUMMARY</h2>
+        <p>This document provides a complete blueprint for integrating M-Pesa into Fixera's payment system. M-Pesa is critical for the business model because:</p>
+        <ul>
+            <li><span class="check">✅</span> 90%+ of Kenya uses M-Pesa (vs 20% with bank cards)</li>
+            <li><span class="check">✅</span> Matches Kenya's cash-heavy economy</li>
+            <li><span class="check">✅</span> Enables worker payouts (B2C)</li>
+            <li><span class="check">✅</span> Enables customer payments (STK Push)</li>
+            <li><span class="check">✅</span> Reduces cash handling for Fixera</li>
+        </ul>
+        <p><strong>Key Insight:</strong> This plan supports 5 different user types (Customer, Worker, Vendor, Rider, Supplier) with different payment models.</p>
+    </div>
+
+    <div class="section">
+        <h2>🎯 M-PESA PAYMENT METHODS</h2>
+
+        <h3><span class="check">✅</span> 1. Lipa Na M-Pesa Online (STK Push) - CUSTOMER PAYMENTS</h3>
+        <ul>
+            <li>Customer gets M-Pesa prompt on their phone</li>
+            <li>No redirect to M-Pesa website needed</li>
+            <li>Payment completes in 40 seconds</li>
+            <li>"Enter PIN" screen appears automatically</li>
+        </ul>
+        <p><strong>Payment Limits:</strong></p>
+        <ul>
+            <li>Min: KSh 100</li>
+            <li>Max: KSh 150,000/transaction</li>
+            <li>Daily max: KSh 300,000</li>
+        </ul>
+
+        <h3><span class="check">✅</span> 2. B2C (Business to Consumer) - WORKER/VENDOR PAYOUTS</h3>
+        <ul>
+            <li>Fixera sends money to worker's M-Pesa account</li>
+            <li>Settlement payouts after service completion</li>
+            <li>Money appears in recipient's wallet instantly</li>
+            <li>Fixera initiates, fully automated</li>
+        </ul>
+
+        <h3><span class="check">✅</span> 3. C2B (Consumer to Business) - OPTIONAL</h3>
+        <ul>
+            <li>Customers send money via USSD/M-Pesa app</li>
+            <li>Good for offline payments</li>
+            <li>Manual reconciliation needed</li>
+            <li>Status: Optional (build later if needed)</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>💰 PAYMENT FLOWS BY USER TYPE</h2>
+
+        <h3>1️⃣ CUSTOMER PAYMENT FLOW (STK Push)</h3>
+        <p><strong>Refund Policy:</strong></p>
+        <ul>
+            <li>Cancellation &lt;2 hours before: Full refund</li>
+            <li>Cancellation 2-24 hours: 50% refund</li>
+            <li>Cancellation &gt;24 hours: No refund</li>
+        </ul>
+
+        <h3>2️⃣ WORKER PAYMENT FLOW (B2C Settlement)</h3>
+        <p><strong>Settlement Timing:</strong></p>
+        <div class="flow">
+            T=0: Service completed<br>
+            T+24h: Dispute window closed, settlement created<br>
+            T+3 days: Batch B2C processed<br>
+            T+4 days: Money in worker's M-Pesa account
+        </div>
+        <p><strong>Commission Structure:</strong></p>
+        <div class="box">
+            Service amount: KSh 1,000<br>
+            Commission (15%): -KSh 150<br>
+            M-Pesa B2C fee: -KSh 30 (Fixera absorbs)<br>
+            <strong>Worker receives: KSh 820</strong>
+        </div>
+
+        <h3>3️⃣ VENDOR PAYMENT FLOW (Net 7/30 Terms)</h3>
+        <ul>
+            <li>Net 7: Payment 7 days after invoice acceptance</li>
+            <li>Net 30: Payment 30 days after invoice acceptance</li>
+            <li>Batch process: Monday & Thursday mornings</li>
+        </ul>
+
+        <h3>4️⃣ RIDER PAYMENT FLOW (Per-Delivery)</h3>
+        <ul>
+            <li>Delivery payment: KSh 100-300 (varies by distance)</li>
+            <li>Platform fee: -KSh 25/delivery</li>
+            <li>Settlement: Same-day if >KSh 500, else Friday consolidation</li>
+        </ul>
+
+        <h3>5️⃣ SUPPLIER PAYMENT FLOW (Bulk Monthly)</h3>
+        <ul>
+            <li>Net 30/60 terms</li>
+            <li>End-of-month batch processing</li>
+            <li>Commission: 5% (lowest rate)</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>🗄️ DATABASE SCHEMA CHANGES</h2>
+        <p><strong>4 New Tables Required:</strong></p>
+        <ol>
+            <li><strong>payments</strong> - All transactions</li>
+            <li><strong>payment_settlements</strong> - Aggregate payouts</li>
+            <li><strong>payment_disputes</strong> - Chargebacks & refunds</li>
+            <li><strong>payment_webhooks</strong> - Audit log</li>
+        </ol>
+        <p>Each table includes:</p>
+        <ul>
+            <li>Proper indexing for performance</li>
+            <li>Referential integrity with existing tables</li>
+            <li>Status tracking fields</li>
+            <li>Timestamp tracking</li>
+            <li>JSONB metadata fields</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>🔧 IMPLEMENTATION PHASES</h2>
+
+        <div class="phase">
+            <h3>PHASE 1: FOUNDATION (Weeks 1-2)</h3>
+            <p><strong>Week 1: M-Pesa Account Setup</strong></p>
+            <ul>
+                <li><span class="err">❌</span> Register Fixera with Safaricom</li>
+                <li><span class="err">❌</span> Get M-Pesa shortcode (6-digit till)</li>
+                <li><span class="err">❌</span> Get API consumer key & secret</li>
+                <li><span class="err">❌</span> Create Daraja API Account</li>
+                <li><span class="err">❌</span> Generate OAuth credentials</li>
+                <li><span class="err">❌</span> Configure Webhooks</li>
+                <li><span class="err">❌</span> Sandbox Testing</li>
+            </ul>
+
+            <p><strong>Week 2: Database Setup</strong></p>
+            <ul>
+                <li><span class="err">❌</span> Create migrations for 4 tables</li>
+                <li><span class="err">❌</span> Add indexes for performance</li>
+                <li><span class="err">❌</span> Modify existing tables (payments, wallets)</li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <h3>PHASE 2: PAYMENT SERVICE (Weeks 2-3)</h3>
+            <ul>
+                <li><span class="err">❌</span> STK Push Service</li>
+                <li><span class="err">❌</span> B2C Service</li>
+                <li><span class="err">❌</span> Webhook Handler</li>
+                <li><span class="err">❌</span> Settlement Service</li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <h3>PHASE 3: INTEGRATION (Weeks 3-4)</h3>
+            <ul>
+                <li><span class="err">❌</span> Frontend Updates (PaymentPage.jsx)</li>
+                <li><span class="err">❌</span> Settlement Automation (weekly batch)</li>
+                <li><span class="err">❌</span> Admin Dashboard (payment tracking)</li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <h3>PHASE 4: TESTING (Weeks 5-6)</h3>
+            <ul>
+                <li><span class="err">❌</span> Unit Tests</li>
+                <li><span class="err">❌</span> Integration Tests</li>
+                <li><span class="err">❌</span> End-to-End Tests</li>
+                <li><span class="err">❌</span> Sandbox Testing</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🔐 SECURITY & COMPLIANCE</h2>
+
+        <h3>Critical Security Measures:</h3>
+        <ul>
+            <li><span class="check">✅</span> Webhook signature verification on all callbacks</li>
+            <li><span class="check">✅</span> Idempotency keys prevent duplicate payments</li>
+            <li><span class="check">✅</span> PCI DSS compliance (TLS 1.3, encrypted fields)</li>
+            <li><span class="check">✅</span> KYC verification with tier limits</li>
+            <li><span class="check">✅</span> Device fingerprinting & IP geolocation</li>
+            <li><span class="check">✅</span> Velocity checks for unusual patterns</li>
+            <li><span class="check">✅</span> Daily M-Pesa balance reconciliation</li>
+            <li><span class="check">✅</span> Rate limiting (10 payment attempts/hour)</li>
+        </ul>
+
+        <h3>KYC Verification Tiers:</h3>
+        <div class="box">
+            <strong>Tier 1 (Unverified):</strong> KSh 10,000/day limit<br>
+            <strong>Tier 2 (Phone verified):</strong> KSh 100,000/day limit<br>
+            <strong>Tier 3 (Full KYC):</strong> KSh 300,000/day limit<br>
+            <strong>Workers:</strong> Phone + National ID required<br>
+            <strong>Vendors:</strong> Business registration required
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>📊 COMMISSION STRUCTURE</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>User Type</th>
+                    <th>Commission</th>
+                    <th>M-Pesa Fee</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Customer</td>
+                    <td>N/A</td>
+                    <td>Included</td>
+                    <td>Embedded in pricing</td>
+                </tr>
+                <tr>
+                    <td>Worker</td>
+                    <td>15%</td>
+                    <td>KSh 30 (Fixera)</td>
+                    <td>Per service</td>
+                </tr>
+                <tr>
+                    <td>Vendor</td>
+                    <td>10%</td>
+                    <td>KSh 30 (Fixera)</td>
+                    <td>Lower rate</td>
+                </tr>
+                <tr>
+                    <td>Rider</td>
+                    <td>15%</td>
+                    <td>KSh 25</td>
+                    <td>Per delivery</td>
+                </tr>
+                <tr>
+                    <td>Supplier</td>
+                    <td>5%</td>
+                    <td>KSh 30 (Fixera)</td>
+                    <td>Bulk discount</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>📈 FINANCIAL PROJECTIONS</h2>
+        <p><strong>Year 1 Estimate (1,000 active workers):</strong></p>
+        <div class="box">
+            Jobs per worker per month: 10<br>
+            Avg job value: KSh 1,500<br>
+            Total monthly volume: KSh 15,000,000<br>
+            <br>
+            <strong>Commission (avg 12%):</strong><br>
+            Monthly: KSh 1,800,000<br>
+            Annual: <strong>KSh 21,600,000</strong><br>
+            <br>
+            Customer acquisition cost: KSh 500<br>
+            Worker acquisition cost: KSh 500<br>
+            Payback period: ~3 months
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>✅ GO-LIVE CHECKLIST</h2>
+        <h3>Pre-Launch (Week 6):</h3>
+        <ul>
+            <li><span class="err">❌</span> All M-Pesa flows tested in sandbox</li>
+            <li><span class="err">❌</span> B2C working for worker payouts</li>
+            <li><span class="err">❌</span> STK working for customer payments</li>
+            <li><span class="err">❌</span> Webhook signature verification working</li>
+            <li><span class="err">❌</span> Settlement automation tested</li>
+            <li><span class="err">❌</span> Dispute flow tested</li>
+            <li><span class="err">❌</span> Admin dashboard functional</li>
+            <li><span class="err">❌</span> Documentation complete</li>
+            <li><span class="err">❌</span> Support team trained</li>
+            <li><span class="err">❌</span> Monitoring/alerts set up</li>
+            <li><span class="err">❌</span> Compliance audit passed</li>
+        </ul>
+
+        <h3>Launch Strategy (Phased Rollout):</h3>
+        <div class="box">
+            <strong>Week 1: Beta (10% of users)</strong><br>
+            ├─ Payment limits: KSh 5,000 max<br>
+            ├─ Manual settlement review<br>
+            └─ 24/7 support team monitoring<br>
+            <br>
+            <strong>Week 2: Expanded (25% of users)</strong><br>
+            ├─ Payment limits: KSh 25,000 max<br>
+            ├─ Semi-automated settlement<br>
+            └─ Monitor for issues<br>
+            <br>
+            <strong>Week 3: Full Rollout (100%)</strong><br>
+            ├─ All limits enabled<br>
+            ├─ Full automation<br>
+            └─ Continuous monitoring
+        </div>
+    </div>
+
+    <div class="section critical">
+        <h2>🚨 CRITICAL SUCCESS FACTORS</h2>
+        <ol>
+            <li><strong>M-Pesa Account Setup</strong> - Longest lead time (5-10 business days)</li>
+            <li><strong>Safaricom Approval</strong> - Can be unpredictable, start early</li>
+            <li><strong>Webhook Reliability</strong> - Out-of-order delivery handling essential</li>
+            <li><strong>Settlement Automation</strong> - Must be 99.9% reliable</li>
+            <li><strong>Monitoring & Alerts</strong> - Real-time issue detection required</li>
+            <li><strong>Support Preparedness</strong> - Team needs payment troubleshooting training</li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2>📞 SAFARICOM CONTACTS</h2>
+        <h3>M-Pesa Business:</h3>
+        <ul>
+            <li>Website: https://www.safaricom.co.ke/business</li>
+            <li>Email: <code>bisdev@safaricom.co.ke</code></li>
+            <li>Phone: <code>0722 205 000</code></li>
+        </ul>
+
+        <h3>Daraja Developer:</h3>
+        <ul>
+            <li>Website: https://developer.safaricom.co.ke</li>
+            <li>Sandbox login: Use test credentials</li>
+        </ul>
+    </div>
+
+    <hr style="border: 1px solid #C9A020; margin: 30px 0;">
+    <p style="text-align: center; color: #999;">
+        <strong>Document Version: 1.0</strong><br>
+        <strong>Status: Ready for Implementation</strong><br>
+        <strong>Last Updated: June 5, 2026</strong><br>
+        <strong>Contact: development@fixera.co.ke</strong>
+    </p>
+</body>
+</html>

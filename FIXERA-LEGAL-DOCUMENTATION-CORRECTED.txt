@@ -1,0 +1,1732 @@
+================================================================================
+FIXERA COMPREHENSIVE LEGAL DOCUMENTATION PACKAGE 
+================================================================================
+
+FOR LEGAL REVIEW & EXECUTION
+Prepared: June 5, 2026
+Version: 1.1 - (6 Partner Types, Updated Commissions & Wallet System)
+
+CONTENTS:
+1. Business Terms & Conditions
+2. Master Partner Agreement
+3. Partner-Specific Agreements (6 types)
+4. IP Protection & Brand Protection Policy
+5. Partner Qualification Checklist
+
+================================================================================
+SECTION 1: FIXERA BUSINESS TERMS & CONDITIONS
+================================================================================
+
+EFFECTIVE DATE: [TO BE COMPLETED BY LAWYER]
+VERSION: 1.1 - CORRECTED
+
+1. DEFINITIONS
+
+1.1 "Fixera" or "Company" - Digital marketplace platform connecting service seekers with service providers
+
+1.2 "Customer" - User seeking services through the Fixera platform
+
+1.3 "Partner" - Service provider registered on Fixera, including:
+    - Service Workers (plumbing, electrical, painting, cleaning)
+    - Vendors (service companies, construction companies, etc.)
+    - Riders/Couriers (delivery service providers)
+    - Suppliers (bulk goods and materials)
+    - Movers (professional moving companies)
+    - Water Carriers (clean water delivery)
+
+1.4 "Service" - Work performed by Partners for Customers through the Fixera platform
+
+1.5 "Commission" - Fixera's transaction fee, ranging 15-20% depending on partner type:
+    - Service Workers: 15%
+    - Vendors: 20%
+    - Riders: 15%
+    - Suppliers: 20%
+    - Movers: 20%
+    - Water Carriers: 20%
+
+1.6 "Wallet" - Digital payment system within Fixera for earnings management
+    - Available to: Service Workers & Riders ONLY
+    - Minimum deposit: KSh 500
+    - Partners can deposit more than KSh 500 to access more job opportunities
+
+1.7 "Deposit" - Security deposit required from Partners (mandatory KSh 500)
+    - Applies to ALL partners: Service Workers, Vendors, Riders, Suppliers, Movers, Water Carriers
+    - Wallet deposit for Service Workers & Riders: Can be KSh 500 minimum or higher
+
+2. USER ELIGIBILITY & REGISTRATION
+
+2.1 Age Requirements
+- Customers: Must be 18+ years old
+- Partners: Must be 18+ years old with valid national ID
+
+2.2 Registration Requirements
+- Valid phone number
+- Valid email address
+- Accurate personal information
+- Acceptance of these Terms & Conditions
+- Partner-specific agreement acceptance (for Partners)
+
+2.3 Account Verification
+- Phone number verification via SMS OTP
+- Email address verification
+- National ID verification (for Partners)
+- KYC documentation verification (Partners with transactions >KSh 100,000)
+
+2.4 Prohibited Activities - Users may NOT:
+- Impersonate another person
+- Create multiple fraudulent accounts
+- Conduct illegal activities
+- Engage in harassment, discrimination, or abuse
+- Share account credentials
+- Manipulate ratings or reviews
+- Conduct transactions outside the platform
+- Violate intellectual property rights
+- Conduct services outside the platform (Partners)
+
+3. COMMISSION & PAYMENT STRUCTURE
+
+3.1 CORRECTED Commission Rates by Partner Type
+- Service Workers: 15% commission to Fixera (85% to partner)
+- Vendors: 20% commission to Fixera (80% to vendor) - UPDATED FROM 10%
+- Riders: 15% commission to Fixera (85% to rider)
+- Suppliers: 20% commission to Fixera (80% to supplier) - UPDATED FROM 5%
+- Movers: 20% commission to Fixera (80% to mover) - UPDATED FROM 15%
+- Water Carriers: 20% commission to Fixera (80% to carrier) - UPDATED FROM 15%
+
+3.2 Payment Methods
+- Customers pay via: M-Pesa STK Push or in-app wallet
+- Partner settlements: Weekly (Workers/Riders) or weekly/monthly (Vendors/Suppliers/Movers/Water Carriers)
+- Minimum payout threshold: KSh 500
+- M-Pesa B2C fees: KSh 30 per transaction (Fixera absorbs)
+
+3.3 Wallet System - SERVICE WORKERS & RIDERS ONLY
+- ONLY Service Workers and Riders have wallet system
+- Minimum wallet deposit: KSh 500 (non-refundable verification fee)
+- Partners can deposit MORE than KSh 500 for MORE job opportunities
+- Example: Deposit KSh 1,000 = Access to higher-value jobs
+- Example: Deposit KSh 2,000 = Access to premium jobs
+- Commission deducted from deposit for cash payments
+- Deposit refundable after 30 days in good standing
+
+3.4 Other Partners Payment Terms
+- Vendors: Monthly invoice-based payment (Net 7-30 days bank transfer)
+- Suppliers: Monthly order-based payment (Net 30-60 days bank transfer)
+- Movers: Weekly M-Pesa B2C settlement or monthly bank transfer
+- Water Carriers: Weekly M-Pesa B2C settlement
+
+3.5 Refund Policy
+- Cancellation <2 hours before service: Full refund to customer
+- Cancellation 2-24 hours before service: 50% refund to customer
+- Cancellation >24 hours: No refund
+- Service not completed: Full refund to customer, no payment to Partner
+- Dispute resolution window: 24 hours
+
+4. SERVICE DELIVERY & QUALITY STANDARDS
+
+4.1 Partner Obligations
+- Arrive on time or notify customer of delay (30-minute notice)
+- Perform services exactly as described in booking
+- Maintain professional behavior and appearance
+- Respect customer property and privacy
+- Complete services safely and to industry standards
+- Maintain cleanliness and hygiene standards
+- Use appropriate safety equipment
+- Follow local regulations and licensing requirements
+- Respond to customer messages within 30 minutes
+- Use Fixera messaging system ONLY (no private contact)
+- Obtain customer signature/confirmation of service completion
+
+4.2 Customer Obligations
+- Provide accurate service details during booking
+- Provide access to service location
+- Make agreed payment on time
+- Maintain respectful communication
+- Rate services fairly
+
+4.3 Quality Standards & Ratings
+- Rating scale: 1-5 stars
+- Partners with <3.5 average rating: May face suspension
+- Partners with <3.0 average rating: Automatic suspension
+- Suspension periods: 7 days minimum to permanent ban
+
+5. DISPUTE RESOLUTION PROCESS
+
+5.1 Dispute Resolution Steps
+1. Customer/Partner reports dispute within 24 hours of service
+2. Fixera reviews evidence (photos, messages, timestamps)
+3. Fixera determines resolution (refund, payment, suspension)
+4. Appeal process available within 7 days
+5. Final decision by Fixera management
+
+5.2 Dispute Categories & Resolutions
+- Service not performed: Full refund to customer, no payment to Partner
+- Partial service completion: Partial refund based on Fixera assessment
+- Quality issues: Partial refund based on severity level
+- No-show Partner: Full refund to customer + Partner suspension
+- No-show Customer: No refund, Partner retains full fee
+
+5.3 Chargeback & Payment Disputes
+- All chargebacks handled through M-Pesa dispute process
+- Fixera cooperates fully with M-Pesa investigation
+- Fraudulent chargebacks: Partner may be permanently banned
+- Legitimate chargebacks: Customer refunded, Partner loses payment
+
+6. DEPOSITS & SECURITY REQUIREMENTS
+
+6.1 Partner Security Deposit - ALL PARTNERS
+- Mandatory deposit: KSh 500 for ALL Partner types
+- Purpose: Customer protection and Partner compliance assurance
+- Refund: Available after 30 days in good standing
+- Forfeiture conditions: Fraud, customer harm, policy violations
+
+6.2 WALLET DEPOSIT SYSTEM - SERVICE WORKERS & RIDERS ONLY
+- Minimum wallet deposit: KSh 500 (security verification)
+- Additional deposits: Partners can deposit MORE for more opportunities
+- Deposit amount increases job opportunity access:
+  * KSh 500 deposit = Standard job access
+  * KSh 1,000 deposit = More job opportunities
+  * KSh 2,000+ deposit = Premium job access
+- Deposit usage: Commission deducted for cash jobs
+- When deposit < KSh 500: Partner cannot accept cash jobs
+- Redeposit required when balance depletes to <KSh 500
+- M-Pesa jobs: Deposit never deducted, always protected
+
+6.3 Deposit Forfeiture Categories
+- Category 1 - Fraud: 100% forfeiture (fake ID, payment fraud, impersonation)
+- Category 2 - Customer Harm: 50-100% forfeiture (theft, damage, violence)
+- Category 3 - Platform Abuse: 25-100% forfeiture (rating manipulation, harassment)
+- Category 4 - Repeated Violations: 25%+ escalating forfeiture
+
+7. LIABILITY & LIMITATION OF LIABILITY
+
+7.1 Fixera Liability Limitations
+Fixera is NOT liable for:
+- Direct harm or injury during service delivery
+- Loss or damage to customer property (beyond insurance coverage)
+- Partner misconduct or poor service quality
+- Third-party actions
+- Service quality issues or disputes
+- Platform downtime or technical issues
+
+7.2 Indemnification by Partners
+Partners indemnify Fixera from:
+- All claims arising from Partner conduct or behavior
+- Injury or damage caused by Partner actions
+- Violation of laws or regulations by Partner
+- Breach of Partner agreement
+- Third-party claims related to Partner services
+
+7.3 Insurance Requirements
+- High-risk services (movers, construction): Liability insurance mandatory
+- Fixera does NOT provide insurance
+- Partners fully responsible for own insurance coverage
+- Insurance verification required during onboarding
+
+7.4 Fixera's Total Liability Limit
+Fixera's total liability is LIMITED to the amount paid by customer for the specific transaction or KSh 10,000, whichever is less.
+
+8. INTELLECTUAL PROPERTY RIGHTS & BRAND PROTECTION
+
+8.1 Fixera IP Ownership
+All content on Fixera platform is protected:
+- Brand name: FIXERA ™
+- Logo and design: FIXERA ®
+- Technology and algorithms
+- User interface and all features
+- Marketing materials
+- Database structures
+- Business model and processes
+- Mobile and web application code
+- All digital infrastructure
+
+8.2 User/Partner Restrictions
+Users and Partners may NOT:
+- Copy or reproduce Fixera content
+- Use Fixera name or logo without written permission
+- Create competing platforms using Fixera's model or business methods
+- Reverse engineer Fixera technology
+- Claim ownership of Fixera features or design
+- Use Fixera IP for commercial purposes
+- Access or export customer data
+- Share proprietary Fixera information with competitors
+- Screenshot and reproduce Fixera content for external use
+
+8.3 Limited License Granted
+Partners are granted LIMITED license only to:
+- Use Fixera platform as intended
+- Display Fixera branding only as pre-approved
+- Reference Fixera in professional capacity with written permission
+- Use Fixera name only in context of platform partnership
+
+8.4 Brand Usage Guidelines
+APPROVED uses:
+- Identifying self as Fixera partner (with prior permission)
+- Professional references in bio or website (with disclaimer)
+- Partnership announcements (with written approval)
+- Social media mentions (with proper attribution)
+
+PROHIBITED uses:
+- Creating competing services using Fixera model
+- Implying endorsement by Fixera
+- Commercial use without permission
+- Third-party website/app integration without approval
+- Trademark registration attempts
+- Merchandising or physical products
+- Social media impersonation
+- Any use implying Fixera co-ownership or partnership
+
+9. DATA PRIVACY & SECURITY
+
+9.1 Data Collection
+Fixera collects:
+- Personal information: name, phone, email, national ID
+- Transaction data: bookings, payments, ratings, reviews
+- Location data: service delivery locations
+- Device information: for security and fraud detection
+- Communication logs: messages and correspondence
+
+9.2 Data Usage
+Fixera uses collected data for:
+- Service delivery and transaction processing
+- Payment processing and settlement
+- Fraud detection and prevention
+- Service analytics and improvement
+- Customer/Partner communication
+- Legal compliance and regulatory requirements
+
+9.3 Data Protection Measures
+- Encryption of sensitive data in transit and at rest
+- ODPC (Office of Data Protection Commissioner) compliance
+- Industry-standard security measures implemented
+- NO data sold to third parties
+- Data retained per legal requirements only
+- Regular security audits conducted
+
+9.4 User Rights
+- Users have right to access their personal data
+- Users can request data correction
+- Users can request account deletion
+- Users can object to data processing
+- All requests processed within 30 days
+
+10. TERMINATION & SUSPENSION
+
+10.1 Grounds for Account Suspension/Termination
+Fixera may suspend or terminate accounts for:
+- Violation of Terms & Conditions
+- Multiple customer disputes or complaints
+- Fraudulent activity or deception
+- Non-payment or payment chargebacks
+- Safety concerns or threats
+- Legal violations or criminal activity
+- Rating below 3.0 (automatic for Partners)
+- Policy violations or code of conduct breach
+
+10.2 Suspension Procedure
+- First offense: Warning
+- Repeated violations: Temporary suspension (7-30 days)
+- Serious violations: Permanent ban from platform
+
+10.3 Appeal Process
+- Users have 7 days to appeal suspension
+- Appeal reviewed by Fixera management team
+- Decision communicated within 14 days
+- Final decision is binding
+
+10.4 Effect of Termination
+Upon account termination:
+- Partner may not accept new bookings
+- All outstanding earnings paid within 30 days
+- Account access revoked immediately
+- Data retained per legal requirements
+- No refund of deposits for policy violations
+
+11. MODIFICATIONS TO TERMS
+
+11.1 Right to Modify
+- Fixera may modify these terms at any time
+- 30 days advance notice provided to users
+- Continued platform use implies acceptance
+- Users may terminate if they disagree
+
+12. GOVERNING LAW & DISPUTE RESOLUTION
+
+12.1 Jurisdiction
+- These terms governed by laws of the Republic of Kenya
+- All disputes subject to Kenyan jurisdiction
+- Disputes first submitted to arbitration (if applicable)
+- Escalated to Kenyan courts if arbitration unsuccessful
+
+12.2 Venue
+- Any legal action must be brought in Kenyan courts
+- Both parties submit to jurisdiction of Kenyan courts
+- Choice of law: Laws of Kenya apply
+
+13. SEVERABILITY
+
+If any provision of these terms is found invalid or unenforceable, remaining provisions continue in full force and effect.
+
+14. CONTACT INFORMATION
+
+For legal inquiries or support:
+Email: legal@fixera.co.ke
+Phone: +254 712 XXXXX
+Address: [TO BE COMPLETED BY LAWYER]
+Hours: Monday-Friday, 9 AM - 5 PM EAT
+
+================================================================================
+SECTION 2: MASTER PARTNER AGREEMENT
+================================================================================
+
+FIXERA MASTER PARTNER AGREEMENT
+
+This Agreement made this ____ day of ____________, 202__ ("Effective Date")
+
+BETWEEN:
+
+FIXERA (hereinafter called "the Company"), AND
+
+_________________ (hereinafter called "the Partner")
+
+WHEREAS:
+
+1. The Company operates Fixera, a digital marketplace platform connecting service seekers with service providers
+
+2. The Partner wishes to become a registered service provider on the Fixera platform
+
+3. The parties wish to establish the terms and conditions under which the Partner will provide services
+
+NOW IT IS HEREBY AGREED AS FOLLOWS:
+
+1. AGREEMENT TO TERMS
+
+By registering as a Partner on Fixera, the Partner:
+- Confirms reading and understanding all terms
+- Agrees to be bound by all stated terms and conditions
+- Agrees to comply with all platform policies
+- Commits to maintaining professional standards
+- Acknowledges Partner-specific terms apply
+
+2. RELATIONSHIP STATUS
+
+2.1 Independent Contractor Status
+The Partner is an independent contractor, NOT an employee of Fixera.
+- Partner sets own work schedule
+- Partner provides own equipment and tools
+- Partner responsible for own income taxes
+- Partner responsible for own insurance coverage
+
+2.2 No Employment Relationship
+Partner is NOT entitled to:
+- Salary or wages
+- Health insurance
+- Retirement benefits
+- Paid leave or vacation
+- Workers compensation
+- Employment benefits of any kind
+
+3. PARTNER OBLIGATIONS
+
+3.1 Service Delivery Standards
+- Perform services exactly as described in booking
+- Arrive on time or provide advance notice
+- Maintain professional appearance and behavior
+- Respect customer property and privacy
+- Complete services safely and properly
+- Follow all local regulations and licensing requirements
+
+3.2 Communication Requirements
+- Respond to customers within 30 minutes
+- Use Fixera messaging system exclusively (no private contact)
+- Maintain professional tone in communications
+- Provide service progress updates
+- Confirm service completion with customer
+
+3.3 Compliance Obligations
+- Maintain valid national ID at all times
+- Keep all documentation current (certificates, licenses, etc.)
+- Pay personal income taxes independently
+- Maintain required business/professional licenses
+- Comply with all local and national regulations
+- Maintain required insurance coverage
+
+4. EARNINGS & COMMISSION STRUCTURE
+
+4.1 CORRECTED Commission Rates
+- Service Workers: 15% commission to Fixera (Partner earns 85%)
+- Vendors: 20% commission to Fixera (Partner earns 80%)
+- Riders: 15% commission to Fixera (Partner earns 85%)
+- Suppliers: 20% commission to Fixera (Partner earns 80%)
+- Movers: 20% commission to Fixera (Partner earns 80%)
+- Water Carriers: 20% commission to Fixera (Partner earns 80%)
+
+4.2 Payment Methods
+- Settlement via M-Pesa B2C (for workers/riders)
+- Settlement via bank transfer (for vendors/suppliers/movers/water carriers)
+- Weekly settlement schedule (workers/riders)
+- Monthly settlement schedule (vendors/suppliers/movers/water carriers)
+
+4.3 Allowed Deductions
+The Company may deduct from Partner earnings:
+- M-Pesa transaction fees (if applicable)
+- Chargebacks or dispute refunds
+- Penalties for policy violations
+- Court-ordered wage garnishments
+
+4.4 Minimum Payment Threshold
+- Minimum payout: KSh 500
+- Payments below threshold held until reached
+- No interest paid on held amounts
+- Partner responsible for tracking balance
+
+5. WALLET DEPOSIT REQUIREMENTS - SERVICE WORKERS & RIDERS ONLY
+
+5.1 Mandatory Wallet Deposit
+- Amount: KSh 500 MINIMUM (can deposit more for more opportunities)
+- Payment method: M-Pesa STK Push
+- Purpose: Customer protection and Partner compliance assurance
+- Refund: Available after 30 days in good standing
+- Additional deposits: Partners encouraged to deposit more (KSh 1,000, KSh 2,000+)
+
+5.2 Wallet Deposit Usage
+Deposit serves as:
+- Security for customer protection against Partner misconduct
+- Guarantee of Partner compliance with all terms
+- Commission pool for cash-paid services
+- Coverage for damages caused by Partner
+- Access point for job opportunities (more deposit = more job access)
+
+5.3 Deposit Forfeiture
+Deposit may be forfeited (partially or fully) for:
+- Fraud or deception (100% forfeiture)
+- Customer harm - theft, damage, violence (50-100% forfeiture)
+- Platform abuse - rating manipulation, harassment (25-100% forfeiture)
+- Repeated policy violations (25%+ escalating forfeiture)
+
+5.4 Deposit Refund Process
+- Eligible after 30 days in good standing
+- No violations or complaints
+- Automatically refunded to Partner's account
+- May take up to 7 days to receive
+
+6. CODE OF CONDUCT
+
+6.1 Required Professional Behavior
+Partner must:
+- Treat customers with respect and professionalism
+- Maintain professional appearance and hygiene
+- Follow all safety protocols and procedures
+- Avoid substance use before or during service
+- Not discriminate based on protected characteristics
+- Not harass, threaten, or abuse customers
+- Maintain confidentiality of customer information
+
+6.2 Prohibited Conduct
+Partner must NOT:
+- Conduct services or accept payment outside Fixera platform
+- Request or accept off-platform payments
+- Pressure customers for high ratings or reviews
+- Manipulate, fake, or create fraudulent ratings
+- Conduct illegal activities
+- Cause damage to customer property
+- Steal from or defraud customers
+- Impersonate another Partner
+- Share confidential business information
+
+7. DISPUTE & COMPLAINT RESOLUTION
+
+7.1 Customer Complaint Process
+When customer files complaint:
+- Company will investigate fairly and thoroughly
+- Partner given opportunity to respond with evidence
+- Evidence reviewed: photos, messages, timestamps
+- Fair resolution determined based on evidence
+- Partner may appeal within 7 days
+
+7.2 Complaint Consequences by Category
+- No-show without notice: 7-day suspension + fine
+- Poor quality service: Warning or partial refund
+- Rude/unprofessional behavior: Warning or suspension
+- Property damage: Fine or suspension + restitution
+- Fraud or deception: Immediate permanent ban
+- Theft or criminal activity: Permanent ban + legal action
+
+8. SUSPENSION & TERMINATION
+
+8.1 Grounds for Suspension
+- Rating consistently below 3.5 stars
+- Multiple customer complaints within 30 days
+- Safety violations or threats
+- Non-compliance with Partner agreement
+- Local law or licensing violations
+- Fraud, deception, or dishonesty
+
+8.2 Suspension Schedule
+- First suspension: 7 days
+- Second suspension: 30 days
+- Third suspension: 90 days or permanent ban
+- Serious violations: Immediate permanent ban
+
+8.3 Appeal & Review Process
+Partner may appeal suspension within 7 days by:
+- Providing written explanation
+- Submitting evidence of compliance improvements
+- Requesting second review of case
+- Appeals reviewed within 14 days
+
+8.4 Termination
+Partner or Company may terminate relationship:
+- With 30 days written notice
+- Or immediately for serious violations
+- Final payment processed within 30 days
+- Access revoked upon termination
+
+9. LIABILITY & INSURANCE
+
+9.1 Partner Liability
+Partner is liable for:
+- Damage to customer property caused by Partner actions
+- Injury caused by Partner negligence
+- Violation of laws or regulations
+- Breach of this Agreement
+
+9.2 Partner Insurance Responsibility
+Partner must obtain and maintain:
+- Liability insurance (if required by law for service type)
+- Health insurance (Partner's responsibility)
+- Property insurance (for Partner's equipment)
+- Vehicle insurance (if using own vehicle)
+- Professional insurance (if required by trade)
+
+9.3 Fixera Indemnification
+Partner indemnifies Fixera from:
+- All claims arising from Partner conduct or behavior
+- Injury or damage caused by Partner
+- Violation of laws by Partner
+- Breach of this Agreement
+- Third-party legal claims related to Partner services
+
+9.4 Insurance Verification
+- Insurance proof required during onboarding
+- Periodic verification conducted
+- Lapse in insurance results in immediate suspension
+- Partner bears all costs of maintaining insurance
+
+10. INTELLECTUAL PROPERTY & CONFIDENTIALITY
+
+10.1 IP Ownership
+Partner acknowledges Fixera owns:
+- All brand name, logo, and trademark rights
+- All technology and software
+- All proprietary business processes
+- All customer data and transaction information
+- All platform features and functionality
+
+10.2 IP Restrictions
+Partner may NOT:
+- Use Fixera IP without written permission
+- Create competing platform based on Fixera model
+- Reverse engineer or copy technology
+- Claim ownership of any Fixera features
+- Use Fixera name for personal commercial purposes
+
+10.3 Confidentiality Obligations
+Partner agrees to keep confidential:
+- Customer personal information
+- Transaction details and financial data
+- Fixera business strategies
+- Proprietary technology and processes
+- Unpublished features
+- Commission structures
+- Internal communications
+
+10.4 Non-Disclosure
+Partner may NOT disclose confidential information to:
+- Competitors
+- Media or journalists
+- Other Partners (unless authorized)
+- Family or friends (in professional context)
+- Social media or public channels
+- Third parties without written permission
+
+10.5 Consequences of Breach
+IP/Confidentiality breach results in:
+- Immediate account termination
+- Legal action for damages
+- Injunctive relief (court order to stop)
+- Financial penalties
+- Potential criminal prosecution
+
+11. TERM & TERMINATION
+
+11.1 Term
+- Agreement effective upon registration
+- Continues indefinitely
+- Either party may terminate with 30 days notice
+
+11.2 Immediate Termination (No Notice Required)
+Fixera may immediately terminate for:
+- Fraud or deception
+- Serious safety violation
+- Criminal activity
+- Repeated serious violations
+
+11.3 Effect of Termination
+Upon termination:
+- Partner may not accept new bookings
+- All outstanding earnings paid within 30 days
+- Account access revoked
+- Data retained per legal requirements
+- Deposit forfeited if violations occurred
+
+12. LIMITATION OF LIABILITY
+
+12.1 Fixera's Liability Limit
+Company's total liability is LIMITED to:
+- Amount earned by Partner in past 30 days, OR
+- KSh 10,000, whichever is less
+
+12.2 Fixera NOT Liable For
+- Platform downtime or technical issues
+- Payment delays beyond Company's control
+- Customer disputes or chargebacks
+- Third-party actions
+- Force majeure events
+- Indirect or consequential damages
+
+13. GOVERNING LAW
+
+These terms governed by laws of the Republic of Kenya.
+All disputes resolved through Kenyan arbitration or courts.
+
+14. ENTIRE AGREEMENT
+
+This Agreement, combined with Partner-specific terms, constitutes entire agreement between parties and supersedes all prior agreements or discussions.
+
+================================================================================
+SECTION 3: PARTNER-SPECIFIC AGREEMENTS (6 TYPES - CORRECTED)
+================================================================================
+
+------- PARTNER TYPE 1: SERVICE WORKERS -------
+
+SERVICE WORKER SPECIFIC AGREEMENT
+
+Applicable to: Plumbing workers, Electrical workers, Painters, Cleaners, etc.
+(NOTE: Does NOT include Carpentry)
+
+1. Service Specifications
+- Individual service provider (not company)
+- Services: Plumbing, Electrical, Painting, Cleaning, etc. (NO carpentry)
+- Commission: 15% to Fixera, 85% to Worker
+- Settlement: Weekly via M-Pesa B2C on Fridays
+- Wallet System: YES - KSh 500 minimum deposit (can deposit more for more opportunities)
+
+2. Mandatory Qualifications Requirements
+
+DOCUMENTATION:
+☐ Valid National ID (photocopy)
+☐ Phone verification (SMS OTP)
+☐ Email verification (email confirmation)
+☐ Passport photo (clear, recent color photo)
+☐ Service worker license/certification (if applicable by law)
+☐ Professional references (2-3 minimum)
+☐ Background check clearance
+☐ KYC form fully completed
+☐ Bank account details for settlement
+
+SKILLS & EXPERIENCE:
+☐ Minimum 2 years experience in chosen trade
+☐ Proof of experience (portfolio, customer references, or demonstrated skills)
+☐ Professional tools and equipment
+☐ Safety equipment (helmet, gloves, safety shoes, etc.)
+☐ First aid certification (highly preferred)
+☐ Professional liability insurance (recommended)
+
+3. Wallet Deposit System
+- Mandatory: KSh 500 minimum
+- Payment: M-Pesa STK Push
+- Refund: After 30 days in good standing
+- Depletion: Commission for cash jobs deducted from deposit
+- Redeposit: When balance drops below KSh 500
+- ADDITIONAL DEPOSITS: Partners can deposit MORE than KSh 500 for MORE job opportunities
+  * KSh 500 = Standard access
+  * KSh 1,000 = More job opportunities
+  * KSh 2,000+ = Premium access to high-value jobs
+
+4. Service Delivery Standards
+- Arrive on time or provide 30-minute advance notice
+- Professional appearance: clean clothes, good hygiene
+- Complete service within quoted timeframe
+- Do not damage customer property
+- Clean work area before leaving
+- Provide payment receipt
+- Obtain customer signature/confirmation
+
+5. Commission Deduction (Cash Jobs Only)
+- Commission calculated: 15% of service amount
+- Deduction source: From deposit (not from earnings)
+- M-Pesa jobs: Commission from earnings, deposit untouched
+- Example: KSh 1,000 service → KSh 150 commission from deposit → KSh 850 to worker
+
+6. Suspension Criteria
+- No-show without notice: 7-day suspension
+- Customer complaint sustained: 7-day suspension
+- Rating below 3.5 stars: Automatic 7-day suspension
+- Rating below 3.0 stars: Automatic 30-day suspension
+- Safety violation: 30-day to permanent ban
+- Fraud/theft: Immediate permanent ban
+
+------- PARTNER TYPE 2: VENDORS -------
+
+VENDOR SPECIFIC AGREEMENT
+
+Applicable to: Service companies, Cleaning companies, Construction companies, etc.
+
+1. Service Specifications
+- Business entity (registered company)
+- Services: House cleaning, office cleaning, construction, etc.
+- Commission: 20% to Fixera, 80% to Vendor - UPDATED FROM 10%
+- Settlement: Monthly via bank transfer (Net 7-30 days)
+- Wallet System: NO - Uses monthly invoicing instead
+
+2. Mandatory Qualifications Requirements
+
+BUSINESS DOCUMENTATION:
+☐ Valid National ID (owner/director)
+☐ Certificate of Incorporation (from SPP)
+☐ KRA PIN certificate (current)
+☐ Tax compliance certificate (current)
+☐ Business bank account details
+☐ Business address proof (rental agreement or ownership)
+☐ Phone verification (SMS OTP)
+☐ Email verification (email confirmation)
+☐ Company website or online presence (preferred)
+☐ Professional references (3-5 minimum)
+☐ Public liability insurance certificate
+☐ Business proposal or portfolio
+
+BUSINESS REQUIREMENTS:
+☐ Registered business entity (not sole trader)
+☐ Valid KRA PIN number
+☐ Current tax compliance status
+☐ Business operating license
+☐ Liability insurance minimum KSh 5,000,000
+☐ Employee list (if applicable)
+☐ Operating minimum 1 year (established business)
+☐ Minimum 3 professional references
+☐ Business address in Kenya
+☐ Proven service track record
+
+3. Service Delivery Standards
+- Professional team appearance and conduct
+- Arrive on time or 2-hour advance notice
+- Complete services within quoted timeline
+- Maintain professional customer communication
+- Provide detailed service report
+- Clean work area post-service
+- Obtain customer sign-off/confirmation
+- Respond to customer inquiries within 2 hours
+
+4. Deposit Requirements
+- Mandatory: KSh 500
+- Payment: M-Pesa STK Push
+- Refund: After 30 days in good standing
+- Protection: Non-cash payment (no commission deduction)
+- Redeposit: Not typically required for vendors
+
+5. Invoice & Settlement Terms
+- Invoice required for each monthly settlement
+- Payment terms: Net 7 or Net 30 (configurable)
+- Settlement: End of month processing
+- Minimum monthly payout: KSh 1,000
+- Commission: 20% of gross service amount - UPDATED FROM 10%
+
+6. Suspension Criteria
+- No-show without notice: 7-day suspension
+- Customer complaint substantiated: 7-30 day suspension
+- Missing required documentation: 30-day suspension
+- Insurance lapse: Immediate suspension until renewed
+- Rating below 3.0: 30-day suspension
+- Fraud/theft/damage: Permanent ban
+
+------- PARTNER TYPE 3: RIDERS/COURIERS -------
+
+RIDER SPECIFIC AGREEMENT
+
+Applicable to: Delivery riders, Couriers, Logistics providers
+
+1. Service Specifications
+- Individual delivery service provider
+- Services: Same-day delivery, rush delivery, scheduled delivery
+- Commission: 15% to Fixera, 85% to Rider
+- Settlement: Daily (if >KSh 500) or Weekly Friday (if <KSh 500) via M-Pesa
+- Wallet System: YES - KSh 500 minimum deposit (can deposit more for more opportunities)
+
+2. Mandatory Qualifications Requirements
+
+DOCUMENTATION:
+☐ Valid National ID
+☐ Proof of age (18+ years minimum)
+☐ Valid driver's license (if using vehicle)
+☐ Vehicle registration (if own vehicle)
+☐ Vehicle insurance (if own vehicle)
+☐ Phone verification (SMS OTP)
+☐ Email verification (email confirmation)
+☐ Passport photo (clear, recent color)
+☐ Proof of residence (utility bill, lease)
+☐ Background check clearance
+☐ KYC form completed
+
+VEHICLE REQUIREMENTS (if using vehicle):
+☐ Vehicle in good mechanical condition
+☐ Third-party liability insurance minimum
+☐ Valid roadworthiness certificate
+☐ Proof of regular vehicle maintenance
+☐ GPS/tracking capability (preferred)
+☐ Weather protection capability (for items)
+☐ Adequate capacity for items
+
+SKILLS & EXPERIENCE:
+☐ Safe driving record (no major violations)
+☐ Knowledge of city routes and traffic patterns
+☐ Customer service experience
+☐ Punctuality track record
+☐ Communication skills
+☐ Physical ability for deliveries
+
+3. Wallet Deposit System
+- Mandatory: KSh 500 minimum
+- Payment: M-Pesa STK Push
+- Refund: After 30 days
+- Protection: Not deducted for deliveries
+- ADDITIONAL DEPOSITS: Can deposit MORE for MORE opportunities
+  * KSh 500 = Standard access
+  * KSh 1,000 = More delivery opportunities
+  * KSh 2,000+ = Premium delivery access
+
+4. Service Delivery Standards
+- Accept delivery request within 5 minutes
+- Arrive within estimated timeframe (notify if delayed)
+- Treat items with care (prevent damage)
+- Protect items from weather exposure
+- Obtain recipient signature/confirmation
+- Provide delivery proof (photo/note)
+- Respond to customer tracking inquiries
+- Maintain professional appearance
+
+5. Settlement Terms
+- Daily settlement if daily earnings >KSh 500
+- Weekly consolidation if daily earnings <KSh 500
+- Commission: 15% of delivery fee
+- M-Pesa B2C fee: KSh 25 (Fixera absorbs)
+- No payment for missed or failed deliveries
+
+6. Suspension Criteria
+- Item damaged/lost: 7-day suspension + replacement cost
+- No-show for delivery: 7-day suspension
+- Customer complaint: 7-day suspension
+- Rating below 3.0: 7-30 day suspension
+- Rude/unprofessional behavior: 7-day suspension
+- Theft/fraud: Permanent ban
+- Traffic violations while delivering: 7-day suspension
+
+------- PARTNER TYPE 4: SUPPLIERS -------
+
+SUPPLIER SPECIFIC AGREEMENT
+
+Applicable to: Bulk material suppliers, Wholesale goods suppliers
+
+1. Service Specifications
+- Business providing bulk goods/materials
+- Services: Bulk orders, wholesale distribution
+- Commission: 20% to Fixera, 80% to Supplier - UPDATED FROM 5%
+- Settlement: Monthly via bank transfer (Net 30-60 days)
+- Wallet System: NO - Uses monthly invoicing instead
+
+2. Mandatory Qualifications Requirements
+
+BUSINESS DOCUMENTATION:
+☐ Valid National ID (owner/director)
+☐ Certificate of Incorporation
+☐ KRA PIN certificate (current)
+☐ Tax compliance certificate (current)
+☐ Business bank account details
+☐ Business address proof
+☐ Trading license (current)
+☐ Phone verification (SMS OTP)
+☐ Email verification (email confirmation)
+☐ Product catalog or samples
+☐ Supply chain documentation
+☐ Professional references (3+ minimum)
+☐ Product liability insurance certificate
+
+BUSINESS REQUIREMENTS:
+☐ Registered business entity
+☐ Valid KRA PIN (currently compliant)
+☐ Business operating license
+☐ Warehouse or storage facility
+☐ Operating minimum 2 years (established supplier)
+☐ Product quality certifications (if applicable)
+☐ Reliable, traceable supply chain
+☐ Capacity to fulfill bulk orders
+☐ Professional inventory management system
+☐ Product liability insurance
+
+3. Service Delivery Standards
+- Respond to orders within 24 hours
+- Provide accurate product information
+- Deliver within agreed timeline
+- Ensure product quality and authenticity
+- Provide invoices and receipts
+- Handle bulk quantities professionally
+- Maintain consistent pricing
+- Communicate delivery updates
+
+4. Deposit Requirements
+- Mandatory: KSh 500
+- Payment: M-Pesa STK Push
+- Refund: After 30 days
+- Protection: Not deducted for orders
+
+5. Invoice & Settlement Terms
+- Minimum invoice: KSh 5,000
+- Payment terms: Net 30-60 days (configurable)
+- Settlement: Monthly via bank transfer
+- Commission: 20% of gross order amount - UPDATED FROM 5%
+- Invoice required for all orders
+
+6. Suspension Criteria
+- Product quality issues: 7-day suspension + replacement
+- Late delivery (repeated): 7-day suspension
+- Incorrect orders: 7-day suspension + refund
+- Customer fraud risk: 30-day suspension
+- Missing documentation: 30-day suspension
+- Rating below 3.0: 30-day suspension
+- Fraud/counterfeit goods: Permanent ban
+
+------- PARTNER TYPE 5: MOVERS -------
+
+MOVER SPECIFIC AGREEMENT
+
+Applicable to: Professional moving companies, Relocation services
+
+1. Service Specifications
+- Professional moving company (registered entity)
+- Services: House moves, office relocations, item transport
+- Commission: 20% to Fixera, 80% to Mover - UPDATED FROM 15%
+- Settlement: Weekly via M-Pesa B2C or monthly via bank transfer
+- Wallet System: NO - Uses M-Pesa B2C settlement
+
+2. Mandatory Qualifications Requirements
+
+BUSINESS DOCUMENTATION:
+☐ Valid National ID (owner/manager)
+☐ Certificate of Incorporation
+☐ KRA PIN certificate (current)
+☐ Business license
+☐ Business address proof
+☐ Phone verification (SMS OTP)
+☐ Email verification (email confirmation)
+☐ Professional references (5+ minimum)
+☐ Liability insurance certificate (KSh 10M+ minimum)
+☐ Fleet registration documents
+☐ Company website/portfolio
+
+BUSINESS REQUIREMENTS:
+☐ Registered moving company
+☐ Valid KRA PIN (compliant)
+☐ Business license for moving services
+☐ Liability insurance minimum KSh 10,000,000
+☐ Fleet of vehicles in good condition
+☐ Professional moving equipment (dollies, straps, padding)
+☐ Operating minimum 2 years (established company)
+☐ Proven moving experience (portfolio/references)
+☐ Professional trained team
+☐ Customer testimonials/references
+
+SAFETY & EQUIPMENT:
+☐ Safety equipment for crew (helmets, gloves, safety shoes)
+☐ Vehicle condition certificates
+☐ Packing materials (boxes, padding, wrapping)
+☐ Professional moving equipment (dollies, ramps, straps)
+☐ Vehicle GPS tracking capability
+☐ First aid kit in vehicles
+
+3. Service Delivery Standards
+- Professional appearance and conduct
+- Arrive on time with appropriate crew size
+- Treat items with extreme care
+- Use proper equipment and techniques
+- Protect property from damage
+- Clean area before leaving
+- Provide moving receipt
+- Respond to concerns within 1 hour
+
+4. Deposit Requirements
+- Mandatory: KSh 500
+- Payment: M-Pesa STK Push
+- Refund: After 30 days
+- Protection: Not typically deducted
+
+5. Settlement Terms
+- Weekly settlement: Friday via M-Pesa B2C (if >KSh 500)
+- Monthly settlement: Bank transfer (if monthly option chosen)
+- Commission: 20% of moving fee - UPDATED FROM 15%
+- Minimum weekly: KSh 500
+- Damage claims may offset earnings
+
+6. Suspension Criteria
+- Item damage/loss: 30-day suspension + compensation
+- No-show: 30-day suspension
+- Insurance lapse: Immediate suspension until renewed
+- Customer complaint: 7-30 day suspension
+- Rating below 3.0: 30-day suspension
+- Negligence/misconduct: 90-day suspension or permanent ban
+- Fraud/theft: Permanent ban
+
+------- PARTNER TYPE 6: WATER CARRIERS -------
+
+WATER CARRIER SPECIFIC AGREEMENT
+
+Applicable to: Clean water delivery providers, Water suppliers
+
+1. Service Specifications
+- Clean water delivery provider
+- Services: 5L jerrycan delivery, 20L delivery, bulk delivery
+- Commission: 20% to Fixera, 80% to Carrier - UPDATED FROM 15%
+- Settlement: Weekly via M-Pesa B2C on Fridays
+- Wallet System: NO - Uses M-Pesa B2C settlement
+
+2. Mandatory Qualifications Requirements
+
+DOCUMENTATION:
+☐ Valid National ID
+☐ Phone verification (SMS OTP)
+☐ Email verification (email confirmation)
+☐ Passport photo (clear, recent color)
+☐ Health certification (fitness/health proof)
+☐ Business license (if self-employed)
+☐ KRA PIN (if self-employed)
+☐ Water quality certification (if applicable)
+☐ Vehicle registration (if using vehicle)
+☐ Background check clearance
+
+VEHICLE & EQUIPMENT REQUIREMENTS:
+☐ Vehicle in good mechanical condition
+☐ Capacity for water jerrycans
+☐ Weather protection for water
+☐ Clean water storage containers
+☐ Food-grade jerrycans ONLY (no reused containers)
+☐ Vehicle insurance
+☐ Vehicle cleanliness standards
+☐ Spill prevention equipment
+
+HEALTH & QUALITY REQUIREMENTS:
+☐ Monthly health check/certification
+☐ Water quality proof (if applicable)
+☐ Hygiene standards maintained
+☐ Equipment cleanliness
+☐ No contamination practices
+☐ Proper water handling procedures
+
+3. Service Delivery Standards
+- Arrive within estimated timeframe
+- Deliver clean, uncontaminated water only
+- Use food-grade containers exclusively
+- Maintain hygiene throughout delivery
+- Protect water from spillage
+- Obtain customer confirmation
+- Maintain vehicle cleanliness
+- Professional conduct and appearance
+
+4. Deposit Requirements
+- Mandatory: KSh 500
+- Payment: M-Pesa STK Push
+- Refund: After 30 days
+- Protection: Not deducted
+
+5. Settlement Terms
+- Weekly settlement: Friday
+- Commission: 20% of delivery fee - UPDATED FROM 15%
+- M-Pesa B2C fee: KSh 30 (Fixera absorbs)
+- Minimum weekly: KSh 500
+- Via M-Pesa B2C
+
+6. Suspension Criteria
+- Contaminated water delivery: 30-day suspension + refund
+- No-show/late delivery: 7-day suspension
+- Health certification lapse: Immediate suspension
+- Customer complaint: 7-day suspension
+- Vehicle condition issues: 7-day suspension until fixed
+- Rating below 3.0: 7-30 day suspension
+- Fraud/health violation: Permanent ban
+
+================================================================================
+SECTION 4: INTELLECTUAL PROPERTY PROTECTION & BRAND POLICY
+================================================================================
+
+FIXERA INTELLECTUAL PROPERTY RIGHTS STATEMENT
+
+1. FIXERA INTELLECTUAL PROPERTY OWNERSHIP
+
+Fixera owns and protects the following intellectual property:
+
+1.1 Registered Trademarks & Brand
+- FIXERA ™ (brand name - registered)
+- FIXERA Logo ® (visual identity - registered)
+- All variations, derivatives, and translations of FIXERA mark
+- All color combinations and design variations
+
+1.2 Copyright & Creative Works
+- All software code and algorithms
+- User interface design and layout
+- Graphics, logos, and visual elements
+- Written content (documentation, guides, FAQs, help articles)
+- Marketing materials and advertisements
+- Email templates and designs
+- Photos, videos, and multimedia content
+- Database structures and architecture
+
+1.3 Patents & Trade Secrets
+- Matching algorithm and methodology
+- Payment processing system
+- Commission calculation methods
+- Customer-Partner routing system
+- Analytics and reporting systems
+- Dispute resolution methodology
+- All proprietary business processes
+- Technical infrastructure and systems
+
+1.4 Digital Assets & Domain
+- fixera.co.ke domain and all subdomains
+- Mobile application source code (iOS and Android)
+- Web application source code
+- Cloud infrastructure configuration
+- Database design and structure
+- All digital systems and backend
+
+2. USER & PARTNER INTELLECTUAL PROPERTY RESTRICTIONS
+
+All users and Partners acknowledge and agree:
+
+2.1 NO OWNERSHIP CLAIMS
+Partners and users may NOT claim ownership or co-ownership of:
+- Fixera brand name or logo
+- Fixera platform features or functionality
+- Fixera technology or algorithms
+- Fixera business model or processes
+- Any Fixera intellectual property
+
+2.2 NO REPRODUCTION ALLOWED
+Partners and users may NOT:
+- Copy Fixera app or website source code
+- Reproduce Fixera's user interface design
+- Clone Fixera's features for competing use
+- Create derivative works based on Fixera
+- Screenshot and republish Fixera content
+- Reverse engineer Fixera technology
+- Share Fixera's proprietary information
+- Scrape or extract data from platform
+- Use Fixera's algorithms or business methods
+
+2.3 LIMITED LICENSE GRANTED
+Partners are granted LIMITED license only to:
+- Use Fixera platform as intended (for service delivery)
+- Display Fixera branding as pre-approved (with clear designation as partner)
+- Reference Fixera in professional context (with written permission)
+- Use Fixera name only in official platform context
+
+2.4 COMPETING PLATFORMS - STRICTLY PROHIBITED
+Partners strictly may NOT:
+- Create competing platform using Fixera's business model
+- Develop similar app with equivalent features
+- Attempt to recruit Fixera users to competing platform
+- Use customer data from Fixera to build competing service
+- Share proprietary Fixera information with competitors
+- Claim Fixera's technology knowledge as their own
+- Attempt to hire Fixera staff to recreate Fixera
+- Use Fixera's commission structure or pricing methods
+
+3. BRAND USAGE GUIDELINES FOR PARTNERS
+
+3.1 APPROVED BRAND USES
+Partners may use Fixera name/logo only for:
+- Identifying self as official Fixera partner (with permission)
+- Displaying on social media with proper attribution/disclaimer
+- Professional references in business bio or website (with disclaimer)
+- Partnership announcements (with prior written approval)
+- Business cards or collateral (with written approval)
+
+3.2 PROHIBITED BRAND USES
+Partners may absolutely NOT use Fixera name/logo for:
+- Creating or promoting competing services
+- Implying official endorsement by Fixera that doesn't exist
+- Commercial purposes without explicit written permission
+- Third-party websites, apps, or platforms
+- Attempting to register trademarks or domain names
+- Merchandising or physical products
+- Social media impersonation
+- Misleading marketing or false claims
+- Any use suggesting partnership beyond what's authorized
+
+3.3 BRAND USAGE APPROVAL PROCESS
+Partners requesting permission to use Fixera brand must:
+- Email detailed request to: brand@fixera.co.ke
+- Provide specific context and purpose
+- Submit mockup or preview of intended use
+- Receive written approval before using
+- Respect all conditions placed on approved use
+- Use only as approved (modifications require new approval)
+
+4. DATA OWNERSHIP & RESTRICTIONS
+
+4.1 FIXERA OWNERSHIP OF CUSTOMER DATA
+Fixera owns all customer data generated on platform:
+- Customer contact information (name, phone, email, address)
+- Complete transaction history
+- Payment information and transaction records
+- Customer ratings and reviews
+- All messages and correspondence
+- Service location data
+- Customer preferences and booking history
+- Device information and usage data
+
+4.2 FIXERA OWNERSHIP OF PARTNER DATA
+Fixera owns all Partner data:
+- Performance metrics and statistics
+- Complete earnings and payment history
+- Job completion rates and performance records
+- Customer feedback and ratings
+- Dispute history
+- Communication logs
+- Documentation and verification records
+
+4.3 ANONYMIZED DATA USAGE
+Fixera may use anonymized, aggregated data for:
+- Service analytics and improvement
+- Marketing research and studies
+- Industry benchmarking
+- Performance reporting
+- Sharing with third parties (anonymized only, no personal identification)
+
+4.4 STRICT DATA RESTRICTIONS ON PARTNERS
+Partners may absolutely NOT:
+- Access or export customer data
+- Use customer data for personal purposes
+- Share customer data with third parties
+- Sell or commercialize customer data
+- Use customer data to build competing service
+- Contact customers outside Fixera platform
+- Claim ownership of customer data
+- Transfer customer data to other platforms
+
+5. INTELLECTUAL PROPERTY ENFORCEMENT
+
+5.1 MONITORING & DETECTION
+Fixera actively monitors for IP infringement:
+- Automated scanning systems for unauthorized use
+- Customer and Partner reporting mechanisms
+- Legal team investigation protocols
+- Third-party IP monitoring services
+- Regular audits of potential violations
+
+5.2 CEASE & DESIST PROCESS
+Upon detection of IP infringement:
+- Formal cease and desist notice issued
+- Demand for immediate cessation of infringing activity
+- Demand for removal of infringing content
+- Request for explanation and remediation plan
+- 5-day deadline for response
+
+5.3 LEGAL ACTION
+If infringement continues after cease & desist:
+- Immediate account termination without notice
+- Civil lawsuit for damages (including statutory damages)
+- Injunctive relief (court order to stop)
+- Criminal prosecution (if applicable)
+- Recovery of all Fixera legal costs
+- Punitive damages for willful infringement
+
+5.4 FINANCIAL PENALTIES FOR IP BREACH
+Partners breaching IP rights face:
+- Forfeiture of ALL earnings in account
+- Payment of all Fixera legal costs and attorney fees
+- Monetary damages award
+- Court-ordered injunction preventing future use
+- Permanent ban from platform
+
+6. DMCA & LEGAL COMPLIANCE
+
+6.1 DIGITAL MILLENNIUM COPYRIGHT ACT (DMCA)
+Fixera complies fully with DMCA requirements:
+- Protects against circumvention of security measures
+- Prohibits unauthorized system access
+- Maintains all copyright notices and attributions
+- Responds promptly to DMCA infringement claims
+- Implemented takedown procedures
+
+6.2 KENYAN DATA PROTECTION COMPLIANCE
+Fixera complies with ODPC (Office of Data Protection Commissioner):
+- Protects user privacy rights
+- Encrypts personal data
+- Maintains data security standards
+- Respects data subject rights
+- Implements privacy-by-design principles
+
+7. THIRD-PARTY INTELLECTUAL PROPERTY
+
+7.1 USER-GENERATED CONTENT
+When Partners upload photos, videos, or other content:
+- Partner grants Fixera unlimited license to use content
+- Fixera owns copyright to content in platform context
+- Fixera may use content for marketing, promotion, analytics
+- Partner retains personal copyright
+- Partner cannot claim exclusive rights
+
+7.2 THIRD-PARTY IP RESPECT
+Fixera respects third-party intellectual property:
+- Does not infringe copyrights
+- Uses licensed content where required
+- Respects third-party trademarks
+- Complies with patent licenses
+- Provides proper attribution
+- Licenses content appropriately
+
+8. DISPUTE RESOLUTION FOR IP CLAIMS
+
+8.1 IP DISPUTE PROCESS
+If IP dispute arises:
+- Notify Fixera legal team: legal@fixera.co.ke
+- Provide detailed description of dispute
+- Include evidence and documentation
+- Fixera investigates within 14 days
+- Fair resolution determined based on evidence
+- Appeal process available within 7 days
+- Final decision communicated within 30 days
+
+8.2 DMCA TAKEDOWN PROCESS
+For copyright infringement claims:
+- File formal DMCA takedown notice
+- Include all required DMCA information
+- Fixera removes content within 48 hours
+- Notifies potentially affected user
+- Counter-notice process available per DMCA
+
+================================================================================
+SECTION 5: COMPREHENSIVE PARTNER REQUIREMENTS CHECKLIST
+================================================================================
+
+PARTNER ONBOARDING & QUALIFICATION CHECKLIST
+For use by Fixera compliance team during partner registration
+
+PARTNER TYPE: ☐ Service Worker  ☐ Vendor  ☐ Rider  ☐ Supplier  ☐ Mover  ☐ Water Carrier
+
+PARTNER NAME: ________________  PHONE: _______________  EMAIL: __________________
+
+REGISTRATION DATE: _____________  REGISTRATION ID: _____________
+
+═══════════════════════════════════════════════════════════════════════════════
+
+SECTION A: IDENTITY & BASIC VERIFICATION
+
+IDENTITY DOCUMENTS:
+☐ Valid National ID provided
+☐ ID expires: _________________
+☐ ID number verified: _________________
+☐ Photocopy attached to file
+☐ ID photocopy date-stamped
+☐ Partner confirms ID ownership
+☐ No suspicious/counterfeit indicators
+
+CONTACT VERIFICATION:
+☐ Phone number verified (SMS OTP)
+☐ Phone number confirmed belongs to partner
+☐ Email address verified (email confirmation)
+☐ Email confirmed belongs to partner
+☐ Backup contact provided (optional)
+☐ Partner contactable via primary phone
+☐ Partner responsive to messages
+
+LOCATION VERIFICATION:
+☐ Business address provided (for vendors/suppliers)
+☐ Address proof provided (rental/ownership agreement)
+☐ Address verified via satellite/street view
+☐ Address is in Kenya
+☐ Address valid and accessible
+☐ Partner confirms address
+
+═══════════════════════════════════════════════════════════════════════════════
+
+SECTION B: BUSINESS VERIFICATION (For Vendors, Suppliers, Movers Only)
+
+BUSINESS REGISTRATION:
+☐ Certificate of Incorporation provided
+☐ Certificate verified with SPP (not expired)
+☐ Company name matches application
+☐ Registration date: ______________
+☐ Business type confirmed
+☐ Ownership structure clear
+☐ Copy attached to file
+
+TAX COMPLIANCE:
+☐ KRA PIN certificate provided
+☐ KRA PIN verified (unique, valid)
+☐ Tax compliance status confirmed
+☐ No tax evasion history
+☐ KRA PIN: __________________
+☐ Copy attached to file
+
+BUSINESS LICENSE:
+☐ Trading license provided
+☐ License valid and current
+☐ License expiry: ______________
+☐ License matches business
+☐ Copy attached to file
+
+═══════════════════════════════════════════════════════════════════════════════
+
+SECTION C: FINANCIAL VERIFICATION
+
+BANK ACCOUNT:
+☐ Bank account details provided
+☐ Account holder name matches partner
+☐ Bank statement provided (last 3 months)
+☐ Account appears active and legitimate
+☐ Account type: ☐ Personal  ☐ Business
+☐ Bank details verified (test deposit if applicable)
+
+CREDIT CHECK:
+☐ Credit check performed (if applicable)
+☐ No adverse credit history
+☐ No fraud indicators
+☐ No debt default history
+☐ Credit score: __________ (if available)
+
+PROOF OF FUNDS:
+☐ Bank statement shows regular activity
+☐ Account balance appears adequate
+☐ No suspicious transactions
+☐ No high-risk transactions
+☐ Financial history looks legitimate
+
+═══════════════════════════════════════════════════════════════════════════════
+
+SECTION D: BACKGROUND & SAFETY CHECKS
+
+BACKGROUND CHECK:
+☐ Background check conducted (criminal records)
+☐ No serious criminal convictions
+☐ No fraud/theft convictions
+☐ No violence convictions
+☐ Acceptable background history
+☐ Check date: ______________
+☐ Check results in file
+
+REFERENCE CHECKS:
+☐ Professional references provided
+☐ Number of references: _______
+☐ References contacted
+☐ References verified positive
+☐ Reference details documented
+☐ No red flags from references
+
+SAFETY ASSESSMENT:
+☐ No safety concerns identified
+☐ Partner appears trustworthy
+☐ No history of complaints
+☐ No civil litigation history
+☐ Acceptable safety profile
+
+═══════════════════════════════════════════════════════════════════════════════
+
+SECTION E: INSURANCE & LIABILITY (Where Applicable)
+
+INSURANCE DOCUMENTS:
+☐ Insurance certificate provided
+☐ Insurance type: ☐ Liability  ☐ Vehicle  ☐ Health
+☐ Coverage amount: KSh _______________
+☐ Policy expiry: ______________
+☐ Insurance is active/valid
+☐ Insurer is reputable
+☐ Coverage meets requirements
+
+INSURANCE VERIFICATION:
+☐ Insurance company confirmed
+☐ Policy number verified
+☐ Coverage verified with insurer
+☐ Coverage includes Fixera activities
+☐ No policy exclusions concerning
+
+VEHICLE DOCUMENTS (For Riders/Movers/Water Carriers):
+☐ Vehicle registration provided
+☐ Vehicle ownership confirmed
+☐ Registration matches vehicle
+☐ Registration current/valid
+☐ Vehicle inspection passed
+☐ Vehicle is safe/roadworthy
+☐ Insurance covers commercial use
+
+═══════════════════════════════════════════════════════════════════════════════
+
+SECTION F: PROFESSIONAL QUALIFICATIONS
+
+REQUIRED CERTIFICATIONS:
+☐ Trade certification provided (if required)
+☐ Certification: _______________________
+☐ Certification valid/current
+☐ Certification from recognized body
+☐ Experience documentation provided
+☐ Experience verified (2+ years)
+☐ Skills assessment passed
+
+LICENSES & PERMITS:
+☐ Professional license provided (if required)
+☐ License type: _____________________
+☐ License valid/current
+☐ License expiry: ______________
+☐ License appropriate for services
+☐ Copy attached to file
+
+TRAINING & SKILLS:
+☐ Relevant training documented
+☐ Training from recognized body
+☐ Training certificate valid
+☐ Partner demonstrates competency
+☐ First aid certified (for safety-critical roles)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+SECTION G: EQUIPMENT & SAFETY (Where Applicable)
+
+EQUIPMENT:
+☐ Required equipment owned/available
+☐ Equipment list: _____________________
+☐ Equipment photos provided
+☐ Equipment appears functional
+☐ Equipment is safe
+☐ Equipment meets standards
+
+SAFETY GEAR:
+☐ Safety equipment available
+☐ Safety items: _____________________
+☐ Safety items meet requirements
+☐ Partner aware of safety protocols
+☐ Safety awareness confirmed
+
+HEALTH & HYGIENE:
+☐ Health documentation provided (if required)
+☐ Health certificate current
+☐ No communicable diseases indicated
+☐ Hygiene standards understood
+☐ Hygiene compliance confirmed
+
+═══════════════════════════════════════════════════════════════════════════════
+
+SECTION H: AGREEMENT & COMPLIANCE
+
+TERMS ACCEPTANCE:
+☐ Terms & Conditions accepted
+☐ Partner signature/approval obtained
+☐ Partner confirms understanding
+☐ Partner-specific agreement accepted
+☐ Partner signature/approval obtained
+☐ IP protection clause acknowledged
+☐ Confidentiality clause acknowledged
+
+KYC COMPLETION:
+☐ KYC form completed fully
+☐ All required fields filled
+☐ Information matches documents
+☐ Partner signature on KYC form
+☐ KYC form dated and filed
+
+DEPOSIT PAYMENT:
+☐ Deposit amount: KSh 500 MINIMUM
+☐ Deposit payment method: ☐ M-Pesa  ☐ Bank
+☐ Deposit receipt obtained
+☐ Deposit confirmed received
+☐ Deposit date: ______________
+☐ Payment reference: ______________
+
+WALLET DEPOSIT (Service Workers & Riders ONLY):
+☐ Wallet deposit amount: KSh 500 minimum (or higher)
+☐ Additional deposit available for more opportunities
+☐ Partner informed of job access tiers
+☐ Wallet payment confirmed received
+☐ Wallet deposit date: ______________
+
+═══════════════════════════════════════════════════════════════════════════════
+
+SECTION I: FINAL APPROVAL & NOTES
+
+COMPLIANCE OFFICER REVIEW:
+☐ All required documents obtained
+☐ All verifications completed
+☐ All checks passed
+☐ No red flags identified
+☐ Partner meets all requirements
+☐ Partner approved for registration
+
+COMPLIANCE OFFICER NAME: ___________________  DATE: ______________
+
+APPROVAL STATUS:
+☐ APPROVED - Proceed with activation
+☐ APPROVED WITH CONDITIONS (specify): _______________________________
+☐ PENDING - More information needed: ________________________________
+☐ REJECTED - Reason: ________________________________________________
+
+NOTES & COMMENTS:
+_________________________________________________________________
+_________________________________________________________________
+_________________________________________________________________
+
+NEXT STEPS:
+☐ Account activated on platform
+☐ Partner notified of approval
+☐ Onboarding materials sent
+☐ First-job trial period: 7 days with enhanced monitoring
+☐ Compliance review scheduled for: ______________
+
+═══════════════════════════════════════════════════════════════════════════════
+
+SECTION J: ONGOING MONITORING
+
+PERIODIC REVIEWS:
+☐ 30-day review scheduled
+☐ 90-day performance review scheduled
+☐ 6-month comprehensive review scheduled
+☐ Annual renewal review scheduled
+
+DOCUMENTATION RENEWAL:
+☐ ID renewal check scheduled (before expiry)
+☐ Insurance renewal check scheduled (before expiry)
+☐ License renewal check scheduled (before expiry)
+☐ Certification renewal check scheduled (before expiry)
+☐ Health check renewal (if applicable)
+
+PERFORMANCE METRICS:
+Current Rating: _____ stars
+Completion Rate: _____%
+Complaint Rate: _____%
+Earnings to Date: KSh _______
+Jobs Completed: ______
+
+═══════════════════════════════════════════════════════════════════════════════
+
+END OF CORRECTED LEGAL DOCUMENTATION PACKAGE
+
+For questions or clarifications: legal@fixera.co.ke
+Last Updated: June 10, 2026 - CORRECTED VERSION
+Version: 1.1 - All errors fixed
+
+KEY CORRECTIONS MADE:
+✓ Partner types reduced from 7 to 6 (removed separate Cleaners category)
+✓ Removed Carpentry from Service Workers list
+✓ Updated commission rates:
+  - Vendors: 20% (was 10%)
+  - Suppliers: 20% (was 5%)
+  - Movers: 20% (was 15%)
+  - Water Carriers: 20% (was 15%)
+✓ Wallet system now ONLY for Service Workers & Riders (KSh 500 minimum)
+✓ All other partners use monthly invoicing or bank transfers
+✓ Added note that partners can deposit MORE than KSh 500 for more opportunities

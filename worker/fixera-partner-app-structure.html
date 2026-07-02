@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Fixera Partner App — Full Architecture & Structure</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0A0E1A;color:#E8E8E8;font-family:'Inter',sans-serif;font-size:14px;line-height:1.7;padding:48px 0}
+  .page{max-width:900px;margin:0 auto;padding:0 40px}
+
+  /* Cover */
+  .cover{text-align:center;padding:60px 0 48px;border-bottom:1px solid #1E2D45;margin-bottom:48px}
+  .cover .logo{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#C9A020,#D4B033);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 20px}
+  .cover h1{font-size:32px;font-weight:900;color:#E8E8E8;letter-spacing:-0.5px;margin-bottom:8px}
+  .cover .subtitle{color:#7A8BA0;font-size:14px;font-weight:600;letter-spacing:2px;text-transform:uppercase}
+  .cover .meta{margin-top:20px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+  .cover .tag{background:rgba(201,160,32,0.12);border:1px solid rgba(201,160,32,0.3);color:#C9A020;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700}
+
+  /* Sections */
+  .section{margin-bottom:48px}
+  h2{font-size:20px;font-weight:800;color:#C9A020;margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid #1E2D45;display:flex;align-items:center;gap:10px}
+  h2 .num{background:rgba(201,160,32,0.15);border:1px solid rgba(201,160,32,0.3);border-radius:8px;padding:2px 10px;font-size:13px}
+  h3{font-size:15px;font-weight:700;color:#E8E8E8;margin:20px 0 10px}
+
+  /* Overview cards */
+  .stack-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px}
+  .stack-card{background:#111827;border:1px solid #1E2D45;border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:12px}
+  .stack-card .icon{font-size:22px;flex-shrink:0}
+  .stack-card .name{color:#E8E8E8;font-weight:700;font-size:13px}
+  .stack-card .desc{color:#7A8BA0;font-size:11px;margin-top:2px}
+
+  /* File tree */
+  .filetree{background:#060912;border:1px solid #1E2D45;border-radius:14px;padding:20px 24px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.9;overflow-x:auto}
+  .filetree .folder{color:#C9A020;font-weight:700}
+  .filetree .file{color:#7A8BA0}
+  .filetree .comment{color:#2D4A6A}
+  .filetree .highlight{color:#68D391}
+
+  /* Role cards */
+  .role-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .role-card{border-radius:14px;padding:18px 20px;border:1px solid}
+  .role-card.worker{background:rgba(201,160,32,0.06);border-color:rgba(201,160,32,0.25)}
+  .role-card.vendor{background:rgba(99,179,237,0.06);border-color:rgba(99,179,237,0.25)}
+  .role-card.rider{background:rgba(104,211,145,0.06);border-color:rgba(104,211,145,0.25)}
+  .role-card.supplier{background:rgba(246,173,85,0.06);border-color:rgba(246,173,85,0.25)}
+  .role-card .role-icon{font-size:28px;margin-bottom:8px}
+  .role-card .role-name{font-size:16px;font-weight:800;margin-bottom:4px}
+  .role-card.worker .role-name{color:#C9A020}
+  .role-card.vendor .role-name{color:#63B3ED}
+  .role-card.rider .role-name{color:#68D391}
+  .role-card.supplier .role-name{color:#F6AD55}
+  .role-card .role-route{font-family:'JetBrains Mono',monospace;font-size:11px;color:#4A6080;margin-bottom:8px}
+  .role-card .role-desc{color:#7A8BA0;font-size:12px;line-height:1.6}
+
+  /* Tables */
+  table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+  th{background:#060912;color:#7A8BA0;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1px;padding:10px 14px;text-align:left;border-bottom:1px solid #1E2D45}
+  td{padding:10px 14px;border-bottom:1px solid #111827;color:#E8E8E8;vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:rgba(255,255,255,0.02)}
+  .table-wrap{background:#111827;border:1px solid #1E2D45;border-radius:12px;overflow:hidden;margin-bottom:20px}
+  td code{font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(201,160,32,0.1);color:#C9A020;padding:2px 6px;border-radius:4px}
+  td .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+  td .badge.yes{background:rgba(72,187,120,0.12);color:#68D391;border:1px solid rgba(72,187,120,0.3)}
+  td .badge.no{background:rgba(122,139,160,0.12);color:#7A8BA0;border:1px solid #1E2D45}
+
+  /* Auth flow */
+  .flow{display:flex;flex-direction:column;gap:0}
+  .flow-step{display:flex;gap:16px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #111827}
+  .flow-step:last-child{border-bottom:none}
+  .flow-num{width:28px;height:28px;border-radius:50%;background:rgba(201,160,32,0.15);border:1px solid rgba(201,160,32,0.4);color:#C9A020;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+  .flow-text{color:#E8E8E8;font-size:13px}
+  .flow-text span{color:#7A8BA0;font-size:12px;display:block;margin-top:2px}
+
+  /* Protection layers */
+  .layer{background:#111827;border-radius:12px;border:1px solid #1E2D45;padding:16px 20px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start}
+  .layer-num{font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;white-space:nowrap}
+  .layer-num.l1{background:rgba(252,129,129,0.12);color:#FC8181;border:1px solid rgba(252,129,129,0.3)}
+  .layer-num.l2{background:rgba(246,173,85,0.12);color:#F6AD55;border:1px solid rgba(246,173,85,0.3)}
+  .layer-num.l3{background:rgba(104,211,145,0.12);color:#68D391;border:1px solid rgba(104,211,145,0.3)}
+  .layer-content .title{font-weight:700;color:#E8E8E8;font-size:13px;margin-bottom:4px}
+  .layer-content .desc{color:#7A8BA0;font-size:12px}
+  .layer-content code{font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(99,179,237,0.1);color:#63B3ED;padding:1px 6px;border-radius:4px}
+
+  /* Onboarding steps */
+  .onboard-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .onboard-role{background:#111827;border:1px solid #1E2D45;border-radius:12px;padding:14px}
+  .onboard-role .label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+  .onboard-role.worker .label{color:#C9A020}
+  .onboard-role.vendor .label{color:#63B3ED}
+  .onboard-role.rider .label{color:#68D391}
+  .onboard-role.supplier .label{color:#F6AD55}
+  .step-pill{font-size:10px;padding:3px 8px;border-radius:6px;margin-bottom:4px;display:block;font-weight:600}
+  .step-pill.shared{background:rgba(122,139,160,0.1);color:#7A8BA0;border:1px solid #1E2D45}
+  .step-pill.unique.worker{background:rgba(201,160,32,0.1);color:#C9A020;border:1px solid rgba(201,160,32,0.3)}
+  .step-pill.unique.vendor{background:rgba(99,179,237,0.1);color:#63B3ED;border:1px solid rgba(99,179,237,0.3)}
+  .step-pill.unique.rider{background:rgba(104,211,145,0.1);color:#68D391;border:1px solid rgba(104,211,145,0.3)}
+  .step-pill.unique.supplier{background:rgba(246,173,85,0.1);color:#F6AD55;border:1px solid rgba(246,173,85,0.3)}
+
+  /* Nav */
+  .nav-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .nav-card{background:#111827;border:1px solid #1E2D45;border-radius:12px;padding:16px}
+  .nav-card .nav-role{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+  .nav-card.worker .nav-role{color:#C9A020}
+  .nav-card.vendor .nav-role{color:#63B3ED}
+  .nav-card.rider .nav-role{color:#68D391}
+  .nav-card.supplier .nav-role{color:#F6AD55}
+  .nav-items{display:flex;flex-wrap:wrap;gap:6px}
+  .nav-item{font-size:11px;padding:3px 10px;border-radius:8px;background:#0A0E1A;border:1px solid #1E2D45;color:#7A8BA0}
+
+  /* Design decisions */
+  .decision{background:#111827;border:1px solid #1E2D45;border-radius:14px;padding:18px 20px;margin-bottom:12px;display:flex;gap:16px}
+  .decision-num{font-size:24px;font-weight:900;color:rgba(201,160,32,0.3);flex-shrink:0;width:32px}
+  .decision-title{color:#E8E8E8;font-weight:700;font-size:14px;margin-bottom:6px}
+  .decision-desc{color:#7A8BA0;font-size:13px;line-height:1.6}
+
+  /* Print */
+  @media print{
+    body{background:white;color:#111}
+    .cover{border-bottom:2px solid #C9A020}
+    h2{color:#C9A020;border-bottom:1px solid #eee}
+    .filetree,.table-wrap,.role-card,.layer,.decision,.nav-card,.onboard-role,.stack-card{border:1px solid #ddd!important;background:#fafafa!important}
+    .filetree .folder{color:#B8860B}
+    .filetree .file,.filetree .comment{color:#666}
+    td,th{border-bottom:1px solid #eee!important}
+    .role-card .role-desc,.flow-text span,.layer-content .desc,.decision-desc{color:#555!important}
+    .nav-item{background:#f0f0f0!important;color:#555!important}
+    .step-pill.shared{background:#f0f0f0!important;color:#666!important}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- COVER -->
+  <div class="cover">
+    <div class="logo">🔧</div>
+    <h1>Fixera Partner App</h1>
+    <div class="subtitle">Full Architecture &amp; Structure</div>
+    <div class="meta">
+      <span class="tag">React 18 + Vite 5</span>
+      <span class="tag">Supabase</span>
+      <span class="tag">4 Partner Roles</span>
+      <span class="tag">Role-Based Access</span>
+      <span class="tag">May 2026</span>
+    </div>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div class="section">
+    <h2><span class="num">00</span> Overview</h2>
+    <p style="color:#7A8BA0;margin-bottom:20px">The Fixera Partner App is a unified React web application that serves four distinct partner roles — Workers, Vendors, Riders, and Suppliers — under one codebase. Role-based permissions control what each partner sees and can do.</p>
+    <div class="stack-grid">
+      <div class="stack-card"><div class="icon">⚛️</div><div><div class="name">React 18 + Vite 5</div><div class="desc">Frontend framework + build tool</div></div></div>
+      <div class="stack-card"><div class="icon">🗄️</div><div><div class="name">Supabase</div><div class="desc">Auth, Database, Storage, RLS</div></div></div>
+      <div class="stack-card"><div class="icon">🔀</div><div><div class="name">React Router v6</div><div class="desc">Client-side routing + protected routes</div></div></div>
+      <div class="stack-card"><div class="icon">🎨</div><div><div class="name">CSS Variables + Inter</div><div class="desc">Dark theme, consistent design tokens</div></div></div>
+    </div>
+  </div>
+
+  <!-- FILE STRUCTURE -->
+  <div class="section">
+    <h2><span class="num">01</span> Project File Structure</h2>
+    <div class="filetree">
+<span class="folder">fixera-worker/</span>
+├── <span class="folder">src/</span>
+│   ├── <span class="highlight">App.jsx</span>                   <span class="comment"># Root router — all routes defined here</span>
+│   ├── <span class="file">main.jsx</span>                  <span class="comment"># React entry point</span>
+│   ├── <span class="file">supabase.js</span>               <span class="comment"># Supabase client init</span>
+│   ├── <span class="file">theme.js</span>                  <span class="comment"># CSS variable tokens</span>
+│   │
+│   ├── <span class="folder">hooks/</span>
+│   │   ├── <span class="highlight">useAuth.jsx</span>           <span class="comment"># Auth context — user, profile, loading</span>
+│   │   └── <span class="file">useTheme.js</span>           <span class="comment"># Dark/light theme toggle</span>
+│   │
+│   ├── <span class="folder">components/</span>
+│   │   ├── <span class="highlight">Layout.jsx</span>            <span class="comment"># Sidebar + nav — role-aware</span>
+│   │   ├── <span class="highlight">ProtectedRoute.jsx</span>    <span class="comment"># Auth guard + onboarding gate + role guard</span>
+│   │   └── <span class="file">JobMap.jsx</span>            <span class="comment"># Map component for active jobs</span>
+│   │
+│   ├── <span class="folder">pages/</span>
+│   │   ├── <span class="folder">auth/</span>
+│   │   │   ├── <span class="highlight">LoginPage.jsx</span>         <span class="comment"># Login → redirects by partner_role</span>
+│   │   │   ├── <span class="highlight">RegisterPage.jsx</span>      <span class="comment"># 2-step: role select → role details</span>
+│   │   │   ├── <span class="highlight">OnboardingPage.jsx</span>    <span class="comment"># 6-step role-aware verification wizard</span>
+│   │   │   ├── <span class="file">ForgotPasswordPage.jsx</span><span class="comment"># Password reset request</span>
+│   │   │   └── <span class="file">ResetPasswordPage.jsx</span> <span class="comment"># Password reset confirm</span>
+│   │   │
+│   │   ├── <span class="folder">main/</span>                   <span class="comment"># Worker-specific pages</span>
+│   │   │   ├── <span class="file">DashboardPage.jsx</span>     <span class="comment"># Job listings for workers</span>
+│   │   │   ├── <span class="file">ActiveJobPage.jsx</span>     <span class="comment"># Live job tracking</span>
+│   │   │   ├── <span class="file">JobDetailPage.jsx</span>     <span class="comment"># Single job details</span>
+│   │   │   ├── <span class="file">HistoryPage.jsx</span>       <span class="comment"># Past jobs</span>
+│   │   │   ├── <span class="file">EarningsPage.jsx</span>      <span class="comment"># Earnings breakdown</span>
+│   │   │   ├── <span class="file">ProfilePage.jsx</span>       <span class="comment"># Partner profile editor</span>
+│   │   │   ├── <span class="highlight">SupportPage.jsx</span>       <span class="comment"># Ticket-based support system</span>
+│   │   │   └── <span class="file">ReceiptPage.jsx</span>       <span class="comment"># Job receipt / PDF</span>
+│   │   │
+│   │   ├── <span class="folder">vendor/</span>
+│   │   │   └── <span class="highlight">VendorDashboard.jsx</span>   <span class="comment"># Orders, open/close toggle</span>
+│   │   │
+│   │   ├── <span class="folder">rider/</span>
+│   │   │   └── <span class="highlight">RiderDashboard.jsx</span>    <span class="comment"># Pickup jobs, online toggle, delivery steps</span>
+│   │   │
+│   │   └── <span class="folder">supplier/</span>
+│   │       └── <span class="highlight">SupplierDashboard.jsx</span> <span class="comment"># Product catalog CRUD</span>
+│   │
+│   └── <span class="folder">utils/</span>
+│       └── <span class="file">receiptPDF.js</span>         <span class="comment"># PDF receipt generator</span>
+    </div>
+  </div>
+
+  <!-- FOUR ROLES -->
+  <div class="section">
+    <h2><span class="num">02</span> The Four Partner Roles</h2>
+    <div class="role-grid">
+      <div class="role-card worker">
+        <div class="role-icon">🔧</div>
+        <div class="role-name">Service Worker</div>
+        <div class="role-route">/dashboard</div>
+        <div class="role-desc">Accepts home service jobs — plumbing, electrical, painting, cleaning. Tracks live jobs, earns per completed booking.</div>
+      </div>
+      <div class="role-card vendor">
+        <div class="role-icon">🏪</div>
+        <div class="role-name">Vendor</div>
+        <div class="role-route">/vendor/dashboard</div>
+        <div class="role-desc">Manages laundry and carpet wash orders. Has open/closed toggle. Accepts incoming orders and marks them complete.</div>
+      </div>
+      <div class="role-card rider">
+        <div class="role-icon">🚗</div>
+        <div class="role-name">Rider</div>
+        <div class="role-route">/rider/dashboard</div>
+        <div class="role-desc">Accepts pickup/delivery jobs. Goes online to see available runs. Updates delivery status step-by-step. Earns KSh 300 per delivery.</div>
+      </div>
+      <div class="role-card supplier">
+        <div class="role-icon">📦</div>
+        <div class="role-name">Supplier</div>
+        <div class="role-route">/supplier/dashboard</div>
+        <div class="role-desc">Lists products (paint, tools, cleaning supplies). Products are recommended to customers who book related services.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DATABASE -->
+  <div class="section">
+    <h2><span class="num">03</span> Database Schema (Supabase)</h2>
+    <h3>workers table — all partners live here</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+        <tr><td><code>id</code></td><td>UUID</td><td>Matches auth.users UUID — primary key, enforced by RLS</td></tr>
+        <tr><td><code>partner_role</code></td><td>TEXT</td><td>'worker' / 'vendor' / 'rider' / 'supplier'</td></tr>
+        <tr><td><code>onboarding_complete</code></td><td>BOOLEAN</td><td>false on signup, true when wizard is submitted</td></tr>
+        <tr><td><code>verification_status</code></td><td>TEXT</td><td>pending → approved / rejected / suspended (admin sets this)</td></tr>
+        <tr><td><code>service_details</code></td><td>JSONB</td><td>All onboarding answers — role-specific data stored here</td></tr>
+        <tr><td><code>service</code></td><td>TEXT</td><td>Worker service (Plumbing, Electrical, Painting, Cleaning)</td></tr>
+        <tr><td><code>business_name</code></td><td>TEXT</td><td>Vendor/Supplier business name</td></tr>
+        <tr><td><code>vehicle_type</code></td><td>TEXT</td><td>Rider vehicle type (motorcycle, car, tuk-tuk, bicycle)</td></tr>
+        <tr><td><code>product_category</code></td><td>TEXT</td><td>Supplier category (paint, tools, cleaning, plumbing, electrical)</td></tr>
+        <tr><td><code>profile_photo_url</code></td><td>TEXT</td><td>Storage URL — worker-profiles bucket</td></tr>
+        <tr><td><code>id_photo_url</code></td><td>TEXT</td><td>Storage URL — worker-documents bucket</td></tr>
+        <tr><td><code>status</code></td><td>TEXT</td><td>online / offline</td></tr>
+        <tr><td><code>rating</code></td><td>NUMERIC</td><td>Default 5.0</td></tr>
+        <tr><td><code>earnings</code></td><td>NUMERIC</td><td>Total earnings accumulated</td></tr>
+      </table>
+    </div>
+    <h3>Other tables</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Table</th><th>Purpose</th></tr>
+        <tr><td><code>bookings</code></td><td>Customer service bookings — workers pick from here</td></tr>
+        <tr><td><code>delivery_tracking</code></td><td>Rider delivery assignments — status flow from pending to delivered</td></tr>
+        <tr><td><code>vendor_products</code></td><td>Supplier product catalog</td></tr>
+        <tr><td><code>support_tickets</code></td><td>Partner and customer support tickets</td></tr>
+        <tr><td><code>receipts</code></td><td>Generated job receipt PDFs</td></tr>
+      </table>
+    </div>
+    <h3>Row Level Security Policies (workers table)</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Policy</th><th>Command</th><th>Rule</th></tr>
+        <tr><td>Workers read own profile</td><td>SELECT</td><td><code>auth.uid() = id</code></td></tr>
+        <tr><td>Workers update own profile</td><td>UPDATE</td><td><code>auth.uid() = id</code></td></tr>
+        <tr><td>Workers insert own profile</td><td>INSERT</td><td><code>auth.uid() = id</code></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- AUTH FLOW -->
+  <div class="section">
+    <h2><span class="num">04</span> Authentication &amp; Auth Flow</h2>
+    <h3>Login Flow</h3>
+    <div class="table-wrap" style="padding:4px">
+      <div class="flow" style="padding:8px 16px">
+        <div class="flow-step"><div class="flow-num">1</div><div class="flow-text">User submits email + password on LoginPage<span>Form submit → handleLogin()</span></div></div>
+        <div class="flow-step"><div class="flow-num">2</div><div class="flow-text">signIn() calls supabase.auth.signInWithPassword()<span>Returns auth data with user UUID</span></div></div>
+        <div class="flow-step"><div class="flow-num">3</div><div class="flow-text">onAuthStateChange fires in useAuth.jsx<span>setLoading(true) → fetchProfile(userId)</span></div></div>
+        <div class="flow-step"><div class="flow-num">4</div><div class="flow-text">fetchProfile queries workers table by auth UUID<span>Uses .maybeSingle() — safe if no row found</span></div></div>
+        <div class="flow-step"><div class="flow-num">5</div><div class="flow-text">setLoading(false), setProfile(data)<span>Profile now available across all components</span></div></div>
+        <div class="flow-step"><div class="flow-num">6</div><div class="flow-text">LoginPage reads partner_role → navigates to role dashboard<span>worker → /dashboard · vendor → /vendor/dashboard etc.</span></div></div>
+      </div>
+    </div>
+    <h3 style="margin-top:20px">Signup Flow</h3>
+    <div class="table-wrap" style="padding:4px">
+      <div class="flow" style="padding:8px 16px">
+        <div class="flow-step"><div class="flow-num">1</div><div class="flow-text">RegisterPage: user picks role → fills role-specific details<span>Step 1: role select · Step 2: service/vehicle/business type</span></div></div>
+        <div class="flow-step"><div class="flow-num">2</div><div class="flow-text">signUp() creates Supabase auth user<span>Inserts workers row with onboarding_complete: false</span></div></div>
+        <div class="flow-step"><div class="flow-num">3</div><div class="flow-text">ProtectedRoute checks onboarding_complete<span>false → redirect to /onboarding wizard</span></div></div>
+        <div class="flow-step"><div class="flow-num">4</div><div class="flow-text">After wizard submit: onboarding_complete = true, verification_status = pending<span>Partner reaches their dashboard. Admin reviews documents.</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROTECTED ROUTE -->
+  <div class="section">
+    <h2><span class="num">05</span> Route Protection (ProtectedRoute.jsx)</h2>
+    <p style="color:#7A8BA0;margin-bottom:16px">Every dashboard route passes through three layers of protection:</p>
+    <div class="layer">
+      <span class="layer-num l1">LAYER 1</span>
+      <div class="layer-content">
+        <div class="title">Auth Guard</div>
+        <div class="desc"><code>if (loading)</code> → show spinner &nbsp;|&nbsp; <code>if (!user)</code> → redirect to /login<br/>Prevents unauthenticated access to any dashboard.</div>
+      </div>
+    </div>
+    <div class="layer">
+      <span class="layer-num l2">LAYER 2</span>
+      <div class="layer-content">
+        <div class="title">Onboarding Gate</div>
+        <div class="desc"><code>if (onboarding_complete === false)</code> → redirect to /onboarding<br/>Applies to ALL roles — no partner skips the verification wizard.</div>
+      </div>
+    </div>
+    <div class="layer">
+      <span class="layer-num l3">LAYER 3</span>
+      <div class="layer-content">
+        <div class="title">Role Guard</div>
+        <div class="desc"><code>if (allowedRoles && role not in allowedRoles)</code> → redirect to own dashboard<br/>Prevents a rider from accessing /vendor/dashboard etc.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ONBOARDING -->
+  <div class="section">
+    <h2><span class="num">06</span> Onboarding Wizard (OnboardingPage.jsx)</h2>
+    <p style="color:#7A8BA0;margin-bottom:16px">A 6-step multi-screen verification wizard. Steps vary by partner role. Grey = shared, coloured = role-specific.</p>
+    <div class="onboard-grid">
+      <div class="onboard-role worker">
+        <div class="label">🔧 Worker</div>
+        <span class="step-pill shared">General</span>
+        <span class="step-pill shared">Identity</span>
+        <span class="step-pill shared">Health</span>
+        <span class="step-pill shared">Payment</span>
+        <span class="step-pill unique worker">Service</span>
+        <span class="step-pill unique worker">Requirements</span>
+      </div>
+      <div class="onboard-role rider">
+        <div class="label">🚗 Rider</div>
+        <span class="step-pill shared">General</span>
+        <span class="step-pill shared">Identity</span>
+        <span class="step-pill shared">Health</span>
+        <span class="step-pill shared">Payment</span>
+        <span class="step-pill unique rider">Vehicle</span>
+        <span class="step-pill unique rider">Compliance</span>
+      </div>
+      <div class="onboard-role vendor">
+        <div class="label">🏪 Vendor</div>
+        <span class="step-pill shared">General</span>
+        <span class="step-pill shared">Identity</span>
+        <span class="step-pill shared">Payment</span>
+        <span class="step-pill unique vendor">Business</span>
+        <span class="step-pill unique vendor">Operations</span>
+        <span class="step-pill unique vendor">Agreement</span>
+      </div>
+      <div class="onboard-role supplier">
+        <div class="label">📦 Supplier</div>
+        <span class="step-pill shared">General</span>
+        <span class="step-pill shared">Identity</span>
+        <span class="step-pill shared">Payment</span>
+        <span class="step-pill unique supplier">Business</span>
+        <span class="step-pill unique supplier">Products</span>
+        <span class="step-pill unique supplier">Agreement</span>
+      </div>
+    </div>
+    <h3 style="margin-top:20px">What each step collects</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Step</th><th>Data Collected</th></tr>
+        <tr><td>GENERAL</td><td>Full name, phone, city, area, profile photo, health status, emergency contact</td></tr>
+        <tr><td>IDENTITY</td><td>ID type, ID number, front/back photo upload, Fixera partner terms acceptance</td></tr>
+        <tr><td>HEALTH</td><td>Health declaration, fitness for fieldwork confirmation</td></tr>
+        <tr><td>PAYMENT</td><td>M-Pesa number or bank name + account number</td></tr>
+        <tr><td>SERVICE (workers)</td><td>Service selection: Plumbing / Electrical / Painting / Cleaning</td></tr>
+        <tr><td>REQUIREMENTS (workers)</td><td>ERB cert (electrical), NITA cert (plumbing), portfolio (painting), DCI check (cleaning), criminal declaration</td></tr>
+        <tr><td>VEHICLE (riders)</td><td>Driving license number/class/photo, vehicle make/model/plate, logbook, insurance upload</td></tr>
+        <tr><td>COMPLIANCE (riders)</td><td>GPS tracking consent, code of conduct acceptance</td></tr>
+        <tr><td>BUSINESS (vendors/suppliers)</td><td>Business registration number + certificate upload, location</td></tr>
+        <tr><td>OPERATIONS (vendors)</td><td>Operating hours, machine capacity, pricing (small/medium/large), pickup agreement</td></tr>
+        <tr><td>PRODUCTS (suppliers)</td><td>Brand names, brand authorization letter, bulk pricing, delivery capability</td></tr>
+        <tr><td>AGREEMENT</td><td>Partnership terms acceptance, promotion agreement checkbox</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <div class="section">
+    <h2><span class="num">07</span> Role-Based Navigation (Layout.jsx)</h2>
+    <div class="nav-grid">
+      <div class="nav-card worker">
+        <div class="nav-role">🔧 Worker</div>
+        <div class="nav-items">
+          <span class="nav-item">📋 Jobs</span><span class="nav-item">🔧 Active</span><span class="nav-item">📜 History</span><span class="nav-item">💰 Earnings</span><span class="nav-item">👤 Profile</span><span class="nav-item">🎧 Support</span>
+        </div>
+      </div>
+      <div class="nav-card vendor">
+        <div class="nav-role">🏪 Vendor</div>
+        <div class="nav-items">
+          <span class="nav-item">📊 Overview</span><span class="nav-item">📦 Orders</span><span class="nav-item">💰 Pricing</span><span class="nav-item">🎯 Promotions</span><span class="nav-item">👤 Profile</span><span class="nav-item">🎧 Support</span>
+        </div>
+      </div>
+      <div class="nav-card rider">
+        <div class="nav-role">🚗 Rider</div>
+        <div class="nav-items">
+          <span class="nav-item">🗺️ Assignments</span><span class="nav-item">🚗 Active Run</span><span class="nav-item">📜 History</span><span class="nav-item">💰 Earnings</span><span class="nav-item">👤 Profile</span><span class="nav-item">🎧 Support</span>
+        </div>
+      </div>
+      <div class="nav-card supplier">
+        <div class="nav-role">📦 Supplier</div>
+        <div class="nav-items">
+          <span class="nav-item">📦 Products</span><span class="nav-item">🛒 Orders</span><span class="nav-item">📊 Inventory</span><span class="nav-item">💰 Earnings</span><span class="nav-item">👤 Profile</span><span class="nav-item">🎧 Support</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROUTES -->
+  <div class="section">
+    <h2><span class="num">08</span> All App Routes (App.jsx)</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Route</th><th>Component</th><th>Protected</th></tr>
+        <tr><td><code>/</code></td><td>→ /login redirect</td><td><span class="badge no">No</span></td></tr>
+        <tr><td><code>/login</code></td><td>LoginPage</td><td><span class="badge no">No</span></td></tr>
+        <tr><td><code>/register</code></td><td>RegisterPage</td><td><span class="badge no">No</span></td></tr>
+        <tr><td><code>/forgot-password</code></td><td>ForgotPasswordPage</td><td><span class="badge no">No</span></td></tr>
+        <tr><td><code>/onboarding</code></td><td>OnboardingPage</td><td><span class="badge no">No</span></td></tr>
+        <tr><td><code>/dashboard</code></td><td>DashboardPage</td><td><span class="badge yes">Yes</span></td></tr>
+        <tr><td><code>/job/:id</code></td><td>JobDetailPage</td><td><span class="badge yes">Yes</span></td></tr>
+        <tr><td><code>/active/:id</code></td><td>ActiveJobPage</td><td><span class="badge yes">Yes</span></td></tr>
+        <tr><td><code>/history</code></td><td>HistoryPage</td><td><span class="badge yes">Yes</span></td></tr>
+        <tr><td><code>/earnings</code></td><td>EarningsPage</td><td><span class="badge yes">Yes</span></td></tr>
+        <tr><td><code>/profile</code></td><td>ProfilePage</td><td><span class="badge yes">Yes</span></td></tr>
+        <tr><td><code>/support</code></td><td>SupportPage</td><td><span class="badge yes">Yes</span></td></tr>
+        <tr><td><code>/vendor/dashboard</code></td><td>VendorDashboard</td><td><span class="badge yes">Yes</span></td></tr>
+        <tr><td><code>/rider/dashboard</code></td><td>RiderDashboard</td><td><span class="badge yes">Yes</span></td></tr>
+        <tr><td><code>/supplier/dashboard</code></td><td>SupplierDashboard</td><td><span class="badge yes">Yes</span></td></tr>
+        <tr><td><code>/receipt/:jobId</code></td><td>ReceiptPage</td><td><span class="badge yes">Yes</span></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- STORAGE -->
+  <div class="section">
+    <h2><span class="num">09</span> Storage Buckets (Supabase Storage)</h2>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Bucket</th><th>Access</th><th>Used For</th></tr>
+        <tr><td><code>worker-documents</code></td><td>Private</td><td>ID photos, certificates, license uploads during onboarding</td></tr>
+        <tr><td><code>worker-profiles</code></td><td>Public</td><td>Partner profile photos</td></tr>
+        <tr><td><code>receipts</code></td><td>Private</td><td>Generated job receipt PDFs</td></tr>
+      </table>
+    </div>
+    <p style="color:#7A8BA0;font-size:13px;margin-top:8px">Storage RLS: partners can only upload/read files inside a folder named with their own UUID (e.g. <code style="color:#C9A020;background:rgba(201,160,32,0.1);padding:2px 6px;border-radius:4px">worker-documents/32dda2b3-.../id-front.jpg</code>)</p>
+  </div>
+
+  <!-- DESIGN DECISIONS -->
+  <div class="section">
+    <h2><span class="num">10</span> Key Design Decisions</h2>
+    <div class="decision">
+      <div class="decision-num">1</div>
+      <div><div class="decision-title">One app, four roles</div><div class="decision-desc">Instead of building 4 separate apps, one codebase serves all partners. Role is stored as partner_role in the workers table and controls routing, navigation, and dashboard content. Easier to maintain, deploy, and update.</div></div>
+    </div>
+    <div class="decision">
+      <div class="decision-num">2</div>
+      <div><div class="decision-title">Onboarding before dashboard</div><div class="decision-desc">Every new partner must complete the verification wizard before accessing any dashboard. This ensures Fixera collects all compliance documents upfront — ID, certifications, criminal declarations, business registration.</div></div>
+    </div>
+    <div class="decision">
+      <div class="decision-num">3</div>
+      <div><div class="decision-title">RLS at database level</div><div class="decision-desc">Security lives in Supabase Row Level Security, not the React app. Even if someone bypasses the frontend, they can never read or modify another partner's data. auth.uid() = id is enforced at the database engine.</div></div>
+    </div>
+    <div class="decision">
+      <div class="decision-num">4</div>
+      <div><div class="decision-title">service_details JSONB</div><div class="decision-desc">Instead of creating separate tables for each role's onboarding data, all answers are stored in a single JSONB column. This keeps the schema simple while supporting unlimited flexibility — each role stores completely different fields.</div></div>
+    </div>
+    <div class="decision">
+      <div class="decision-num">5</div>
+      <div><div class="decision-title">Verification flow</div><div class="decision-desc">After onboarding, verification_status = 'pending'. Admin reviews all documents in the Admin Dashboard and sets it to 'approved'. Partners can access dashboards immediately but won't receive jobs until approved by admin.</div></div>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding:40px 0 20px;color:#2D4A6A;font-size:12px;border-top:1px solid #1E2D45">
+    Fixera Partner App Architecture · Built with React + Supabase · May 2026
+  </div>
+
+</div>
+
+<script>
+  // Auto-print prompt
+  window.addEventListener('load', () => {
+    const btn = document.createElement('div');
+    btn.innerHTML = '🖨️ Save as PDF (Ctrl+P)';
+    btn.style.cssText = 'position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#C9A020,#D4B033);color:#0A0E1A;font-weight:800;font-size:13px;padding:12px 20px;border-radius:12px;cursor:pointer;box-shadow:0 6px 20px rgba(201,160,32,0.4);z-index:9999;font-family:Inter,sans-serif';
+    btn.onclick = () => window.print();
+    document.body.appendChild(btn);
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+{
+  "name": "Fixera — Home Services",
+  "short_name": "Fixera",
+  "description": "One Call. We Fix It All. Plumbing, Electrical, Cleaning, Painting & more in Nairobi.",
+  "start_url": "/home",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0A0E1A",
+  "theme_color": "#C9A020",
+  "scope": "/",
+  "lang": "en-KE",
+  "categories": ["business", "lifestyle", "utilities"],
+  "icons": [
+    {
+      "src": "/fixera-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Book a Service",
+      "short_name": "Book",
+      "description": "Quickly book a home service",
+      "url": "/home",
+      "icons": [{ "src": "/fixera-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "My Bookings",
+      "short_name": "History",
+      "url": "/history",
+      "icons": [{ "src": "/fixera-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Get Help",
+      "short_name": "Support",
+      "url": "/support",
+      "icons": [{ "src": "/fixera-icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ]
+}
