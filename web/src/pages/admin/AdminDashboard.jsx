@@ -17,6 +17,7 @@ import { listAllBanners, saveBanner, deleteBanner, listAllFAQs, saveFAQ, deleteF
 import { listAllCategories, saveCategory, deleteCategory, listAllServices, saveService, deleteService } from '../../services/catalogService';
 import { listPartnerWallets, getWalletTransactions, getWalletAdjustments, applyWalletAdjustment, getWalletStats, getDepositTransactions, recordDepositReceived, refundDeposit, forfeitDeposit } from '../../services/walletAdminService';
 import { logAction } from '../../services/settingsService';
+import { listAgents, createAgent, updateAgentRole, revokeAgent, AGENT_ROLES, roleLabel } from '../../services/teamService';
 import {
   BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
@@ -108,6 +109,7 @@ const NAV_GROUPS = [
   {
     label: 'Platform',
     items: [
+      { id: 'team',           label: 'Team & Agents',       icon: '🧑‍💼' },
       { id: 'announcements',  label: 'Broadcasts',          icon: '📢' },
       { id: 'service_areas',  label: 'Service Areas',       icon: '📍' },
       { id: 'fraud',          label: 'Fraud & Risk',        icon: '🚩' },
@@ -131,6 +133,15 @@ const ROLE_ACCESS = {
     'overview','live_ops','alerts','dispatch','partners','verification',
     'performance','vendors','suppliers','movers','riders','water','workforce',
     'availability','heatmap','service_areas',
+  ]),
+  // Vets & approves partner credentials — sees only the verification pipeline
+  verification: new Set([
+    'overview','partners','verification','workforce','performance',
+    'vendors','suppliers','movers','riders','water',
+  ]),
+  // Handles safety incidents & disputes — sees only support/dispute tooling
+  trust_safety: new Set([
+    'overview','support','dispute_center','alerts','fraud',
   ]),
 };
 
@@ -1746,7 +1757,14 @@ function DisputesSection() {
   const [newNote, setNewNote]         = useState({});
   const [addingNote, setAddingNote]   = useState({});
   const [assigning, setAssigning]     = useState({});
-  const [assignName, setAssignName]   = useState({});
+  const [assignSel, setAssignSel]     = useState({}); // ticketId → selected agent id
+  const [agents, setAgents]           = useState([]);
+
+  // Load the staff/agent roster once, so tickets can be assigned to a real person
+  useEffect(() => {
+    supabase.from('profiles').select('id, full_name, admin_role').eq('is_admin', true).order('full_name')
+      .then(({ data }) => setAgents(data || []));
+  }, []);
 
   const loadNotes = async (ticketId) => {
     const { data } = await supabase.from('ticket_notes').select('*').eq('ticket_id', ticketId).order('created_at', { ascending: true });
@@ -1774,12 +1792,13 @@ function DisputesSection() {
   };
 
   const assignTicket = async (ticketId) => {
-    const name = assignName[ticketId]?.trim();
-    if (!name) return;
+    const agentId = assignSel[ticketId];
+    const agent = agents.find(a => a.id === agentId);
+    if (!agent) return;
     setAssigning(a => ({ ...a, [ticketId]: true }));
     // SLA deadline: 24 hours from now by default
     const sla_deadline = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
-    await supabase.from('support_tickets').update({ assigned_name: name, assigned_to: user.id, sla_deadline }).eq('id', ticketId);
+    await supabase.from('support_tickets').update({ assigned_name: agent.full_name || 'Agent', assigned_to: agent.id, sla_deadline }).eq('id', ticketId);
     setAssigning(a => ({ ...a, [ticketId]: false }));
     load();
   };
@@ -1986,16 +2005,20 @@ function DisputesSection() {
                   </span>
                 ) : null}
                 <div style={{ display: 'flex', gap: 4 }}>
-                  <input
-                    value={assignName[d.id] || ''}
-                    onChange={e => setAssignName(n => ({ ...n, [d.id]: e.target.value }))}
-                    placeholder={d.assigned_name ? `Reassign (${d.assigned_name})` : 'Assign to…'}
-                    style={{ fontSize: 11, padding: '4px 8px', border: '1px solid #d0d8f0', borderRadius: 6, outline: 'none', fontFamily: 'inherit', width: 150 }}
-                  />
+                  <select
+                    value={assignSel[d.id] || ''}
+                    onChange={e => setAssignSel(n => ({ ...n, [d.id]: e.target.value }))}
+                    style={{ fontSize: 11, padding: '4px 8px', border: '1px solid #d0d8f0', borderRadius: 6, outline: 'none', fontFamily: 'inherit', width: 160, background: '#fff' }}
+                  >
+                    <option value="">{d.assigned_name ? `Reassign (${d.assigned_name})…` : 'Assign to…'}</option>
+                    {agents.map(a => (
+                      <option key={a.id} value={a.id}>{a.full_name || 'Agent'} · {roleLabel(a.admin_role)}</option>
+                    ))}
+                  </select>
                   <button
                     onClick={() => assignTicket(d.id)}
-                    disabled={assigning[d.id]}
-                    style={{ padding: '4px 10px', borderRadius: 6, background: '#4e73df', border: 'none', color: '#fff', fontSize: 11, fontWeight: 700, cursor: 'pointer' }}
+                    disabled={assigning[d.id] || !assignSel[d.id]}
+                    style={{ padding: '4px 10px', borderRadius: 6, background: '#4e73df', border: 'none', color: '#fff', fontSize: 11, fontWeight: 700, cursor: assignSel[d.id] ? 'pointer' : 'not-allowed', opacity: assignSel[d.id] ? 1 : 0.5 }}
                   >
                     {assigning[d.id] ? '…' : 'Assign'}
                   </button>
@@ -7477,6 +7500,140 @@ function PartnerAvailabilitySection() {
   );
 }
 
+// ── Team & Agents (super_admin only) ──────────────────────────────
+function TeamManagementSection() {
+  const { user } = useAuth();
+  const [agents, setAgents]   = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr]         = useState('');
+  const [showAdd, setShowAdd] = useState(false);
+  const [saving, setSaving]   = useState(false);
+  const [form, setForm] = useState({ full_name: '', email: '', password: '', admin_role: 'support' });
+
+  const load = async () => {
+    setLoading(true); setErr('');
+    try { setAgents(await listAgents()); }
+    catch (e) { setErr(e.message); }
+    setLoading(false);
+  };
+  useEffect(() => { load(); }, []);
+
+  const handleCreate = async () => {
+    if (!form.full_name.trim() || !form.email.trim() || form.password.length < 8) {
+      setErr('Fill name, email, and a password of at least 8 characters.'); return;
+    }
+    setSaving(true); setErr('');
+    try {
+      await createAgent(form);
+      setForm({ full_name: '', email: '', password: '', admin_role: 'support' });
+      setShowAdd(false);
+      await load();
+      auditLog('agent_created', `${form.email} as ${form.admin_role}`);
+    } catch (e) { setErr(e.message); }
+    setSaving(false);
+  };
+
+  const handleRoleChange = async (id, admin_role) => {
+    try { await updateAgentRole(id, admin_role); setAgents(a => a.map(x => x.id === id ? { ...x, admin_role } : x)); auditLog('agent_role_changed', `${id} → ${admin_role}`); }
+    catch (e) { alert(e.message); }
+  };
+
+  const handleRevoke = async (a) => {
+    if (!confirm(`Remove ${a.full_name || a.email} from the team? They will lose all dashboard access (their login stays, but is no longer staff).`)) return;
+    try { await revokeAgent(a.id); setAgents(list => list.filter(x => x.id !== a.id)); auditLog('agent_revoked', a.email); }
+    catch (e) { alert(e.message); }
+  };
+
+  const inputSt = { width: '100%', boxSizing: 'border-box', padding: '10px 12px', borderRadius: 8, border: '1px solid #d9dee7', fontSize: 13, fontFamily: 'inherit', outline: 'none' };
+
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6, flexWrap: 'wrap', gap: 10 }}>
+        <div>
+          <h2 style={{ margin: 0 }}>Team &amp; Agents</h2>
+          <p style={{ margin: '4px 0 0', color: '#858796', fontSize: 13 }}>Create staff accounts and assign each one to a department. Agents only see the tools for their department.</p>
+        </div>
+        <button className="btn btn-primary" onClick={() => { setShowAdd(s => !s); setErr(''); }}>
+          {showAdd ? 'Cancel' : '+ Add Agent'}
+        </button>
+      </div>
+
+      {err && <div style={{ background: 'rgba(231,74,59,0.08)', border: '1px solid rgba(231,74,59,0.3)', color: '#e74a3b', padding: '10px 14px', borderRadius: 8, fontSize: 13, margin: '12px 0' }}>{err}</div>}
+
+      {showAdd && (
+        <div style={{ background: '#fff', border: '1px solid #e3e6f0', borderRadius: 12, padding: 18, margin: '14px 0' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 12 }}>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#5a5c69' }}>Full name</label>
+              <input style={inputSt} value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} placeholder="e.g. Jane Wanjiru" />
+            </div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#5a5c69' }}>Email</label>
+              <input style={inputSt} type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="agent@fixera.africa" />
+            </div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#5a5c69' }}>Temporary password</label>
+              <input style={inputSt} value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} placeholder="min 8 characters" />
+            </div>
+            <div>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#5a5c69' }}>Department</label>
+              <select style={inputSt} value={form.admin_role} onChange={e => setForm(f => ({ ...f, admin_role: e.target.value }))}>
+                {AGENT_ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+              </select>
+            </div>
+          </div>
+          <p style={{ color: '#858796', fontSize: 12, margin: '10px 0 0' }}>{AGENT_ROLES.find(r => r.value === form.admin_role)?.desc}</p>
+          <div style={{ marginTop: 14, display: 'flex', gap: 8 }}>
+            <button className="btn btn-primary" disabled={saving} onClick={handleCreate}>{saving ? 'Creating…' : 'Create Agent'}</button>
+          </div>
+          <p style={{ color: '#858796', fontSize: 11, margin: '10px 0 0' }}>The agent logs in at <strong>/admin/login</strong> with this email + password. Ask them to reset their password after first login.</p>
+        </div>
+      )}
+
+      {loading ? <p style={{ color: '#858796' }}>Loading team…</p> : (
+        <div style={{ background: '#fff', border: '1px solid #e3e6f0', borderRadius: 12, overflow: 'hidden', marginTop: 8 }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+            <thead>
+              <tr style={{ background: '#f8f9fc', textAlign: 'left', color: '#5a5c69' }}>
+                <th style={{ padding: '12px 16px' }}>Name</th>
+                <th style={{ padding: '12px 16px' }}>Email</th>
+                <th style={{ padding: '12px 16px' }}>Department</th>
+                <th style={{ padding: '12px 16px' }}></th>
+              </tr>
+            </thead>
+            <tbody>
+              {agents.length === 0 ? (
+                <tr><td colSpan={4} style={{ padding: 20, color: '#858796', textAlign: 'center' }}>No staff accounts yet. Add your first agent above.</td></tr>
+              ) : agents.map(a => {
+                const isMe = a.id === user?.id;
+                return (
+                  <tr key={a.id} style={{ borderTop: '1px solid #eaecf4' }}>
+                    <td style={{ padding: '12px 16px', fontWeight: 700 }}>{a.full_name || '—'}{isMe && <span style={{ marginLeft: 8, fontSize: 10, color: '#4e73df', fontWeight: 700 }}>(you)</span>}</td>
+                    <td style={{ padding: '12px 16px', color: '#5a5c69' }}>{a.email || '—'}</td>
+                    <td style={{ padding: '12px 16px' }}>
+                      {isMe ? (
+                        <span style={{ fontWeight: 700 }}>{roleLabel(a.admin_role)}</span>
+                      ) : (
+                        <select value={a.admin_role || 'support'} onChange={e => handleRoleChange(a.id, e.target.value)}
+                          style={{ padding: '6px 10px', borderRadius: 8, border: '1px solid #d9dee7', fontSize: 12, fontFamily: 'inherit' }}>
+                          {AGENT_ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+                        </select>
+                      )}
+                    </td>
+                    <td style={{ padding: '12px 16px', textAlign: 'right' }}>
+                      {!isMe && <button className="btn btn-sm" style={{ color: '#e74a3b', border: '1px solid rgba(231,74,59,0.3)', background: 'rgba(231,74,59,0.06)' }} onClick={() => handleRevoke(a)}>Remove</button>}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main Shell ────────────────────────────────────────────────────
 export default function AdminDashboard() {
   const [active,       setActive]      = useState('overview');
@@ -7541,6 +7698,7 @@ export default function AdminDashboard() {
     content:       <ContentSection />,
     reviews:       <ReviewsSection />,
     security:      <SecuritySection />,
+    team:          <TeamManagementSection />,
   };
 
   return (
