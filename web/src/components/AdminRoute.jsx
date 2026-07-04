@@ -14,8 +14,8 @@ export default function AdminRoute({ children }) {
   // Still loading auth session
   if (loading) return <Spinner />;
 
-  // Not logged in
-  if (!user) return <Navigate to="/login" replace />;
+  // Not logged in — send to the ADMIN login (not the customer login)
+  if (!user) return <Navigate to="/admin/login" replace />;
 
   // Logged in but profile not yet fetched from DB — wait for it
   if (!profile) return <Spinner />;
