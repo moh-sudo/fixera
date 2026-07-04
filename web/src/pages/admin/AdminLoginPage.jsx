@@ -38,43 +38,40 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError('');
 
+    // Race any promise against a timeout so a stalled request can't spin forever
+    const withTimeout = (p, ms, label) => Promise.race([
+      p,
+      new Promise((_, reject) => setTimeout(() => reject(new Error(`${label} timed out after ${ms / 1000}s — check your connection and try again.`)), ms)),
+    ]);
+
     try {
-      // Authenticate with Supabase
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password: password.trim(),
-      });
+      // 1. Authenticate with Supabase
+      console.log('[admin-login] 1/4 signing in…');
+      const { data, error: authError } = await withTimeout(
+        supabase.auth.signInWithPassword({ email: email.trim(), password: password.trim() }),
+        15000, 'Sign-in',
+      );
+      console.log('[admin-login] 2/4 sign-in returned', { user: data?.user?.id, err: authError?.message });
 
       if (authError) throw authError;
+      if (!data.user) { setError('Login failed. Please try again.'); return; }
 
-      if (!data.user) {
-        setError('Login failed. Please try again.');
-        setLoading(false);
-        return;
-      }
+      // 2. Confirm admin status
+      console.log('[admin-login] 3/4 loading profile…');
+      const { data: profile, error: profileError } = await withTimeout(
+        supabase.from('profiles').select('is_admin, full_name').eq('id', data.user.id).single(),
+        15000, 'Profile lookup',
+      );
+      console.log('[admin-login] 4/4 profile returned', { profile, err: profileError?.message });
 
-      // Check if user is admin in profiles table
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('is_admin, full_name')
-        .eq('id', data.user.id)
-        .single();
+      if (profileError || !profile) { setError('Admin profile not found'); return; }
+      if (!profile.is_admin) { setError('You do not have admin access. Contact support.'); return; }
 
-      if (profileError || !profile) {
-        setError('Admin profile not found');
-        setLoading(false);
-        return;
-      }
-
-      if (!profile.is_admin) {
-        setError('You do not have admin access. Contact support.');
-        setLoading(false);
-        return;
-      }
-
-      // Success - redirect to admin dashboard
+      // 3. Success
+      console.log('[admin-login] ✓ navigating to /admin');
       navigate('/admin');
     } catch (err) {
+      console.error('[admin-login] ✗ error:', err);
       setError(err.message || 'Login failed. Please try again.');
     } finally {
       setLoading(false);
