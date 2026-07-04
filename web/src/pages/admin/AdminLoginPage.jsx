@@ -10,6 +10,24 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [resetting, setResetting] = useState(false);
+
+  const handleForgot = async () => {
+    if (!email.trim()) { setError('Enter your admin email first, then tap "Forgot password".'); return; }
+    setResetting(true); setError(''); setNotice('');
+    try {
+      const { error: rErr } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (rErr) throw rErr;
+      setNotice(`Password reset link sent to ${email.trim()}. Check your inbox (and spam).`);
+    } catch (err) {
+      setError(err.message || 'Could not send reset link. Try again.');
+    } finally {
+      setResetting(false);
+    }
+  };
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -115,7 +133,32 @@ export default function AdminLoginPage() {
               onFocus={e => e.target.style.borderColor = C.gold}
               onBlur={e => e.target.style.borderColor = C.navyBorder}
             />
+            <div style={{ textAlign: 'right', marginTop: 8 }}>
+              <button
+                type="button"
+                onClick={handleForgot}
+                disabled={resetting}
+                style={{ background: 'none', border: 'none', color: C.gold, fontSize: 12, fontWeight: 600, cursor: resetting ? 'default' : 'pointer', padding: 0, fontFamily: 'inherit', opacity: resetting ? 0.6 : 1 }}
+              >
+                {resetting ? 'Sending…' : 'Forgot password?'}
+              </button>
+            </div>
           </div>
+
+          {/* Success notice */}
+          {notice && (
+            <div style={{
+              background: 'rgba(72,187,120,0.1)',
+              border: '1px solid rgba(72,187,120,0.35)',
+              borderRadius: 10,
+              padding: '10px 14px',
+              marginTop: 16,
+              color: '#48BB78',
+              fontSize: 13,
+            }}>
+              ✅ {notice}
+            </div>
+          )}
 
           {/* Error Message */}
           {error && (
