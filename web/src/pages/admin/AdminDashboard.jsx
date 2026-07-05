@@ -598,20 +598,68 @@ function PartnerFleetPanel({ moverId }) {
 }
 
 // ── SECTION: Overview ─────────────────────────────────────────────
+// Jump to another admin section (the shell listens for this event)
+const goToSection = (id) => window.dispatchEvent(new CustomEvent('fixera-nav', { detail: id }));
+
+// Bucket rows into a last-N-days count series for sparklines/charts
+function daySeries(rows, days = 7, valueFn = () => 1) {
+  const start = new Date(); start.setHours(0, 0, 0, 0);
+  const buckets = Array.from({ length: days }, (_, i) => ({
+    label: new Date(start.getTime() - (days - 1 - i) * 86400000), v: 0,
+  }));
+  (rows || []).forEach(r => {
+    if (!r.created_at) return;
+    const t = new Date(r.created_at); t.setHours(0, 0, 0, 0);
+    const idx = buckets.findIndex(b => b.label.getTime() === t.getTime());
+    if (idx >= 0) buckets[idx].v += valueFn(r);
+  });
+  return buckets;
+}
+
+// Tiny sparkline for stat cards
+function Sparkline({ data, color }) {
+  const series = (data && data.length) ? data : [{ v: 0 }, { v: 0 }];
+  return (
+    <ResponsiveContainer width="100%" height={38}>
+      <AreaChart data={series} margin={{ top: 4, right: 0, bottom: 0, left: 0 }}>
+        <defs>
+          <linearGradient id={`spk-${color.replace('#', '')}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={color} stopOpacity={0.35} />
+            <stop offset="100%" stopColor={color} stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <Area type="monotone" dataKey="v" stroke={color} strokeWidth={2} fill={`url(#spk-${color.replace('#', '')})`} dot={false} />
+      </AreaChart>
+    </ResponsiveContainer>
+  );
+}
+
+const ov = {
+  hidden: { opacity: 0, y: 16 },
+  show: (i = 0) => ({ opacity: 1, y: 0, transition: { duration: 0.4, delay: i * 0.05, ease: 'easeOut' } }),
+};
+
 function OverviewSection() {
-  const [stats, setStats]         = useState({});
-  const [recent, setRecent]       = useState([]);
-  const [loading, setLoading]     = useState(true);
-  const [chartModal, setChartModal] = useState(null);
+  const { profile, user } = useAuth();
+  const [stats, setStats]   = useState({});
+  const [recent, setRecent] = useState([]);
+  const [series, setSeries] = useState({ jobs: [], revenue: [], customers: [] });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
-      supabase.from('workers').select('id, verification_status, partner_role'),
-      supabase.from('profiles').select('id', { count: 'exact' }),
-      supabase.from('bookings').select('id, status, sub_service, created_at').order('created_at', { ascending: false }).limit(8),
-      supabase.from('receipts').select('amount'),
-    ]).then(([partners, users, jobs, receipts]) => {
+      supabase.from('workers').select('id, verification_status, partner_role, created_at'),
+      supabase.from('profiles').select('id, created_at').order('created_at', { ascending: false }).limit(400),
+      supabase.from('bookings').select('id, status, sub_service, created_at').order('created_at', { ascending: false }).limit(400),
+      supabase.from('receipts').select('amount, created_at'),
+      supabase.from('support_tickets').select('id, status').then(r => r, () => ({ data: [] })),
+      supabase.from('refunds').select('id, status').then(r => r, () => ({ data: [] })),
+    ]).then(([partners, users, jobs, receipts, tickets, refunds]) => {
       const ws = partners.data || [];
+      const bk = jobs.data || [];
+      const rc = receipts.data || [];
+      const tk = tickets?.data || [];
+      const rf = refunds?.data || [];
       setStats({
         totalPartners:    ws.length,
         pendingPartners:  ws.filter(w => w.verification_status === 'pending').length,
@@ -620,93 +668,188 @@ function OverviewSection() {
         vendors:          ws.filter(w => w.partner_role === 'vendor').length,
         riders:           ws.filter(w => w.partner_role === 'rider').length,
         suppliers:        ws.filter(w => w.partner_role === 'supplier').length,
-        totalCustomers:   users.count || 0,
-        activeJobs:       (jobs.data||[]).filter(j => ['confirmed','on_way','in_progress'].includes(j.status)).length,
-        revenue:          (receipts.data||[]).reduce((s,r) => s+(r.amount||0), 0),
+        movers:           ws.filter(w => w.partner_role === 'mover').length,
+        water:            ws.filter(w => w.partner_role === 'water_carrier').length,
+        totalCustomers:   (users.count ?? (users.data || []).length) || (users.data || []).length,
+        activeJobs:       bk.filter(j => ['confirmed','on_way','in_progress'].includes(j.status)).length,
+        revenue:          rc.reduce((s,r) => s+(r.amount||0), 0),
+        openTickets:      tk.filter(t => ['open','pending','in_progress'].includes(t.status)).length,
+        pendingRefunds:   rf.filter(r => r.status === 'pending').length,
       });
-      setRecent(jobs.data || []);
+      setRecent(bk.slice(0, 6));
+      setSeries({
+        jobs:      daySeries(bk),
+        revenue:   daySeries(rc, 7, r => r.amount || 0),
+        customers: daySeries(users.data, 7),
+      });
       setLoading(false);
     }).catch(() => setLoading(false));
   }, []);
 
-  if (loading) return <Spinner />;
+  if (loading) return <div style={{ padding: 40 }}><Spinner /></div>;
+
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const name = (profile?.full_name || user?.email?.split('@')[0] || 'Admin').split(' ')[0];
+
+  // ── Needs-attention items (only surface what's > 0) ──
+  const attention = [
+    { key:'pending', count: stats.pendingPartners, label:'partners awaiting verification', Icon: BadgeCheck, color:'var(--amber)', to:'verification' },
+    { key:'tickets', count: stats.openTickets,     label:'open support tickets',           Icon: LifeBuoy,   color:'var(--red)',   to:'support' },
+    { key:'refunds', count: stats.pendingRefunds,  label:'refunds pending review',         Icon: RotateCcw,  color:'var(--blue)',  to:'refunds' },
+    { key:'jobs',    count: stats.activeJobs,       label:'jobs in progress right now',     Icon: Radio,      color:'var(--green)', to:'dispatch' },
+  ].filter(a => a.count > 0);
+
+  const kpis = [
+    { label:'Total Partners',    value: stats.totalPartners,   sub:`${stats.pendingPartners} pending`, Icon: Users,       color:'#3B82F6', spark: series.customers, to:'partners' },
+    { label:'Approved Partners', value: stats.approvedPartners, sub:'live on platform', Icon: BadgeCheck,  color:'#16A34A', spark: series.customers, to:'partners' },
+    { label:'Customers',         value: stats.totalCustomers,  sub:'registered',       Icon: UserRound,   color:'#7C6CF0', spark: series.customers, to:'users' },
+    { label:'Active Jobs',       value: stats.activeJobs,      sub:'in progress',      Icon: Radio,       color:'#F59E0B', spark: series.jobs,      to:'dispatch' },
+    { label:'Total Revenue',     value:`KSh ${(stats.revenue||0).toLocaleString()}`, sub:'all time', Icon: Wallet, color:'#C9A020', spark: series.revenue, to:'payments' },
+    { label:'Pending Approval',  value: stats.pendingPartners, sub:'awaiting review',  Icon: BadgeCheck,  color:'#EF4444', spark: series.customers, to:'verification' },
+  ];
+
+  const donut = [
+    { name:'Service Workers', value: stats.workers,   fill:'#C9A020' },
+    { name:'Vendors',         value: stats.vendors,   fill:'#3B82F6' },
+    { name:'Riders',          value: stats.riders,    fill:'#16A34A' },
+    { name:'Suppliers',       value: stats.suppliers, fill:'#F59E0B' },
+    { name:'Movers',          value: stats.movers,    fill:'#7C6CF0' },
+    { name:'Water Carriers',  value: stats.water,     fill:'#06B6D4' },
+  ].filter(d => d.value > 0);
+  const donutTotal = donut.reduce((s, d) => s + d.value, 0);
 
   return (
-    <>
-      <PageHeader title="Dashboard Overview" sub="Real-time snapshot of Fixera operations" />
+    <div>
+      {/* Greeting */}
+      <motion.div variants={ov} custom={0} initial="hidden" animate="show"
+        style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', flexWrap:'wrap', gap:12, marginBottom:22 }}>
+        <div>
+          <h1 style={{ fontSize:24, fontWeight:800, color:'var(--ink)', margin:0, letterSpacing:'-.4px' }}>{greeting}, {name}</h1>
+          <p style={{ fontSize:13.5, color:'var(--muted)', margin:'5px 0 0' }}>Here's what's happening across Fixera today.</p>
+        </div>
+        <button className="btn-navy" onClick={() => goToSection('orders')}><ClipboardList size={15} /> View Orders</button>
+      </motion.div>
 
-      {/* Stats Row */}
-      <div className="row mb-4">
-        {[
-          { icon:'👥', label:'Total Partners',    value:stats.totalPartners,    sub:`${stats.pendingPartners} pending review`, color:'#4e73df', chart:'partners', chartTitle:'Partners by Role' },
-          { icon:'✅', label:'Approved Partners', value:stats.approvedPartners, color:'#1cc88a', chart:'approved', chartTitle:'Partner Approval Status' },
-          { icon:'🧑', label:'Customers',         value:stats.totalCustomers,   color:'#36b9cc', chart:'customers', chartTitle:'Customer Growth Over Time' },
-          { icon:'🔧', label:'Active Jobs',       value:stats.activeJobs,       color:'#f6c23e', chart:'jobs', chartTitle:'Jobs by Status' },
-          { icon:'💰', label:'Total Revenue',     value:`KSh ${(stats.revenue||0).toLocaleString()}`, color:'#1cc88a', chart:'revenue', chartTitle:'Monthly Revenue (KSh)' },
-          { icon:'⏳', label:'Pending Approval',  value:stats.pendingPartners,  sub:'Awaiting review', color:'#e74a3b', chart:'pending', chartTitle:'Pending Applications' },
-        ].map(s => (
-          <div key={s.label} className="col-xl-2 col-md-4 col-sm-6 mb-4">
-            <StatCard {...s} onClick={() => setChartModal({ type: s.chart, title: s.chartTitle })} />
+      {/* ── Needs attention ── */}
+      <motion.div variants={ov} custom={1} initial="hidden" animate="show" style={{ marginBottom:22 }}>
+        {attention.length === 0 ? (
+          <div style={{ display:'flex', alignItems:'center', gap:12, background:'#ECFDF3', border:'1px solid #ABEFC6', borderRadius:'var(--radius)', padding:'16px 20px' }}>
+            <div style={{ width:40, height:40, borderRadius:11, background:'#DCFCE7', display:'flex', alignItems:'center', justifyContent:'center' }}><BadgeCheck size={20} color="#16A34A" /></div>
+            <div><div style={{ fontWeight:800, color:'#15803D', fontSize:14 }}>All clear</div><div style={{ fontSize:12.5, color:'#3F9D6B' }}>Nothing needs your attention right now.</div></div>
+          </div>
+        ) : (
+          <div>
+            <div style={{ fontSize:12, fontWeight:800, letterSpacing:'.6px', textTransform:'uppercase', color:'var(--muted)', marginBottom:10, display:'flex', alignItems:'center', gap:7 }}>
+              <Siren size={14} color="var(--red)" /> Needs your attention
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))', gap:14 }}>
+              {attention.map(a => (
+                <button key={a.key} onClick={() => goToSection(a.to)}
+                  style={{ display:'flex', alignItems:'center', gap:14, background:'var(--surface)', border:'1px solid var(--line)', borderLeft:`4px solid ${a.color}`, borderRadius:14, padding:'14px 16px', cursor:'pointer', textAlign:'left', boxShadow:'var(--shadow-sm)', transition:'transform .15s' }}
+                  onMouseEnter={e => e.currentTarget.style.transform='translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform=''}>
+                  <div style={{ width:44, height:44, borderRadius:12, background:`${a.color}18`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}><a.Icon size={21} color={a.color} /></div>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontSize:22, fontWeight:800, color:'var(--ink)', lineHeight:1 }}>{a.count}</div>
+                    <div style={{ fontSize:12.5, color:'var(--muted)', marginTop:3 }}>{a.label}</div>
+                  </div>
+                  <ChevronDown size={16} color="var(--muted)" style={{ transform:'rotate(-90deg)' }} />
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </motion.div>
+
+      {/* ── KPI cards with sparklines ── */}
+      <motion.div variants={ov} custom={2} initial="hidden" animate="show"
+        style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))', gap:16, marginBottom:22 }}>
+        {kpis.map(k => (
+          <div key={k.label} className="stat-card" onClick={() => goToSection(k.to)} style={{ cursor:'pointer' }}>
+            <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:12 }}>
+              <div className="stat-ico" style={{ background:`${k.color}18` }}><k.Icon size={22} color={k.color} /></div>
+            </div>
+            <div style={{ fontSize:26, fontWeight:800, color:'var(--ink)', lineHeight:1.1, letterSpacing:'-.5px' }}>{k.value}</div>
+            <div style={{ fontSize:11.5, fontWeight:700, letterSpacing:'.4px', textTransform:'uppercase', color:'var(--muted)', marginTop:5 }}>{k.label}</div>
+            <div style={{ fontSize:11.5, color:'var(--muted)', marginTop:2 }}>{k.sub}</div>
+            <div style={{ marginTop:10, marginLeft:-4, marginRight:-4 }}><Sparkline data={k.spark} color={k.color} /></div>
           </div>
         ))}
-      </div>
+      </motion.div>
 
-      {/* Partner Role Breakdown */}
-      <div className="row mb-4">
-        <div className="col-12">
-          <div className="admin-card">
-            <div className="admin-card-header">Partner Breakdown by Role</div>
-            <div className="card-body">
-              <div className="row text-center">
-                {[
-                  { role:'worker',   label:'Service Workers', val:stats.workers,   icon:'🔧', color:'#C9A020' },
-                  { role:'vendor',   label:'Vendors',          val:stats.vendors,   icon:'🏪', color:'#17a2b8' },
-                  { role:'rider',    label:'Riders',           val:stats.riders,    icon:'🚗', color:'#1cc88a' },
-                  { role:'supplier', label:'Suppliers',        val:stats.suppliers, icon:'📦', color:'#fd7e14' },
-                ].map(r => (
-                  <div key={r.role} className="col-md-3 col-6 mb-3 mb-md-0">
-                    <div className="p-3 rounded" style={{ background:`${r.color}12`, border:`1px solid ${r.color}30` }}>
-                      <div style={{ fontSize:30 }}>{r.icon}</div>
-                      <div className="h4 font-weight-bold mt-2 mb-0" style={{ color:r.color }}>{r.val}</div>
-                      <div className="text-xs text-gray-600 mt-1 font-weight-bold text-uppercase" style={{ letterSpacing:'0.05rem' }}>{r.label}</div>
-                    </div>
-                  </div>
-                ))}
+      {/* ── Donut + Revenue + Recent ── */}
+      <motion.div variants={ov} custom={3} initial="hidden" animate="show"
+        style={{ display:'grid', gridTemplateColumns:'minmax(300px,1fr) minmax(300px,1.4fr)', gap:18, marginBottom:22 }}>
+        {/* Donut */}
+        <div className="admin-card" style={{ marginBottom:0 }}>
+          <div className="admin-card-header">Partner Breakdown by Role</div>
+          <div style={{ padding:'18px 20px', display:'flex', alignItems:'center', gap:18, flexWrap:'wrap' }}>
+            <div style={{ width:160, height:160, position:'relative', flexShrink:0 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={donut.length ? donut : [{ name:'None', value:1, fill:'#EDF0F5' }]} dataKey="value" innerRadius={52} outerRadius={78} paddingAngle={donut.length > 1 ? 3 : 0} stroke="none">
+                    {(donut.length ? donut : [{ fill:'#EDF0F5' }]).map((d, i) => <Cell key={i} fill={d.fill} />)}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+              <div style={{ position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', pointerEvents:'none' }}>
+                <div style={{ fontSize:26, fontWeight:800, color:'var(--ink)' }}>{donutTotal}</div>
+                <div style={{ fontSize:10.5, color:'var(--muted)', fontWeight:600 }}>Partners</div>
               </div>
+            </div>
+            <div style={{ flex:1, minWidth:130, display:'grid', gap:9 }}>
+              {(donut.length ? donut : [{ name:'No partners yet', value:0, fill:'#CBD5E1' }]).map(d => (
+                <div key={d.name} style={{ display:'flex', alignItems:'center', gap:9, fontSize:13 }}>
+                  <span style={{ width:9, height:9, borderRadius:3, background:d.fill, flexShrink:0 }} />
+                  <span style={{ color:'var(--ink-2)', flex:1 }}>{d.name}</span>
+                  <span style={{ fontWeight:800, color:'var(--ink)' }}>{d.value}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Chart Modal */}
-      {chartModal && <ChartModal type={chartModal.type} title={chartModal.title} onClose={() => setChartModal(null)} />}
-
-      {/* Recent Bookings Table */}
-      <div className="admin-card">
-        <div className="admin-card-header">Recent Bookings</div>
-        <div className="table-responsive">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Booking ID</th><th>Service</th><th>Date</th><th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recent.length === 0 ? (
-                <tr><td colSpan={4} className="text-center text-gray-500 py-4">No bookings yet</td></tr>
-              ) : recent.map(j => (
-                <tr key={j.id}>
-                  <td style={{ fontFamily:'monospace', color:'#858796' }}>#{j.id.slice(0,10).toUpperCase()}</td>
-                  <td className="font-weight-bold">{j.sub_service || '—'}</td>
-                  <td className="text-gray-600">{new Date(j.created_at).toLocaleDateString('en-KE')}</td>
-                  <td><SBBadge status={j.status} /></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        {/* Recent bookings */}
+        <div className="admin-card" style={{ marginBottom:0 }}>
+          <div className="admin-card-header">Recent Bookings <button onClick={() => goToSection('orders')} style={{ fontSize:12.5, fontWeight:700, color:'var(--gold)', background:'none', border:'none', cursor:'pointer' }}>View all →</button></div>
+          <div style={{ overflowX:'auto' }}>
+            <table className="admin-table">
+              <thead><tr><th>Booking ID</th><th>Service</th><th>Date</th><th>Status</th></tr></thead>
+              <tbody>
+                {recent.length === 0 ? (
+                  <tr><td colSpan={4} style={{ textAlign:'center', color:'var(--muted)', padding:24 }}>No bookings yet</td></tr>
+                ) : recent.map(j => (
+                  <tr key={j.id}>
+                    <td style={{ fontFamily:'ui-monospace,monospace', color:'var(--muted)', fontSize:12.5 }}>#{j.id.slice(0,8).toUpperCase()}</td>
+                    <td style={{ fontWeight:700, color:'var(--ink)' }}>{j.sub_service || '—'}</td>
+                    <td style={{ color:'var(--muted)' }}>{new Date(j.created_at).toLocaleDateString('en-KE')}</td>
+                    <td><SBBadge status={j.status} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-    </>
+      </motion.div>
+
+      {/* ── Jobs trend ── */}
+      <motion.div variants={ov} custom={4} initial="hidden" animate="show">
+        <div className="admin-card" style={{ marginBottom:0 }}>
+          <div className="admin-card-header">Bookings — Last 7 Days</div>
+          <div style={{ padding:'14px 12px 8px' }}>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={series.jobs.map((d, i) => ({ day: d.label.toLocaleDateString('en-KE', { weekday:'short' }), v: d.v }))}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#EDF0F5" vertical={false} />
+                <XAxis dataKey="day" tickLine={false} axisLine={false} tick={{ fontSize:12, fill:'#7A8699' }} />
+                <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={{ fontSize:12, fill:'#7A8699' }} width={28} />
+                <Tooltip cursor={{ fill:'#F4F6FA' }} contentStyle={{ borderRadius:12, border:'1px solid #EDF0F5', fontSize:13 }} />
+                <Bar dataKey="v" name="Bookings" radius={[6,6,0,0]} fill="#C9A020" maxBarSize={40} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </motion.div>
+    </div>
   );
 }
 
