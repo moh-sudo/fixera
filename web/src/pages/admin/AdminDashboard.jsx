@@ -22,6 +22,15 @@ import {
   BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  LayoutDashboard, Radio, Siren, Navigation, ClipboardList, FileText, LifeBuoy,
+  Scale, Bell, Users, BadgeCheck, TrendingUp, Store, Package, Truck, Bike, Droplets,
+  Contact, CreditCard, Send, Wallet, RotateCcw, Calculator, Receipt, Briefcase,
+  Megaphone, Wrench, Image as ImageIcon, Tag, Star, BarChart3, Map as MapIcon,
+  LineChart as LineChartIcon, Activity, MapPin, ShieldAlert, Lock, Settings, UserCog,
+  Search, Mail, HelpCircle, ChevronDown, Home, LogOut, UserRound,
+} from 'lucide-react';
 
 // ── Audit helper ─────────────────────────────────────────────────
 // Non-blocking — uses the local session (no extra network call)
@@ -42,79 +51,79 @@ async function auditLog(action, detail = '') {
 // Grouped: section → items
 const NAV_GROUPS = [
   {
-    label: '🖥️ Command Center',
+    label: 'Operations',
     items: [
-      { id: 'live_ops', label: 'Live Operations',  icon: '🗺️' },
-      { id: 'alerts',   label: 'Alerts Feed',      icon: '🚨' },
+      { id: 'overview',       label: 'Dashboard',           Icon: LayoutDashboard },
+      { id: 'live_ops',       label: 'Live Operations',     Icon: Radio },
+      { id: 'dispatch',       label: 'Dispatch & Tracking', Icon: Navigation },
+      { id: 'alerts',         label: 'Alerts Feed',         Icon: Siren },
+      { id: 'orders',         label: 'Orders',              Icon: ClipboardList },
+      { id: 'quotations',     label: 'Quotations',          Icon: FileText },
+      { id: 'users',          label: 'Customers',           Icon: UserRound },
     ],
   },
   {
-    label: 'Main',
+    label: 'Support',
     items: [
-      { id: 'overview',       label: 'Dashboard',           icon: '📊' },
-      { id: 'users',          label: 'Users',               icon: '🧑' },
-      { id: 'orders',         label: 'Orders',              icon: '📋' },
-      { id: 'quotations',     label: 'Quotations',          icon: '📄' },
-      { id: 'support',        label: 'Support Center',      icon: '⚠️' },
-      { id: 'dispute_center', label: 'Dispute Center',      icon: '⚖️' },
-      { id: 'dispatch',       label: 'Dispatch & Tracking', icon: '📡' },
-      { id: 'notifications',  label: 'Notifications',       icon: '🔔' },
+      { id: 'support',        label: 'Support Center',      Icon: LifeBuoy },
+      { id: 'dispute_center', label: 'Dispute Center',      Icon: Scale },
+      { id: 'notifications',  label: 'Notifications',       Icon: Bell },
     ],
   },
   {
     label: 'Partners',
     items: [
-      { id: 'partners',      label: 'All Partners',        icon: '👥' },
-      { id: 'verification',  label: 'Verification Queue',  icon: '✅' },
-      { id: 'performance',   label: 'Partner Performance', icon: '📊' },
-      { id: 'vendors',       label: 'Vendors',             icon: '🏪' },
-      { id: 'suppliers',     label: 'Suppliers',           icon: '📦' },
-      { id: 'movers',        label: 'Movers',              icon: '🚚' },
-      { id: 'riders',        label: 'Riders',              icon: '🚗' },
-      { id: 'water',         label: 'Water Carriers',      icon: '🚰' },
-      { id: 'workforce',     label: 'Workforce',           icon: '🪪' },
+      { id: 'partners',      label: 'All Partners',         Icon: Users },
+      { id: 'verification',  label: 'Verification Queue',   Icon: BadgeCheck },
+      { id: 'performance',   label: 'Partner Performance',  Icon: TrendingUp },
+      { id: 'vendors',       label: 'Vendors',              Icon: Store },
+      { id: 'suppliers',     label: 'Suppliers',            Icon: Package },
+      { id: 'movers',        label: 'Movers',               Icon: Truck },
+      { id: 'riders',        label: 'Riders',               Icon: Bike },
+      { id: 'water',         label: 'Water Carriers',       Icon: Droplets },
+      { id: 'workforce',     label: 'Workforce',            Icon: Contact },
     ],
   },
   {
     label: 'Finance',
     items: [
-      { id: 'payments',        label: 'Payments',            icon: '💰' },
-      { id: 'payouts',         label: 'Payouts',             icon: '💸' },
-      { id: 'wallets',         label: 'Wallets',             icon: '👛' },
-      { id: 'refunds',         label: 'Refund Management',   icon: '↩️' },
-      { id: 'reconciliation',  label: 'Reconciliation',      icon: '🔢' },
-      { id: 'tax_report',      label: 'Tax Report',          icon: '🧾' },
-      { id: 'earnings',        label: 'Partner Earnings',    icon: '💼' },
-      { id: 'marketing',       label: 'Marketing',           icon: '🎯' },
+      { id: 'payments',        label: 'Payments',           Icon: CreditCard },
+      { id: 'payouts',         label: 'Payouts',            Icon: Send },
+      { id: 'wallets',         label: 'Wallets',            Icon: Wallet },
+      { id: 'refunds',         label: 'Refund Management',  Icon: RotateCcw },
+      { id: 'reconciliation',  label: 'Reconciliation',     Icon: Calculator },
+      { id: 'tax_report',      label: 'Tax Report',         Icon: Receipt },
+      { id: 'earnings',        label: 'Partner Earnings',   Icon: Briefcase },
+      { id: 'marketing',       label: 'Marketing',          Icon: Megaphone },
     ],
   },
   {
     label: 'Content',
     items: [
-      { id: 'services',      label: 'Services Catalog',    icon: '🛠️' },
-      { id: 'content',       label: 'Content (Banners/FAQ)', icon: '🖼️' },
-      { id: 'products',      label: 'Product Approvals',   icon: '🏷️' },
-      { id: 'reviews',       label: 'Reviews & Ratings',   icon: '⭐' },
+      { id: 'services',      label: 'Services Catalog',      Icon: Wrench },
+      { id: 'content',       label: 'Content (Banners/FAQ)', Icon: ImageIcon },
+      { id: 'products',      label: 'Product Approvals',     Icon: Tag },
+      { id: 'reviews',       label: 'Reviews & Ratings',     Icon: Star },
     ],
   },
   {
     label: 'Reports',
     items: [
-      { id: 'analytics',        label: 'Reports & Analytics', icon: '📈' },
-      { id: 'heatmap',          label: 'Booking Heatmap',     icon: '🌡️' },
-      { id: 'revenue_forecast', label: 'Revenue Forecast',    icon: '🔮' },
-      { id: 'availability',     label: 'Partner Availability', icon: '🟢' },
+      { id: 'analytics',        label: 'Reports & Analytics',  Icon: BarChart3 },
+      { id: 'heatmap',          label: 'Booking Heatmap',      Icon: MapIcon },
+      { id: 'revenue_forecast', label: 'Revenue Forecast',     Icon: LineChartIcon },
+      { id: 'availability',     label: 'Partner Availability', Icon: Activity },
     ],
   },
   {
     label: 'Platform',
     items: [
-      { id: 'team',           label: 'Team & Agents',       icon: '🧑‍💼' },
-      { id: 'announcements',  label: 'Broadcasts',          icon: '📢' },
-      { id: 'service_areas',  label: 'Service Areas',       icon: '📍' },
-      { id: 'fraud',          label: 'Fraud & Risk',        icon: '🚩' },
-      { id: 'security',       label: 'Security & Audit',    icon: '🔐' },
-      { id: 'settings',       label: 'Settings',            icon: '⚙️' },
+      { id: 'team',           label: 'Team & Agents',       Icon: UserCog },
+      { id: 'announcements',  label: 'Broadcasts',          Icon: Megaphone },
+      { id: 'service_areas',  label: 'Service Areas',       Icon: MapPin },
+      { id: 'fraud',          label: 'Fraud & Risk',        Icon: ShieldAlert },
+      { id: 'security',       label: 'Security & Audit',    Icon: Lock },
+      { id: 'settings',       label: 'Settings',            Icon: Settings },
     ],
   },
 ];
@@ -7638,10 +7647,15 @@ function TeamManagementSection() {
 export default function AdminDashboard() {
   const [active,       setActive]      = useState('overview');
   const [showDropdown, setShowDropdown]= useState(false);
+  const [collapsed,    setCollapsed]   = useState({}); // sidebar group label → collapsed?
   const { logout, user, profile } = useAuth();
   const navigate         = useNavigate();
   const adminRole        = profile?.admin_role || 'super_admin';
   const visibleNav       = filterNavForRole(NAV_GROUPS, adminRole);
+  const activeItem       = NAV_FLAT.find(n => n.id === active);
+  const displayName      = profile?.full_name || user?.email?.split('@')[0] || 'Admin';
+  const avatarUrl        = profile?.avatar_url || profile?.profile_photo_url || null;
+  const toggleGroup      = (label) => setCollapsed(c => ({ ...c, [label]: !c[label] }));
 
   useEffect(() => {
     const handler = e => setActive(e.detail);
@@ -7702,73 +7716,115 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div style={{ display:'flex', height:'100vh', overflow:'hidden', fontFamily:"'Nunito',-apple-system,sans-serif" }}>
+    <div className="admin-shell">
 
       {/* ── Sidebar ── */}
-      <div className="admin-sidebar">
+      <aside className="admin-sidebar">
         {/* Brand */}
         <div className="sidebar-brand">
-          <div style={{ width:38, height:38, borderRadius:10, background:'linear-gradient(135deg,#C9A020,#D4B033)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, flexShrink:0 }}>🔧</div>
-          <div className="ml-2">
-            <div style={{ color:'#C9A020', fontSize:15, fontWeight:900, letterSpacing:2 }}>FIXERA</div>
-            <div style={{ color:'rgba(255,255,255,0.3)', fontSize:9, fontWeight:700, letterSpacing:2 }}>ADMIN PANEL</div>
+          <div className="sidebar-brand-mark">
+            <Wrench size={20} color="#C9A020" strokeWidth={2.2} />
+          </div>
+          <div>
+            <div className="sidebar-brand-name">FIXERA</div>
+            <div className="sidebar-brand-sub">Admin Panel</div>
           </div>
         </div>
 
-        <nav style={{ flex:1, overflowY:'auto', padding:'4px 0' }}>
-          {visibleNav.map((group, gi) => (
-            <div key={group.label}>
-              {gi > 0 && <hr className="sidebar-divider" />}
-              <div className="sidebar-heading">{group.label}</div>
-              {group.items.map(item => (
-                <button key={item.id} onClick={() => setActive(item.id)} className={`sidebar-nav-link ${active===item.id?'active':''}`}>
-                  <span style={{fontSize:16}}>{item.icon}</span> {item.label}
+        <nav className="sidebar-scroll">
+          {visibleNav.map((group) => {
+            const isCollapsed = !!collapsed[group.label];
+            return (
+              <div key={group.label} className={`sidebar-group ${isCollapsed ? 'collapsed' : ''}`}>
+                <button className="sidebar-group-header" onClick={() => toggleGroup(group.label)}>
+                  <span className="sidebar-group-title">{group.label}</span>
+                  <ChevronDown size={13} className="sidebar-group-chev" />
                 </button>
-              ))}
-            </div>
-          ))}
+                <AnimatePresence initial={false}>
+                  {!isCollapsed && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.18, ease: 'easeOut' }}
+                      style={{ overflow: 'hidden' }}
+                    >
+                      {group.items.map(item => (
+                        <button key={item.id} onClick={() => setActive(item.id)}
+                          className={`sidebar-nav-link ${active === item.id ? 'active' : ''}`}>
+                          <span className="nav-ico">{item.Icon && <item.Icon size={17} strokeWidth={2} />}</span>
+                          <span className="nav-label">{item.label}</span>
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            );
+          })}
         </nav>
 
-        <hr className="sidebar-divider" />
-        <div style={{ padding:'8px 6px' }}>
-          <button onClick={() => navigate('/home')} className="sidebar-nav-link">🏠 Customer App</button>
-          <button onClick={async () => { await logout(); navigate('/login'); }} className="sidebar-nav-link" style={{ color:'#e74a3b' }}>🚪 Log Out</button>
+        {/* Profile card */}
+        <div className="sidebar-foot">
+          <div className="sidebar-profile">
+            {avatarUrl
+              ? <img src={avatarUrl} alt="" className="sidebar-avatar" />
+              : <div className="sidebar-avatar" style={{ display:'flex', alignItems:'center', justifyContent:'center' }}><UserRound size={18} color="#fff" /></div>}
+            <div style={{ flex:1, minWidth:0 }}>
+              <div style={{ fontSize:13, fontWeight:800, color:'var(--ink)', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{displayName}</div>
+              <div style={{ fontSize:10.5, color:'var(--muted)', fontWeight:600, textTransform:'capitalize' }}>{(adminRole || 'super_admin').replace('_',' ')}</div>
+            </div>
+            <button onClick={async () => { await logout(); navigate('/admin/login'); }} title="Log out"
+              style={{ width:30, height:30, borderRadius:8, border:'1px solid var(--line)', background:'#fff', color:'var(--red)', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <LogOut size={15} />
+            </button>
+          </div>
         </div>
-      </div>
+      </aside>
 
       {/* ── Main Content ── */}
       <div className="admin-content">
         {/* Topbar */}
         <div className="admin-topbar">
-          <div className="flex-grow-1">
-            <div style={{ fontWeight:800, color:'#3a3b45', fontSize:14 }}>
-              {NAV_FLAT.find(n => n.id===active)?.icon} {NAV_FLAT.find(n => n.id===active)?.label}
+          <div style={{ minWidth:0 }}>
+            <div className="topbar-title" style={{ display:'flex', alignItems:'center', gap:9 }}>
+              {activeItem?.Icon && <activeItem.Icon size={19} color="var(--gold)" strokeWidth={2.2} />}
+              {activeItem?.label || 'Dashboard'}
             </div>
-            <div style={{ color:'#858796', fontSize:11 }}>Fixera Admin Dashboard · {new Date().toLocaleDateString('en-KE', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}</div>
+            <div className="topbar-sub">Fixera Operations · {new Date().toLocaleDateString('en-KE', { weekday:'long', day:'numeric', month:'long', year:'numeric' })}</div>
           </div>
-          <div className="position-relative">
-            <div className="d-flex align-items-center" style={{ gap:10, cursor:'pointer' }} onClick={() => setShowDropdown(d => !d)}>
-              <div style={{ width:36, height:36, borderRadius:'50%', background:'linear-gradient(135deg,#C9A020,#D4B033)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:16 }}>👤</div>
-              <div>
-                <div style={{ fontSize:12, fontWeight:700, color:'#3a3b45', display:'flex', alignItems:'center', gap:6 }}>
-                  Admin ▾
-                  {adminRole !== 'super_admin' && (
-                    <span style={{ fontSize:9, fontWeight:800, padding:'2px 6px', borderRadius:20, letterSpacing:1, textTransform:'uppercase', background:'rgba(78,115,223,0.12)', color:'#4e73df', border:'1px solid rgba(78,115,223,0.25)' }}>
-                      {adminRole}
-                    </span>
-                  )}
-                </div>
-                <div style={{ fontSize:10, color:'#858796' }}>{user?.email}</div>
+
+          <div style={{ flex:1 }} />
+
+          <label className="topbar-search">
+            <Search size={16} />
+            <input placeholder="Search anything…" />
+            <span className="topbar-kbd">⌘K</span>
+          </label>
+
+          <button className="topbar-icon-btn" title="Alerts"><Bell size={18} /><span className="topbar-dot">3</span></button>
+          <button className="topbar-icon-btn" title="Messages"><Mail size={18} /></button>
+          <button className="topbar-icon-btn" title="Help"><HelpCircle size={18} /></button>
+
+          <div style={{ position:'relative' }}>
+            <div onClick={() => setShowDropdown(d => !d)} style={{ display:'flex', alignItems:'center', gap:10, cursor:'pointer', paddingLeft:6 }}>
+              {avatarUrl
+                ? <img src={avatarUrl} alt="" style={{ width:38, height:38, borderRadius:11, objectFit:'cover' }} />
+                : <div style={{ width:38, height:38, borderRadius:11, background:'linear-gradient(135deg,var(--navy),var(--navy-2))', display:'flex', alignItems:'center', justifyContent:'center' }}><UserRound size={18} color="#fff" /></div>}
+              <div style={{ lineHeight:1.2 }}>
+                <div style={{ fontSize:13, fontWeight:800, color:'var(--ink)' }}>{displayName}</div>
+                <div style={{ fontSize:10.5, color:'var(--muted)', fontWeight:600, textTransform:'capitalize' }}>{(adminRole || 'super_admin').replace('_',' ')}</div>
               </div>
+              <ChevronDown size={16} color="var(--muted)" />
             </div>
             {showDropdown && (
-              <div style={{ position:'absolute', right:0, top:48, background:'#fff', border:'1px solid #e3e6f0', borderRadius:8, boxShadow:'0 4px 16px rgba(0,0,0,0.12)', minWidth:180, zIndex:200 }}>
-                <button onClick={() => { setShowDropdown(false); navigate('/home'); }} style={{ display:'block', width:'100%', padding:'10px 16px', background:'none', border:'none', textAlign:'left', fontSize:13, color:'#3a3b45', cursor:'pointer' }}>
-                  🏠 Customer App
+              <div style={{ position:'absolute', right:0, top:52, background:'#fff', border:'1px solid var(--line)', borderRadius:12, boxShadow:'var(--shadow)', minWidth:190, zIndex:200, overflow:'hidden' }}>
+                <button onClick={() => { setShowDropdown(false); navigate('/home'); }} style={{ display:'flex', alignItems:'center', gap:10, width:'100%', padding:'11px 16px', background:'none', border:'none', textAlign:'left', fontSize:13, color:'var(--ink-2)', cursor:'pointer', fontWeight:600 }}>
+                  <Home size={15} /> Customer App
                 </button>
-                <hr style={{ margin:'4px 0', borderColor:'#e3e6f0' }} />
-                <button onClick={async () => { await logout(); navigate('/login'); }} style={{ display:'block', width:'100%', padding:'10px 16px', background:'none', border:'none', textAlign:'left', fontSize:13, color:'#e74a3b', cursor:'pointer', fontWeight:700 }}>
-                  🚪 Log Out
+                <div style={{ height:1, background:'var(--line)' }} />
+                <button onClick={async () => { await logout(); navigate('/admin/login'); }} style={{ display:'flex', alignItems:'center', gap:10, width:'100%', padding:'11px 16px', background:'none', border:'none', textAlign:'left', fontSize:13, color:'var(--red)', cursor:'pointer', fontWeight:700 }}>
+                  <LogOut size={15} /> Log Out
                 </button>
               </div>
             )}
