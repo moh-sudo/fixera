@@ -33,6 +33,50 @@ body, .admin-root {
   -webkit-font-smoothing: antialiased;
 }
 
+/* ── Auto night mode (7pm – 6am, matches the customer app) ────
+   Toggled by JS setting data-theme="dark" on .admin-shell.
+   Every color in this file already reads a CSS var, so this
+   single block reskins the whole dashboard. */
+.admin-shell[data-theme="dark"] {
+  --ink:      #F0F2F5;
+  --ink-2:    #C7CDD6;
+  --muted:    #8B929E;
+  --line:     #262B38;
+  --line-2:   #2F3542;
+  --canvas:   #0F1117;
+  --surface:  #1A1D27;
+  --gold:     #D4AF37;
+  --gold-2:   #C9A020;
+  --gold-soft:#241D08;
+  --navy:     #1E3355;
+  --navy-2:   #2A4570;
+  --blue:     #5B9CFF;
+  --green:    #2ECC71;
+  --amber:    #F5A623;
+  --red:      #F05252;
+  --violet:   #9B8CFF;
+  --shadow:   0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.3), 0 2px 8px rgba(0,0,0,.25);
+  color-scheme: dark;
+}
+/* Hardcoded hex colors elsewhere in this file, dark-mode overrides */
+.admin-shell[data-theme="dark"] .topbar-search        { background: #20242F; }
+.admin-shell[data-theme="dark"] .topbar-search input   { color: var(--ink); }
+.admin-shell[data-theme="dark"] .topbar-search:focus-within { background: #262B38; }
+.admin-shell[data-theme="dark"] .topbar-kbd            { background: #20242F; border-color: var(--line-2); }
+.admin-shell[data-theme="dark"] .sidebar-nav-link:hover{ background: #20242F; }
+.admin-shell[data-theme="dark"] .sidebar-profile       { background: #1F232E; }
+.admin-shell[data-theme="dark"] .admin-table th        { background: #1F232E; }
+.admin-shell[data-theme="dark"] .admin-card-header     { background: transparent; }
+.admin-shell[data-theme="dark"] .sb-badge-success   { background: #0D2E1B; color: #4ADE80; }
+.admin-shell[data-theme="dark"] .sb-badge-warning   { background: #2E2308; color: #FBBF24; }
+.admin-shell[data-theme="dark"] .sb-badge-danger    { background: #2E1212; color: #F87171; }
+.admin-shell[data-theme="dark"] .sb-badge-info      { background: #10233F; color: #60A5FA; }
+.admin-shell[data-theme="dark"] .sb-badge-secondary { background: #262B38; color: #C7CDD6; }
+.admin-shell[data-theme="dark"] .sb-badge-gold      { background: #241D08; color: #E5C158; }
+.admin-shell[data-theme="dark"] .job-modal-panel    { background: var(--surface); }
+.admin-shell[data-theme="dark"] .job-modal-overlay  { background: rgba(0,0,0,.6); }
+
 /* ── Shell ─────────────────────────────────────────────────── */
 .admin-shell { display: flex; height: 100vh; overflow: hidden; background: var(--canvas); font-family: 'Inter', sans-serif; }
 

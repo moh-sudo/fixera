@@ -47,6 +47,20 @@ async function auditLog(action, detail = '') {
   } catch (_) { /* non-blocking */ }
 }
 
+// ── Auto night mode — dark 7pm–6am, resets to light at 6am (matches the customer app) ──
+function isAdminNight() {
+  const h = new Date().getHours();
+  return h < 6 || h >= 19;
+}
+function useAdminNightMode() {
+  const [night, setNight] = useState(isAdminNight());
+  useEffect(() => {
+    const id = setInterval(() => setNight(isAdminNight()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  return night;
+}
+
 // ── Nav ───────────────────────────────────────────────────────────
 // Grouped: section → items
 const NAV_GROUPS = [
@@ -7858,6 +7872,7 @@ export default function AdminDashboard() {
   const [active,       setActive]      = useState('overview');
   const [showDropdown, setShowDropdown]= useState(false);
   const [collapsed,    setCollapsed]   = useState({}); // sidebar group label → collapsed?
+  const isNight          = useAdminNightMode();
   const { logout, user, profile } = useAuth();
   const navigate         = useNavigate();
   const adminRole        = profile?.admin_role || 'super_admin';
@@ -7926,7 +7941,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="admin-shell">
+    <div className="admin-shell" data-theme={isNight ? 'dark' : 'light'}>
 
       {/* ── Sidebar ── */}
       <aside className="admin-sidebar">
