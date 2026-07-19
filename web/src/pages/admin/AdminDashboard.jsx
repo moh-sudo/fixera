@@ -30,6 +30,7 @@ import {
   Megaphone, Wrench, Image as ImageIcon, Tag, Star, BarChart3, Map as MapIcon,
   LineChart as LineChartIcon, Activity, MapPin, ShieldAlert, Lock, Settings, UserCog,
   Search, Mail, HelpCircle, ChevronDown, Home, LogOut, UserRound,
+  Handshake, Smartphone, Flag, Save, StickyNote, Clock, Plus, AlertCircle,
 } from 'lucide-react';
 
 // ── Audit helper ─────────────────────────────────────────────────
@@ -2076,25 +2077,25 @@ function DisputesSection() {
   };
 
   const DEPT_META = {
-    finance:         { label: '💰 Finance',         color: '#1cc88a', sla_hours: 24 },
-    operations:      { label: '🛠️ Operations',      color: '#4e73df', sla_hours: 8  },
-    trust_safety:    { label: '🛡️ Trust & Safety',  color: '#e74a3b', sla_hours: 1  },
-    accounts:        { label: '🔐 Accounts',         color: '#C9A020', sla_hours: 48 },
-    technical:       { label: '📱 Technical',        color: '#9F7AEA', sla_hours: 24 },
-    partner_success: { label: '🤝 Partner Success',  color: '#fd7e14', sla_hours: 48 },
+    finance:         { label: 'Finance',         Icon: Wallet,     color: 'var(--green)',  sla_hours: 24 },
+    operations:      { label: 'Operations',      Icon: Wrench,     color: 'var(--blue)',   sla_hours: 8  },
+    trust_safety:    { label: 'Trust & Safety',  Icon: ShieldAlert,color: 'var(--red)',    sla_hours: 1  },
+    accounts:        { label: 'Accounts',        Icon: Lock,       color: 'var(--gold)',   sla_hours: 48 },
+    technical:       { label: 'Technical',       Icon: Smartphone, color: 'var(--violet)', sla_hours: 24 },
+    partner_success: { label: 'Partner Success', Icon: Handshake,  color: 'var(--amber)',  sla_hours: 48 },
   };
 
   const PRIORITY_META = {
-    urgent: { label: '🚨 URGENT', bg: 'rgba(231,74,59,0.12)', color: '#e74a3b', border: 'rgba(231,74,59,0.4)' },
-    high:   { label: '🔶 HIGH',   bg: 'rgba(246,173,85,0.12)', color: '#F6AD55', border: 'rgba(246,173,85,0.4)' },
-    normal: { label: '🔵 NORMAL', bg: 'rgba(78,115,223,0.10)', color: '#4e73df', border: 'rgba(78,115,223,0.3)' },
+    urgent: { label: 'URGENT', Icon: Siren, bg: 'rgba(239,68,68,.12)', color: 'var(--red)',   border: 'rgba(239,68,68,.35)' },
+    high:   { label: 'HIGH',   Icon: Flag,  bg: 'rgba(245,158,11,.12)', color: 'var(--amber)', border: 'rgba(245,158,11,.35)' },
+    normal: { label: 'NORMAL', Icon: null,  bg: 'rgba(59,130,246,.10)', color: 'var(--blue)',  border: 'rgba(59,130,246,.3)' },
   };
 
   const STATUS_FLOW = {
-    open:        { next: 'in_review',    label: '▶ Mark In Review',   btnClass: 'btn-primary'  },
-    in_review:   { next: 'in_progress',  label: '▶ Mark In Progress', btnClass: 'btn-warning'  },
-    in_progress: { next: 'resolved',     label: '✅ Resolve',          btnClass: 'btn-success'  },
-    resolved:    { next: 'open',         label: '↩ Reopen',            btnClass: 'btn-secondary'},
+    open:        { next: 'in_review',    label: 'Mark In Review',   bg: 'var(--blue)' },
+    in_review:   { next: 'in_progress',  label: 'Mark In Progress', bg: 'var(--amber)' },
+    in_progress: { next: 'resolved',     label: 'Resolve',          bg: 'var(--green)' },
+    resolved:    { next: 'open',         label: 'Reopen',           bg: 'var(--muted)' },
   };
 
   const slaStatus = (ticket) => {
@@ -2103,8 +2104,8 @@ function DisputesSection() {
     if (!dept) return null;
     const hoursElapsed = (Date.now() - new Date(ticket.created_at).getTime()) / 3_600_000;
     const ratio        = hoursElapsed / dept.sla_hours;
-    if (ratio >= 1)   return { label: `⏰ SLA BREACHED (${Math.round(hoursElapsed)}h)`, color: '#e74a3b', bg: 'rgba(231,74,59,0.12)' };
-    if (ratio >= 0.75) return { label: `⚠️ SLA at risk (${Math.round(hoursElapsed)}h/${dept.sla_hours}h)`, color: '#F6AD55', bg: 'rgba(246,173,85,0.1)' };
+    if (ratio >= 1)   return { label: `SLA BREACHED (${Math.round(hoursElapsed)}h)`, color: 'var(--red)', bg: 'rgba(239,68,68,.12)' };
+    if (ratio >= 0.75) return { label: `SLA at risk (${Math.round(hoursElapsed)}h/${dept.sla_hours}h)`, color: 'var(--amber)', bg: 'rgba(245,158,11,.1)' };
     return null;
   };
 
@@ -2143,155 +2144,151 @@ function DisputesSection() {
     load();
   };
 
+  const STATUS_FILTERS = [
+    { k: 'open',        label: 'Open',        color: 'var(--red)' },
+    { k: 'in_review',   label: 'In Review',   color: 'var(--blue)' },
+    { k: 'in_progress', label: 'In Progress', color: 'var(--amber)' },
+    { k: 'resolved',    label: 'Resolved',    color: 'var(--green)' },
+    { k: 'all',         label: 'All' },
+  ];
+  const ROLE_FILTERS = [
+    { k:'all', label:'Everyone' }, { k:'customer', label:'Customers', Icon: UserRound }, { k:'worker', label:'Workers', Icon: Wrench },
+    { k:'vendor', label:'Vendors', Icon: Store }, { k:'rider', label:'Riders', Icon: Bike }, { k:'supplier', label:'Suppliers', Icon: Package },
+    { k:'mover', label:'Movers', Icon: Truck }, { k:'water_carrier', label:'Water Carriers', Icon: Droplets },
+  ];
+  const inputSt = { flex:1, fontSize:12.5, padding:'8px 12px', border:'1px solid var(--line-2)', borderRadius:9, outline:'none', fontFamily:'inherit', background:'var(--surface)', color:'var(--ink)' };
+
   return (
     <>
       <PageHeader title="Support Center" sub="Unified ticket queue — department-routed, priority-sorted, SLA-tracked" />
 
       {/* Status filter */}
-      <div className="mb-2">
-        {[
-          { k: 'open',        label: '🔴 Open'        },
-          { k: 'in_review',   label: '🔵 In Review'   },
-          { k: 'in_progress', label: '🟡 In Progress' },
-          { k: 'resolved',    label: '✅ Resolved'     },
-          { k: 'all',         label: 'All'             },
-        ].map(f => <FilterPill key={f.k} active={filter === f.k} onClick={() => setFilter(f.k)}>{f.label}</FilterPill>)}
+      <div style={{ marginBottom:8 }}>
+        {STATUS_FILTERS.map(f => (
+          <FilterPill key={f.k} active={filter === f.k} onClick={() => setFilter(f.k)}>
+            <span style={{ display:'inline-flex', alignItems:'center', gap:6 }}>
+              {f.color && <span style={{ width:7, height:7, borderRadius:'50%', background:f.color, display:'inline-block' }} />}
+              {f.label}
+            </span>
+          </FilterPill>
+        ))}
       </div>
 
       {/* Department filter */}
-      <div className="mb-2">
+      <div style={{ marginBottom:8 }}>
         <FilterPill active={deptFilter === 'all'} onClick={() => setDept('all')}>All Departments</FilterPill>
-        {Object.entries(DEPT_META).map(([k, m]) =>
-          <FilterPill key={k} active={deptFilter === k} onClick={() => setDept(k)}>{m.label}</FilterPill>)}
+        {Object.entries(DEPT_META).map(([k, m]) => (
+          <FilterPill key={k} active={deptFilter === k} onClick={() => setDept(k)}>
+            <span style={{ display:'inline-flex', alignItems:'center', gap:6 }}><m.Icon size={12.5} />{m.label}</span>
+          </FilterPill>
+        ))}
       </div>
 
       {/* User type filter */}
-      <div className="mb-3">
-        {[
-          { k: 'all',          label: 'Everyone'          },
-          { k: 'customer',     label: '🧑 Customers'      },
-          { k: 'worker',       label: '🔧 Workers'        },
-          { k: 'vendor',       label: '🏪 Vendors'        },
-          { k: 'rider',        label: '🚗 Riders'         },
-          { k: 'supplier',     label: '📦 Suppliers'      },
-          { k: 'mover',        label: '🚚 Movers'         },
-          { k: 'water_carrier',label: '🚰 Water Carriers' },
-        ].map(f => <FilterPill key={f.k} active={roleTixFilter === f.k} onClick={() => setRoleTix(f.k)}>{f.label}</FilterPill>)}
+      <div style={{ marginBottom:16 }}>
+        {ROLE_FILTERS.map(f => (
+          <FilterPill key={f.k} active={roleTixFilter === f.k} onClick={() => setRoleTix(f.k)}>
+            <span style={{ display:'inline-flex', alignItems:'center', gap:6 }}>{f.Icon && <f.Icon size={12.5} />}{f.label}</span>
+          </FilterPill>
+        ))}
       </div>
 
       {loading ? <Spinner /> : disputes.length === 0 ? (
-        <div className="text-center py-5">
-          <div style={{ fontSize: 48 }}>🕊️</div>
-          <p className="text-gray-500 mt-2">No tickets — all clear!</p>
+        <div style={{ textAlign:'center', padding:'56px 0' }}>
+          <div style={{ width:56, height:56, borderRadius:16, background:'var(--line)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 14px' }}><LifeBuoy size={26} color="var(--muted)" /></div>
+          <p style={{ color:'var(--muted)', margin:0 }}>No tickets — all clear!</p>
         </div>
-      ) : disputes.map(d => {
+      ) : disputes.map((d, i) => {
         const dept    = DEPT_META[d.department] || DEPT_META.partner_success;
         const pri     = PRIORITY_META[d.priority] || PRIORITY_META.normal;
         const flow    = STATUS_FLOW[d.status] || STATUS_FLOW.open;
         const sla     = slaStatus(d);
         const isUrgentOpen = d.priority === 'urgent' && d.status !== 'resolved';
+        const sub     = (agents.find(a => a.id === d.assigned_to)) || null;
 
         return (
-          <div key={d.id} className="admin-card mb-3" style={isUrgentOpen ? { borderLeft: '4px solid #e74a3b' } : {}}>
-            <div className="card-body">
+          <motion.div key={d.id} initial={{ opacity:0, y:8 }} animate={{ opacity:1, y:0 }} transition={{ duration:.3, delay: Math.min(i,8)*0.03 }}
+            className={`admin-card ${isUrgentOpen ? 'attn-pulse' : ''}`} style={isUrgentOpen ? { borderLeft: '4px solid var(--red)' } : {}}>
+            <div style={{ padding:18 }}>
 
               {/* Header row */}
-              <div className="d-flex justify-content-between align-items-start mb-2">
-                <div className="d-flex align-items-start" style={{ gap: 10, flex: 1, minWidth: 0 }}>
-                  <span style={{ fontSize: 20, flexShrink: 0 }}>{ROLE_ICON[d.user_type] || '📋'}</span>
-                  <div style={{ minWidth: 0 }}>
-                    <div className="font-weight-bold text-gray-800" style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                      <span>{d.subject || 'Support Request'}</span>
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:10, gap:12 }}>
+                <div style={{ display:'flex', alignItems:'flex-start', gap:11, flex:1, minWidth:0 }}>
+                  <div style={{ width:38, height:38, borderRadius:11, background:'var(--gold-soft)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                    <RoleIcon role={d.user_type} size={17} color="var(--gold-2)" />
+                  </div>
+                  <div style={{ minWidth:0 }}>
+                    <div style={{ fontWeight:800, color:'var(--ink)', fontSize:14.5 }}>{d.subject || 'Support Request'}</div>
+                    <div style={{ fontSize:11.5, color:'var(--muted)', marginTop:3 }}>
                       #{d.id.slice(0, 8).toUpperCase()} · {new Date(d.created_at).toLocaleDateString('en-KE')} · {(ROLE_LABEL[d.user_type] || d.user_type || 'User').toUpperCase()}
-                      {d.user_name && <> · <strong>{d.user_name}</strong></>}
+                      {d.user_name && <> · <strong style={{ color:'var(--ink-2)' }}>{d.user_name}</strong></>}
                       {d.user_email && <> · {d.user_email}</>}
                     </div>
                     {/* Badges row */}
-                    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
-                      <span style={{ fontSize: 10, fontWeight: 800, padding: '2px 8px', borderRadius: 6, background: pri.bg, color: pri.color, border: `1px solid ${pri.border}` }}>
-                        {pri.label}
+                    <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginTop:8 }}>
+                      <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:10, fontWeight:800, padding:'3px 9px', borderRadius:20, background:pri.bg, color:pri.color, border:`1px solid ${pri.border}` }}>
+                        {pri.Icon && <pri.Icon size={11} />} {pri.label}
                       </span>
-                      <span className="sb-badge" style={{ background: `${dept.color}18`, color: dept.color, border: `1px solid ${dept.color}50`, fontSize: 10 }}>
-                        {dept.label}
+                      <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:10, fontWeight:800, padding:'3px 9px', borderRadius:20, background:`${dept.color}18`, color:dept.color, border:`1px solid ${dept.color}50` }}>
+                        <dept.Icon size={11} /> {dept.label}
                       </span>
                       {d.category && (
-                        <span style={{ fontSize: 10, padding: '2px 8px', borderRadius: 6, background: 'rgba(0,0,0,0.06)', color: '#6c757d', border: '1px solid #e3e6f0' }}>
-                          {d.category}
-                        </span>
+                        <span style={{ fontSize:10, fontWeight:700, padding:'3px 9px', borderRadius:20, background:'var(--line)', color:'var(--ink-2)' }}>{d.category}</span>
                       )}
                     </div>
                   </div>
                 </div>
-                <div className="text-right" style={{ flexShrink: 0, marginLeft: 12 }}>
-                  <SBBadge status={d.status || 'open'} />
-                </div>
+                <div style={{ flexShrink:0 }}><SBBadge status={d.status || 'open'} /></div>
               </div>
 
               {/* SLA warning */}
               {sla && (
-                <div style={{ background: sla.bg, border: `1px solid ${sla.color}40`, borderRadius: 6, padding: '5px 10px', marginBottom: 10, fontSize: 11, fontWeight: 700, color: sla.color }}>
-                  {sla.label}
+                <div style={{ display:'flex', alignItems:'center', gap:7, background:sla.bg, borderRadius:8, padding:'7px 11px', marginBottom:11, fontSize:11.5, fontWeight:700, color:sla.color }}>
+                  <Clock size={13} /> {sla.label}
                 </div>
               )}
 
               {/* Message */}
-              <div className="p-2 rounded text-xs text-gray-600 mb-3" style={{ background: '#f8f9fc', border: '1px solid #e3e6f0' }}>
+              <div style={{ padding:'10px 13px', borderRadius:10, background:'var(--canvas)', border:'1px solid var(--line)', fontSize:12.5, color:'var(--ink-2)', marginBottom:13, lineHeight:1.5 }}>
                 {d.message || '—'}
               </div>
 
               {/* Admin note input */}
-              <div className="input-group input-group-sm mb-2">
-                <input
-                  value={note[d.id] || ''}
-                  onChange={e => setNote(n => ({ ...n, [d.id]: e.target.value }))}
-                  placeholder="Add or update admin note…"
-                  className="form-control"
-                />
-                <div className="input-group-append">
-                  <button onClick={() => saveNote(d.id)} className="btn btn-outline-secondary btn-sm">💾 Save Note</button>
-                </div>
+              <div style={{ display:'flex', gap:8, marginBottom:11 }}>
+                <input value={note[d.id] || ''} onChange={e => setNote(n => ({ ...n, [d.id]: e.target.value }))} placeholder="Add or update admin note…" style={inputSt} />
+                <button onClick={() => saveNote(d.id)} style={{ display:'flex', alignItems:'center', gap:6, padding:'8px 14px', borderRadius:9, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--ink-2)', fontSize:12, fontWeight:700, cursor:'pointer', whiteSpace:'nowrap' }}>
+                  <Save size={13} /> Save Note
+                </button>
               </div>
 
               {/* Status action button */}
-              <button
-                onClick={() => advanceStatus(d)}
-                disabled={!!updating[d.id]}
-                className={`btn btn-sm ${flow.btnClass}`}
-                style={{ opacity: updating[d.id] ? 0.6 : 1 }}
-              >
+              <button onClick={() => advanceStatus(d)} disabled={!!updating[d.id]}
+                style={{ padding:'8px 16px', borderRadius:9, border:'none', background:flow.bg, color:'#fff', fontSize:12.5, fontWeight:700, cursor:'pointer', opacity: updating[d.id] ? 0.6 : 1 }}>
                 {updating[d.id] ? '…' : flow.label}
               </button>
 
               {/* Assign + SLA */}
-              <div style={{ marginTop: 8, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+              <div style={{ marginTop:10, display:'flex', gap:8, alignItems:'center', flexWrap:'wrap' }}>
                 {d.assigned_name ? (
-                  <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: 'rgba(78,115,223,0.1)', border: '1px solid rgba(78,115,223,0.3)', color: '#4e73df', fontWeight: 700 }}>
-                    👤 {d.assigned_name}
+                  <span style={{ display:'inline-flex', alignItems:'center', gap:5, fontSize:11, padding:'4px 10px', borderRadius:20, background:'rgba(59,130,246,.1)', color:'var(--blue)', fontWeight:700 }}>
+                    <UserRound size={12} /> {d.assigned_name}
                   </span>
                 ) : null}
                 {d.sla_deadline ? (
-                  <span style={{ fontSize: 11, padding: '3px 10px', borderRadius: 20, background: new Date(d.sla_deadline) < new Date() ? 'rgba(231,74,59,0.1)' : 'rgba(246,173,85,0.1)', border: `1px solid ${new Date(d.sla_deadline) < new Date() ? 'rgba(231,74,59,0.3)' : 'rgba(246,173,85,0.3)'}`, color: new Date(d.sla_deadline) < new Date() ? '#e74a3b' : '#F6AD55', fontWeight: 700 }}>
-                    ⏰ Due {new Date(d.sla_deadline).toLocaleString('en-KE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                  <span style={{ display:'inline-flex', alignItems:'center', gap:5, fontSize:11, padding:'4px 10px', borderRadius:20, background: new Date(d.sla_deadline) < new Date() ? 'rgba(239,68,68,.1)' : 'rgba(245,158,11,.1)', color: new Date(d.sla_deadline) < new Date() ? 'var(--red)' : 'var(--amber)', fontWeight:700 }}>
+                    <Clock size={12} /> Due {new Date(d.sla_deadline).toLocaleString('en-KE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                   </span>
                 ) : null}
-                <div style={{ display: 'flex', gap: 4 }}>
-                  <select
-                    value={assignSel[d.id] || ''}
-                    onChange={e => setAssignSel(n => ({ ...n, [d.id]: e.target.value }))}
-                    style={{ fontSize: 11, padding: '4px 8px', border: '1px solid #d0d8f0', borderRadius: 6, outline: 'none', fontFamily: 'inherit', width: 160, background: '#fff' }}
-                  >
+                <div style={{ display:'flex', gap:6 }}>
+                  <select value={assignSel[d.id] || ''} onChange={e => setAssignSel(n => ({ ...n, [d.id]: e.target.value }))}
+                    style={{ fontSize:11.5, padding:'6px 10px', border:'1px solid var(--line-2)', borderRadius:8, outline:'none', fontFamily:'inherit', width:170, background:'var(--surface)', color:'var(--ink)' }}>
                     <option value="">{d.assigned_name ? `Reassign (${d.assigned_name})…` : 'Assign to…'}</option>
                     {agents.map(a => (
                       <option key={a.id} value={a.id}>{a.full_name || 'Agent'} · {roleLabel(a.admin_role)}</option>
                     ))}
                   </select>
-                  <button
-                    onClick={() => assignTicket(d.id)}
-                    disabled={assigning[d.id] || !assignSel[d.id]}
-                    style={{ padding: '4px 10px', borderRadius: 6, background: '#4e73df', border: 'none', color: '#fff', fontSize: 11, fontWeight: 700, cursor: assignSel[d.id] ? 'pointer' : 'not-allowed', opacity: assignSel[d.id] ? 1 : 0.5 }}
-                  >
+                  <button onClick={() => assignTicket(d.id)} disabled={assigning[d.id] || !assignSel[d.id]}
+                    style={{ padding:'6px 12px', borderRadius:8, background:'var(--navy)', border:'none', color:'#fff', fontSize:11.5, fontWeight:700, cursor: assignSel[d.id] ? 'pointer' : 'not-allowed', opacity: assignSel[d.id] ? 1 : 0.5 }}>
                     {assigning[d.id] ? '…' : 'Assign'}
                   </button>
                 </div>
@@ -2299,56 +2296,48 @@ function DisputesSection() {
 
               {/* Existing admin note */}
               {d.admin_note && (
-                <div className="alert alert-success py-2 text-xs mt-2 mb-0">📝 {d.admin_note}</div>
+                <div style={{ display:'flex', alignItems:'flex-start', gap:8, background:'rgba(22,163,74,.08)', color:'#15803D', borderRadius:9, padding:'9px 12px', marginTop:10, fontSize:12 }}>
+                  <StickyNote size={14} style={{ flexShrink:0, marginTop:1 }} /> {d.admin_note}
+                </div>
               )}
 
               {/* ── Internal Notes Thread ── */}
-              <div style={{ marginTop: 10 }}>
-                <button
-                  onClick={() => toggleNotes(d.id)}
-                  style={{ background: 'none', border: 'none', padding: 0, color: '#4e73df', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}
-                >
-                  🔒 Internal Notes {ticketNotes[d.id] ? `(${ticketNotes[d.id].length})` : ''} {notesOpen[d.id] ? '▲' : '▼'}
+              <div style={{ marginTop:12 }}>
+                <button onClick={() => toggleNotes(d.id)}
+                  style={{ display:'inline-flex', alignItems:'center', gap:6, background:'none', border:'none', padding:0, color:'var(--blue)', fontSize:12, fontWeight:700, cursor:'pointer' }}>
+                  <Lock size={13} /> Internal Notes {ticketNotes[d.id] ? `(${ticketNotes[d.id].length})` : ''}
+                  <ChevronDown size={13} style={{ transform: notesOpen[d.id] ? 'rotate(180deg)' : 'none', transition:'transform .15s' }} />
                 </button>
 
                 {notesOpen[d.id] && (
-                  <div style={{ marginTop: 8, padding: '10px 12px', background: '#f0f4ff', border: '1px solid #d0d8f0', borderRadius: 8 }}>
-                    <div style={{ fontSize: 10, fontWeight: 800, color: '#4e73df', marginBottom: 8, letterSpacing: 1 }}>
-                      🔒 INTERNAL — NOT VISIBLE TO CUSTOMER
+                  <div style={{ marginTop:9, padding:'12px 14px', background:'#EAF1FE', border:'1px solid #C9DBFA', borderRadius:11 }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:10, fontWeight:800, color:'var(--blue)', marginBottom:9, letterSpacing:'.5px', textTransform:'uppercase' }}>
+                      <Lock size={11} /> Internal — not visible to customer
                     </div>
 
-                    {/* Notes thread */}
                     {(ticketNotes[d.id] || []).length === 0 ? (
-                      <div style={{ color: '#aaa', fontSize: 12, marginBottom: 8 }}>No internal notes yet.</div>
+                      <div style={{ color:'#7B93C9', fontSize:12, marginBottom:8 }}>No internal notes yet.</div>
                     ) : (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 10 }}>
+                      <div style={{ display:'flex', flexDirection:'column', gap:8, marginBottom:10 }}>
                         {(ticketNotes[d.id] || []).map(n => (
-                          <div key={n.id} style={{ background: '#fff', border: '1px solid #dde3f5', borderRadius: 6, padding: '8px 10px' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 3 }}>
-                              <span style={{ fontSize: 11, fontWeight: 700, color: '#4e73df' }}>{n.admin_name}</span>
-                              <span style={{ fontSize: 10, color: '#aaa' }}>{new Date(n.created_at).toLocaleString('en-KE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
+                          <div key={n.id} style={{ background:'#fff', border:'1px solid #DCE6FB', borderRadius:8, padding:'8px 11px' }}>
+                            <div style={{ display:'flex', justifyContent:'space-between', marginBottom:3 }}>
+                              <span style={{ fontSize:11, fontWeight:700, color:'var(--blue)' }}>{n.admin_name}</span>
+                              <span style={{ fontSize:10, color:'#94A3B8' }}>{new Date(n.created_at).toLocaleString('en-KE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}</span>
                             </div>
-                            <div style={{ fontSize: 12, color: '#333', lineHeight: 1.5 }}>{n.note}</div>
+                            <div style={{ fontSize:12, color:'#334155', lineHeight:1.5 }}>{n.note}</div>
                           </div>
                         ))}
                       </div>
                     )}
 
-                    {/* Add note input */}
-                    <div style={{ display: 'flex', gap: 6 }}>
-                      <input
-                        value={newNote[d.id] || ''}
-                        onChange={e => setNewNote(n => ({ ...n, [d.id]: e.target.value }))}
-                        onKeyDown={e => e.key === 'Enter' && !e.shiftKey && addNote(d.id)}
-                        placeholder="Add internal note…"
-                        style={{ flex: 1, fontSize: 12, padding: '6px 10px', border: '1px solid #d0d8f0', borderRadius: 6, outline: 'none', fontFamily: 'inherit' }}
-                      />
-                      <button
-                        onClick={() => addNote(d.id)}
-                        disabled={addingNote[d.id]}
-                        style={{ padding: '6px 12px', borderRadius: 6, background: '#4e73df', border: 'none', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', opacity: addingNote[d.id] ? 0.6 : 1 }}
-                      >
-                        {addingNote[d.id] ? '…' : 'Add'}
+                    <div style={{ display:'flex', gap:7 }}>
+                      <input value={newNote[d.id] || ''} onChange={e => setNewNote(n => ({ ...n, [d.id]: e.target.value }))}
+                        onKeyDown={e => e.key === 'Enter' && !e.shiftKey && addNote(d.id)} placeholder="Add internal note…"
+                        style={{ flex:1, fontSize:12, padding:'7px 11px', border:'1px solid #C9DBFA', borderRadius:8, outline:'none', fontFamily:'inherit', background:'#fff' }} />
+                      <button onClick={() => addNote(d.id)} disabled={addingNote[d.id]}
+                        style={{ display:'flex', alignItems:'center', gap:5, padding:'7px 13px', borderRadius:8, background:'var(--blue)', border:'none', color:'#fff', fontSize:12, fontWeight:700, cursor:'pointer', opacity: addingNote[d.id] ? 0.6 : 1 }}>
+                        {addingNote[d.id] ? '…' : <><Plus size={13} /> Add</>}
                       </button>
                     </div>
                   </div>
@@ -2356,7 +2345,7 @@ function DisputesSection() {
               </div>
 
             </div>
-          </div>
+          </motion.div>
         );
       })}
     </>
