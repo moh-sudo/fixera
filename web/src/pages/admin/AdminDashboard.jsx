@@ -709,15 +709,17 @@ function OverviewSection() {
     { label:'Pending Approval',  value: stats.pendingPartners, sub:'awaiting review',  Icon: BadgeCheck,  color:'#EF4444', spark: series.customers, to:'verification' },
   ];
 
-  const donut = [
-    { name:'Service Workers', value: stats.workers,   fill:'#C9A020' },
-    { name:'Vendors',         value: stats.vendors,   fill:'#3B82F6' },
-    { name:'Riders',          value: stats.riders,    fill:'#16A34A' },
-    { name:'Suppliers',       value: stats.suppliers, fill:'#F59E0B' },
-    { name:'Movers',          value: stats.movers,    fill:'#7C6CF0' },
-    { name:'Water Carriers',  value: stats.water,     fill:'#06B6D4' },
-  ].filter(d => d.value > 0);
-  const donutTotal = donut.reduce((s, d) => s + d.value, 0);
+  // Always show ALL roles so the full partner mix is visible (even at 0)
+  const donutAll = [
+    { name:'Service Workers', value: stats.workers   || 0, fill:'#C9A020' },
+    { name:'Vendors',         value: stats.vendors   || 0, fill:'#3B82F6' },
+    { name:'Riders',          value: stats.riders    || 0, fill:'#16A34A' },
+    { name:'Suppliers',       value: stats.suppliers || 0, fill:'#F59E0B' },
+    { name:'Movers',          value: stats.movers    || 0, fill:'#7C6CF0' },
+    { name:'Water Carriers',  value: stats.water     || 0, fill:'#06B6D4' },
+  ];
+  const donutTotal = donutAll.reduce((s, d) => s + d.value, 0);
+  const donutPie   = donutAll.filter(d => d.value > 0);
 
   return (
     <div>
@@ -745,8 +747,8 @@ function OverviewSection() {
             </div>
             <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))', gap:14 }}>
               {attention.map(a => (
-                <button key={a.key} onClick={() => goToSection(a.to)}
-                  style={{ display:'flex', alignItems:'center', gap:14, background:'var(--surface)', border:'1px solid var(--line)', borderLeft:`4px solid ${a.color}`, borderRadius:14, padding:'14px 16px', cursor:'pointer', textAlign:'left', boxShadow:'var(--shadow-sm)', transition:'transform .15s' }}
+                <button key={a.key} onClick={() => goToSection(a.to)} className="attn-pulse"
+                  style={{ display:'flex', alignItems:'center', gap:14, background:'var(--surface)', border:'1px solid var(--line)', borderLeft:`4px solid ${a.color}`, borderRadius:14, padding:'14px 16px', cursor:'pointer', textAlign:'left', transition:'transform .15s' }}
                   onMouseEnter={e => e.currentTarget.style.transform='translateY(-2px)'} onMouseLeave={e => e.currentTarget.style.transform=''}>
                   <div style={{ width:44, height:44, borderRadius:12, background:`${a.color}18`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}><a.Icon size={21} color={a.color} /></div>
                   <div style={{ flex:1, minWidth:0 }}>
@@ -787,8 +789,8 @@ function OverviewSection() {
             <div style={{ width:160, height:160, position:'relative', flexShrink:0 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={donut.length ? donut : [{ name:'None', value:1, fill:'#EDF0F5' }]} dataKey="value" innerRadius={52} outerRadius={78} paddingAngle={donut.length > 1 ? 3 : 0} stroke="none">
-                    {(donut.length ? donut : [{ fill:'#EDF0F5' }]).map((d, i) => <Cell key={i} fill={d.fill} />)}
+                  <Pie data={donutPie.length ? donutPie : [{ name:'None', value:1, fill:'#EDF0F5' }]} dataKey="value" innerRadius={52} outerRadius={78} paddingAngle={donutPie.length > 1 ? 3 : 0} stroke="none" isAnimationActive>
+                    {(donutPie.length ? donutPie : [{ fill:'#EDF0F5' }]).map((d, i) => <Cell key={i} fill={d.fill} />)}
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
@@ -797,14 +799,18 @@ function OverviewSection() {
                 <div style={{ fontSize:10.5, color:'var(--muted)', fontWeight:600 }}>Partners</div>
               </div>
             </div>
-            <div style={{ flex:1, minWidth:130, display:'grid', gap:9 }}>
-              {(donut.length ? donut : [{ name:'No partners yet', value:0, fill:'#CBD5E1' }]).map(d => (
-                <div key={d.name} style={{ display:'flex', alignItems:'center', gap:9, fontSize:13 }}>
-                  <span style={{ width:9, height:9, borderRadius:3, background:d.fill, flexShrink:0 }} />
-                  <span style={{ color:'var(--ink-2)', flex:1 }}>{d.name}</span>
-                  <span style={{ fontWeight:800, color:'var(--ink)' }}>{d.value}</span>
-                </div>
-              ))}
+            <div style={{ flex:1, minWidth:150, display:'grid', gap:8 }}>
+              {donutAll.map(d => {
+                const pct = donutTotal ? Math.round((d.value / donutTotal) * 100) : 0;
+                return (
+                  <div key={d.name} style={{ display:'flex', alignItems:'center', gap:9, fontSize:12.5 }}>
+                    <span style={{ width:9, height:9, borderRadius:3, background:d.fill, flexShrink:0, opacity: d.value ? 1 : .35 }} />
+                    <span style={{ color: d.value ? 'var(--ink-2)' : 'var(--muted)', flex:1 }}>{d.name}</span>
+                    <span style={{ fontWeight:800, color:'var(--ink)' }}>{d.value}</span>
+                    <span style={{ color:'var(--muted)', fontSize:11, minWidth:32, textAlign:'right' }}>{pct}%</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -832,13 +838,14 @@ function OverviewSection() {
         </div>
       </motion.div>
 
-      {/* ── Jobs trend ── */}
-      <motion.div variants={ov} custom={4} initial="hidden" animate="show">
+      {/* ── Bookings + Revenue trends ── */}
+      <motion.div variants={ov} custom={4} initial="hidden" animate="show"
+        style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:18, marginBottom:22 }}>
         <div className="admin-card" style={{ marginBottom:0 }}>
           <div className="admin-card-header">Bookings — Last 7 Days</div>
           <div style={{ padding:'14px 12px 8px' }}>
             <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={series.jobs.map((d, i) => ({ day: d.label.toLocaleDateString('en-KE', { weekday:'short' }), v: d.v }))}>
+              <BarChart data={series.jobs.map(d => ({ day: d.label.toLocaleDateString('en-KE', { weekday:'short' }), v: d.v }))}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#EDF0F5" vertical={false} />
                 <XAxis dataKey="day" tickLine={false} axisLine={false} tick={{ fontSize:12, fill:'#7A8699' }} />
                 <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={{ fontSize:12, fill:'#7A8699' }} width={28} />
@@ -848,6 +855,66 @@ function OverviewSection() {
             </ResponsiveContainer>
           </div>
         </div>
+        <div className="admin-card" style={{ marginBottom:0 }}>
+          <div className="admin-card-header">Revenue — Last 7 Days</div>
+          <div style={{ padding:'14px 12px 8px' }}>
+            <ResponsiveContainer width="100%" height={220}>
+              <AreaChart data={series.revenue.map(d => ({ day: d.label.toLocaleDateString('en-KE', { weekday:'short' }), v: d.v }))}>
+                <defs><linearGradient id="rev-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#16A34A" stopOpacity={0.3} /><stop offset="100%" stopColor="#16A34A" stopOpacity={0} /></linearGradient></defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#EDF0F5" vertical={false} />
+                <XAxis dataKey="day" tickLine={false} axisLine={false} tick={{ fontSize:12, fill:'#7A8699' }} />
+                <YAxis tickLine={false} axisLine={false} tick={{ fontSize:12, fill:'#7A8699' }} width={44} tickFormatter={v => v >= 1000 ? `${(v/1000).toFixed(0)}k` : v} />
+                <Tooltip contentStyle={{ borderRadius:12, border:'1px solid #EDF0F5', fontSize:13 }} formatter={v => [`KSh ${Number(v).toLocaleString()}`, 'Revenue']} />
+                <Area type="monotone" dataKey="v" stroke="#16A34A" strokeWidth={2.5} fill="url(#rev-grad)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* ── Live map preview + analytics ── */}
+      <motion.div variants={ov} custom={5} initial="hidden" animate="show"
+        style={{ display:'grid', gridTemplateColumns:'1.4fr 1fr 1fr', gap:18 }}>
+        {/* Live map preview */}
+        <button onClick={() => goToSection('live_ops')} className="admin-card" style={{ marginBottom:0, padding:0, cursor:'pointer', textAlign:'left', border:'1px solid var(--line)', overflow:'hidden', position:'relative', minHeight:180 }}>
+          <div style={{ position:'absolute', inset:0, background:'linear-gradient(135deg,#0F1B2D,#1E3355)', opacity:1 }} />
+          <div style={{ position:'absolute', inset:0, backgroundImage:'radial-gradient(circle at 30% 40%, rgba(201,160,32,.25), transparent 40%), radial-gradient(circle at 70% 70%, rgba(59,130,246,.2), transparent 40%)' }} />
+          <svg viewBox="0 0 400 200" style={{ position:'absolute', inset:0, width:'100%', height:'100%', opacity:.18 }}><path d="M0 120 Q100 60 200 110 T400 90" stroke="#fff" strokeWidth="2" fill="none"/><path d="M0 160 Q120 120 240 150 T400 140" stroke="#fff" strokeWidth="1.5" fill="none"/></svg>
+          <div style={{ position:'relative', padding:'20px 22px', color:'#fff', height:'100%', display:'flex', flexDirection:'column', justifyContent:'space-between', minHeight:180 }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                <span className="live-dot" style={{ width:9, height:9, borderRadius:'50%', background:'#48BB78', display:'inline-block' }} />
+                <span style={{ fontSize:11, fontWeight:800, letterSpacing:1, color:'#9FE8B8' }}>LIVE OPERATIONS</span>
+              </div>
+              <MapPin size={20} color="#C9A020" />
+            </div>
+            <div>
+              <div style={{ fontSize:30, fontWeight:800 }}>{stats.activeJobs}</div>
+              <div style={{ fontSize:12.5, color:'rgba(255,255,255,.7)' }}>jobs in progress on the map right now</div>
+              <div style={{ marginTop:12, display:'inline-flex', alignItems:'center', gap:7, fontSize:12.5, fontWeight:700, color:'#C9A020' }}>Open Live Map <ChevronDown size={15} style={{ transform:'rotate(-90deg)' }} /></div>
+            </div>
+          </div>
+        </button>
+
+        {/* Website visits (Google Analytics) */}
+        <a href="https://analytics.google.com" target="_blank" rel="noopener noreferrer" className="admin-card" style={{ marginBottom:0, padding:18, textDecoration:'none', display:'flex', flexDirection:'column', justifyContent:'space-between', minHeight:180 }}>
+          <div className="stat-ico" style={{ background:'#EAF1FE' }}><BarChart3 size={22} color="#3B82F6" /></div>
+          <div>
+            <div style={{ fontSize:22, fontWeight:800, color:'var(--muted)' }}>—</div>
+            <div style={{ fontSize:12, fontWeight:700, textTransform:'uppercase', letterSpacing:'.4px', color:'var(--ink-2)', marginTop:4 }}>Website Visits</div>
+            <div style={{ fontSize:11.5, color:'var(--gold)', fontWeight:700, marginTop:6 }}>View in Google Analytics →</div>
+          </div>
+        </a>
+
+        {/* App installs */}
+        <a href="https://analytics.google.com" target="_blank" rel="noopener noreferrer" className="admin-card" style={{ marginBottom:0, padding:18, textDecoration:'none', display:'flex', flexDirection:'column', justifyContent:'space-between', minHeight:180 }}>
+          <div className="stat-ico" style={{ background:'#F1EAFE' }}><UserRound size={22} color="#7C6CF0" /></div>
+          <div>
+            <div style={{ fontSize:22, fontWeight:800, color:'var(--muted)' }}>—</div>
+            <div style={{ fontSize:12, fontWeight:700, textTransform:'uppercase', letterSpacing:'.4px', color:'var(--ink-2)', marginTop:4 }}>App Installs</div>
+            <div style={{ fontSize:11.5, color:'var(--gold)', fontWeight:700, marginTop:6 }}>Connect analytics →</div>
+          </div>
+        </a>
       </motion.div>
     </div>
   );
