@@ -195,9 +195,24 @@ const STATUS_MAP = {
   paid:        { cls: 'sb-badge-success',   label: 'Paid'        },
 };
 
-const ROLE_COLOR = { worker: '#C9A020', vendor: '#17a2b8', rider: '#1cc88a', supplier: '#fd7e14', mover: '#9F7AEA', water_carrier: '#00B5D8' };
-const ROLE_ICON  = { worker: '🔧', vendor: '🏪', rider: '🚗', supplier: '📦', mover: '🚚', water_carrier: '🚰' };
+const ROLE_COLOR = { worker: '#C9A020', vendor: '#3B82F6', rider: '#16A34A', supplier: '#F59E0B', mover: '#7C6CF0', water_carrier: '#06B6D4' };
+const ROLE_ICON  = { worker: '🔧', vendor: '🏪', rider: '🚗', supplier: '📦', mover: '🚚', water_carrier: '🚰' }; // legacy emoji (kept for a few not-yet-migrated call sites)
+const ROLE_ICON_COMP = { worker: Wrench, vendor: Store, rider: Bike, supplier: Package, mover: Truck, water_carrier: Droplets };
 const ROLE_LABEL = { worker: 'Service Worker', vendor: 'Vendor', rider: 'Rider', supplier: 'Supplier', mover: 'Mover', water_carrier: 'Water Carrier' };
+
+// Renders a role's Lucide icon (falls back gracefully if role is unknown)
+function RoleIcon({ role, size = 16, color }) {
+  const Icon = ROLE_ICON_COMP[role] || Users;
+  return <Icon size={size} color={color || ROLE_COLOR[role] || 'var(--muted)'} strokeWidth={2} />;
+}
+
+// Common emoji → Lucide icon, so older call sites that still pass an emoji
+// string into StatCard automatically render a clean icon with zero edits.
+const EMOJI_ICON_MAP = {
+  '⏳': ClipboardList, '✅': BadgeCheck, '💚': Wallet, '💰': Wallet,
+  '🔍': Search, '📄': FileText, '⏰': Bell, '🔒': Lock, '❌': ShieldAlert,
+  '👥': Users, '🧑': UserRound, '🔧': Wrench, '📦': Package, '🚨': Siren,
+};
 
 // ── Shared Components ─────────────────────────────────────────────
 function SBBadge({ status }) {
@@ -206,41 +221,41 @@ function SBBadge({ status }) {
 }
 
 function RoleBadge({ role }) {
-  return <span className="sb-badge" style={{ background: ROLE_COLOR[role] || '#6c757d', color: '#fff' }}>{ROLE_ICON[role]} {role?.toUpperCase()}</span>;
+  return (
+    <span className="sb-badge" style={{ background: ROLE_COLOR[role] || '#6c757d', color: '#fff', display:'inline-flex', alignItems:'center', gap:5 }}>
+      <RoleIcon role={role} size={12} color="#fff" /> {role?.toUpperCase()}
+    </span>
+  );
 }
 
 function Spinner() {
-  return <div className="d-flex justify-content-center py-5"><div className="sb-spinner" /></div>;
+  return <div style={{ display:'flex', justifyContent:'center', padding:'48px 0' }}><div className="sb-spinner" /></div>;
 }
 
-function PageHeader({ title, sub }) {
+function PageHeader({ title, sub, action }) {
   return (
-    <div className="page-heading">
-      <h1>{title}</h1>
-      {sub && <p>{sub}</p>}
-    </div>
+    <motion.div initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} transition={{ duration:.35, ease:'easeOut' }}
+      className="page-heading" style={{ display:'flex', alignItems:'flex-end', justifyContent:'space-between', flexWrap:'wrap', gap:12 }}>
+      <div><h1>{title}</h1>{sub && <p>{sub}</p>}</div>
+      {action}
+    </motion.div>
   );
 }
 
 // Professional stat card
-function StatCard({ icon, label, value, sub, color = '#4e73df', onClick }) {
+function StatCard({ icon, label, value, sub, color = 'var(--blue)', onClick }) {
+  const EmojiIcon = typeof icon === 'string' ? EMOJI_ICON_MAP[icon] : null;
   return (
-    <div
-      className="admin-card h-100"
-      onClick={onClick}
-      style={{ borderTop: `3px solid ${color}`, borderRadius: 10, cursor: onClick ? 'pointer' : 'default', transition: 'transform 0.15s, box-shadow 0.15s' }}
-      onMouseEnter={e => { if (onClick) { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'; }}}
-      onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow=''; }}
-    >
-      <div className="card-body p-3">
-        <div className="d-flex align-items-center justify-content-between mb-2">
-          <div style={{ width: 44, height: 44, borderRadius: 10, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>{icon}</div>
-          <div className="text-xs font-weight-bold text-uppercase text-right" style={{ color, letterSpacing: '0.08rem', maxWidth: 100, lineHeight: 1.3 }}>{label}</div>
+    <div className="stat-card" onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
+      <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:12 }}>
+        <div className="stat-ico" style={{ background: `${color}18` }}>
+          {EmojiIcon ? <EmojiIcon size={22} color={color} /> : (typeof icon === 'string' ? <span style={{ fontSize:20 }}>{icon}</span> : icon)}
         </div>
-        <div style={{ fontSize: 26, fontWeight: 900, color: '#2d3748', lineHeight: 1 }}>{value}</div>
-        {sub && <div className="text-xs mt-1" style={{ color: '#a0aec0' }}>{sub}</div>}
-        {onClick && <div className="text-xs mt-2 font-weight-bold" style={{ color, opacity: 0.7 }}>View report →</div>}
       </div>
+      <div style={{ fontSize:24, fontWeight:800, color:'var(--ink)', lineHeight:1.1 }}>{value}</div>
+      <div style={{ fontSize:11, fontWeight:700, letterSpacing:'.4px', textTransform:'uppercase', color:'var(--muted)', marginTop:6 }}>{label}</div>
+      {sub && <div style={{ fontSize:11.5, color:'var(--muted)', marginTop:2 }}>{sub}</div>}
+      {onClick && <div style={{ fontSize:11.5, fontWeight:700, color, marginTop:8 }}>View report →</div>}
     </div>
   );
 }
@@ -443,9 +458,9 @@ function FilterPill({ active, onClick, children }) {
 
 function InfoRow({ label, value }) {
   return (
-    <div className="d-flex justify-content-between py-2 border-bottom" style={{ borderColor: '#e3e6f0' }}>
-      <span className="text-xs text-gray-500 font-weight-bold text-uppercase" style={{ letterSpacing: '0.05rem' }}>{label}</span>
-      <span className="text-xs font-weight-bold text-gray-800" style={{ maxWidth: '60%', textAlign: 'right' }}>{value || '—'}</span>
+    <div style={{ display:'flex', justifyContent:'space-between', padding:'9px 0', borderBottom:'1px solid var(--line)' }}>
+      <span style={{ fontSize:11, fontWeight:700, textTransform:'uppercase', letterSpacing:'.4px', color:'var(--muted)' }}>{label}</span>
+      <span style={{ fontSize:12.5, fontWeight:700, color:'var(--ink)', maxWidth:'60%', textAlign:'right' }}>{value || '—'}</span>
     </div>
   );
 }
@@ -979,90 +994,91 @@ function PartnersSection() {
     !search || p.full_name?.toLowerCase().includes(search.toLowerCase()) || p.email?.toLowerCase().includes(search.toLowerCase())
   );
 
+  const ACTION_BTN = { display:'flex', alignItems:'center', justifyContent:'center', gap:8, width:'100%', padding:'11px 14px', borderRadius:10, border:'none', fontWeight:700, fontSize:13.5, cursor:'pointer', marginBottom:9 };
+
   if (selected) {
     const role = selected.partner_role || 'worker';
     const sd   = selected.service_details;
     return (
-      <div>
-        <button onClick={() => setSelected(null)} className="btn btn-sm btn-outline-secondary mb-3">← Back to Partners</button>
+      <motion.div initial={{ opacity:0, y:10 }} animate={{ opacity:1, y:0 }} transition={{ duration:.3 }}>
+        <button onClick={() => setSelected(null)} style={{ display:'inline-flex', alignItems:'center', gap:7, background:'none', border:'none', color:'var(--ink-2)', fontWeight:700, fontSize:13, cursor:'pointer', marginBottom:16, padding:0 }}>
+          <ChevronDown size={15} style={{ transform:'rotate(90deg)' }} /> Back to Partners
+        </button>
 
-        <div className="admin-card mb-3">
-          <div className="card-body">
-            <div className="d-flex align-items-center">
-              <div className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                style={{ width:72, height:72, background:`${ROLE_COLOR[role]}15`, border:`2px solid ${ROLE_COLOR[role]}40`, fontSize:30 }}>
-                {ROLE_ICON[role]}
+        <div className="admin-card">
+          <div style={{ padding:20, display:'flex', alignItems:'center', gap:18, flexWrap:'wrap' }}>
+            <div style={{ width:72, height:72, borderRadius:18, background:`${ROLE_COLOR[role]}18`, border:`2px solid ${ROLE_COLOR[role]}40`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <RoleIcon role={role} size={30} />
+            </div>
+            <div style={{ flex:1, minWidth:200 }}>
+              <div style={{ fontSize:18, fontWeight:800, color:'var(--ink)', marginBottom:6 }}>{selected.full_name || 'Unknown'}</div>
+              <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap', marginBottom:6 }}>
+                <RoleBadge role={role} />
+                <SBBadge status={selected.verification_status} />
+                {selected.city && <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:12, color:'var(--muted)' }}><MapPin size={12} /> {selected.city}</span>}
               </div>
-              <div className="ml-3 flex-grow-1">
-                <h5 className="font-weight-bold mb-1 text-gray-800">{selected.full_name || 'Unknown'}</h5>
-                <div className="mb-1">
-                  <RoleBadge role={role} />
-                  <span className="ml-2"><SBBadge status={selected.verification_status} /></span>
-                  {selected.city && <span className="ml-2 text-xs text-gray-500">📍 {selected.city}</span>}
-                </div>
-                <div className="text-xs text-gray-500">{selected.email} · {selected.phone}</div>
-              </div>
-              <div className="text-right">
-                <div className="text-xs text-gray-500">Joined</div>
-                <div className="text-xs font-weight-bold">{new Date(selected.created_at).toLocaleDateString('en-KE')}</div>
-              </div>
+              <div style={{ fontSize:12.5, color:'var(--muted)' }}>{selected.email} · {selected.phone}</div>
+            </div>
+            <div style={{ textAlign:'right' }}>
+              <div style={{ fontSize:11, color:'var(--muted)', fontWeight:700, textTransform:'uppercase', letterSpacing:'.4px' }}>Joined</div>
+              <div style={{ fontSize:13, fontWeight:800, color:'var(--ink)', marginTop:2 }}>{new Date(selected.created_at).toLocaleDateString('en-KE')}</div>
             </div>
           </div>
         </div>
 
-        <div className="row">
-          <div className="col-md-6">
-            <div className="admin-card mb-3">
-              <div className="admin-card-header">👤 Personal Info</div>
-              <div className="card-body py-2">
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:18 }}>
+          <div>
+            <div className="admin-card">
+              <div className="admin-card-header"><UserRound size={15} color="var(--gold)" /> Personal Info</div>
+              <div style={{ padding:'6px 20px 14px' }}>
                 {[['Full Name',selected.full_name],['Email',selected.email],['Phone',selected.phone],['City',selected.city],
-                  ['Partner Agreement', selected.agreement_accepted_at ? `✅ Signed ${new Date(selected.agreement_accepted_at).toLocaleDateString('en-KE')}${selected.agreement_version ? ` (v${selected.agreement_version})` : ''}` : '⚠️ Not yet signed'],
+                  ['Partner Agreement', selected.agreement_accepted_at ? `Signed ${new Date(selected.agreement_accepted_at).toLocaleDateString('en-KE')}${selected.agreement_version ? ` (v${selected.agreement_version})` : ''}` : 'Not yet signed'],
                   ['Health Status',sd?.healthStatus],
                   ['Emergency Contact',sd?.emergencyContact?`${sd.emergencyContact.name} (${sd.emergencyContact.relation})`:null],
                   ['Emergency Phone',sd?.emergencyContact?.phone]].map(([l,v]) => <InfoRow key={l} label={l} value={v} />)}
               </div>
             </div>
             {sd?.payment && (
-              <div className="admin-card mb-3">
-                <div className="admin-card-header">💰 Payment Details</div>
-                <div className="card-body py-2">
+              <div className="admin-card">
+                <div className="admin-card-header"><Wallet size={15} color="var(--green)" /> Payment Details</div>
+                <div style={{ padding:'6px 20px 14px' }}>
                   {[['Method',sd.payment.method],['M-Pesa',sd.payment.mpesa],['Bank',sd.payment.bank],['Account',sd.payment.bankAccount]].map(([l,v]) => <InfoRow key={l} label={l} value={v} />)}
                 </div>
               </div>
             )}
-            <div className="admin-card mb-3">
-              <div className="admin-card-header">🪪 Identity Documents</div>
-              <div className="card-body">
+            <div className="admin-card">
+              <div className="admin-card-header"><BadgeCheck size={15} color="var(--blue)" /> Identity Documents</div>
+              <div style={{ padding:'6px 20px 16px' }}>
                 {sd?.identity ? (
                   <>
                     <InfoRow label="ID Type" value={sd.identity.type} />
                     <InfoRow label="ID Number" value={sd.identity.number} />
                     <InfoRow label="KRA PIN" value={selected.tax_pin} />
-                    <div className="d-flex gap-2 mt-2">
-                      {sd.identity.frontUrl && <a href={sd.identity.frontUrl} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-warning flex-grow-1">📄 ID Front</a>}
-                      {sd.identity.backUrl  && <a href={sd.identity.backUrl}  target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-warning flex-grow-1">📄 ID Back</a>}
+                    <div style={{ display:'flex', gap:8, marginTop:12 }}>
+                      {sd.identity.frontUrl && <a href={sd.identity.frontUrl} target="_blank" rel="noreferrer" style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:6, padding:'9px 12px', borderRadius:9, border:'1px solid var(--gold-soft)', background:'var(--gold-soft)', color:'var(--gold-2)', fontSize:12.5, fontWeight:700, textDecoration:'none' }}><FileText size={14} /> ID Front</a>}
+                      {sd.identity.backUrl  && <a href={sd.identity.backUrl}  target="_blank" rel="noreferrer" style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:6, padding:'9px 12px', borderRadius:9, border:'1px solid var(--gold-soft)', background:'var(--gold-soft)', color:'var(--gold-2)', fontSize:12.5, fontWeight:700, textDecoration:'none' }}><FileText size={14} /> ID Back</a>}
                     </div>
                   </>
                 ) : selected.id_photo_url ? (
-                  <a href={selected.id_photo_url} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-warning">📄 View ID Document →</a>
-                ) : <p className="text-xs text-gray-500 mb-0">No documents uploaded</p>}
+                  <a href={selected.id_photo_url} target="_blank" rel="noreferrer" style={{ display:'inline-flex', alignItems:'center', gap:6, color:'var(--gold-2)', fontWeight:700, fontSize:12.5, textDecoration:'none' }}><FileText size={14} /> View ID Document →</a>
+                ) : <p style={{ fontSize:12.5, color:'var(--muted)', margin:0 }}>No documents uploaded</p>}
               </div>
             </div>
           </div>
 
-          <div className="col-md-6">
+          <div>
             {sd && (
-              <div className="admin-card mb-3">
-                <div className="admin-card-header">{ROLE_ICON[role]} {ROLE_LABEL[role] || role} Requirements</div>
-                <div className="card-body py-2"><ServiceDetailsView details={sd} /></div>
+              <div className="admin-card">
+                <div className="admin-card-header"><RoleIcon role={role} size={15} /> {ROLE_LABEL[role] || role} Requirements</div>
+                <div style={{ padding:'6px 20px 14px' }}><ServiceDetailsView details={sd} /></div>
               </div>
             )}
 
             {/* ── Mover / Water Carrier company info (legal §1007 + §1087) ── */}
             {(role === 'mover' || role === 'water_carrier') && (
-              <div className="admin-card mb-3">
-                <div className="admin-card-header">🏢 Company Information</div>
-                <div className="card-body py-2">
+              <div className="admin-card">
+                <div className="admin-card-header"><Store size={15} color="var(--violet)" /> Company Information</div>
+                <div style={{ padding:'6px 20px 14px' }}>
                   <InfoRow label="Company Name"   value={selected.business_name} />
                   <InfoRow label="Owner ID #"     value={selected.owner_national_id} />
                   {role === 'mover' && (
@@ -1070,7 +1086,7 @@ function PartnersSection() {
                       <InfoRow label="Cert. of Incorporation" value={selected.registration_number} />
                       <InfoRow label="Years in Operation"     value={selected.years_in_operation ? `${selected.years_in_operation} years` : null} />
                       {selected.years_in_operation != null && Number(selected.years_in_operation) < 2 && (
-                        <div className="alert alert-warning py-2 px-3 my-2 text-xs"><strong>⚠️ Below legal minimum (2 years)</strong></div>
+                        <div style={{ display:'flex', alignItems:'center', gap:8, background:'#FEF3C7', color:'#92400E', borderRadius:9, padding:'9px 12px', margin:'10px 0', fontSize:12, fontWeight:700 }}><ShieldAlert size={14} /> Below legal minimum (2 years)</div>
                       )}
                     </>
                   )}
@@ -1093,73 +1109,96 @@ function PartnersSection() {
             {role === 'mover' && (
               <PartnerFleetPanel moverId={selected.id} />
             )}
-            <div className="admin-card mb-3">
-              <div className="admin-card-header">⚡ Approval Actions</div>
-              <div className="card-body">
+            <div className="admin-card">
+              <div className="admin-card-header"><ShieldAlert size={15} color="var(--gold)" /> Approval Actions</div>
+              <div style={{ padding:'6px 20px 18px' }}>
                 {selected.verification_status === 'pending' && (
-                  <div className="alert alert-warning py-2 text-xs mb-3">⏳ Application Under Review — check documents before approving</div>
+                  <div style={{ display:'flex', alignItems:'center', gap:8, background:'var(--gold-soft)', color:'#92400E', borderRadius:9, padding:'10px 12px', marginBottom:14, fontSize:12, fontWeight:700 }}><ClipboardList size={14} /> Application under review — check documents before approving</div>
                 )}
                 {selected.verification_status !== 'approved' && (
-                  <button onClick={() => act(selected.id,'approved')} disabled={acting} className="btn btn-success btn-block mb-2 font-weight-bold">✅ Approve Partner</button>
+                  <button onClick={() => act(selected.id,'approved')} disabled={acting} style={{ ...ACTION_BTN, background:'var(--green)', color:'#fff' }}><BadgeCheck size={16} /> Approve Partner</button>
                 )}
                 {selected.verification_status !== 'rejected' && (
                   <>
-                    <textarea value={rejectNote} onChange={e => setRejectNote(e.target.value)} placeholder="Reason for rejection (shown to partner)..." className="form-control form-control-sm mb-2" rows={3} />
-                    <button onClick={() => act(selected.id,'rejected',rejectNote)} disabled={acting} className="btn btn-danger btn-block mb-2 font-weight-bold">❌ Reject Application</button>
+                    <textarea value={rejectNote} onChange={e => setRejectNote(e.target.value)} placeholder="Reason for rejection (shown to partner)..." rows={3}
+                      style={{ width:'100%', boxSizing:'border-box', padding:'10px 12px', borderRadius:9, border:'1px solid var(--line-2)', fontSize:12.5, fontFamily:'inherit', marginBottom:9, resize:'vertical' }} />
+                    <button onClick={() => act(selected.id,'rejected',rejectNote)} disabled={acting} style={{ ...ACTION_BTN, background:'var(--red)', color:'#fff' }}><ShieldAlert size={16} /> Reject Application</button>
                   </>
                 )}
                 {selected.verification_status === 'approved' && (
-                  <button onClick={() => act(selected.id,'suspended')} disabled={acting} className="btn btn-warning btn-block mb-2 font-weight-bold">🚫 Suspend Account</button>
+                  <button onClick={() => act(selected.id,'suspended')} disabled={acting} style={{ ...ACTION_BTN, background:'var(--amber)', color:'#fff' }}><Lock size={16} /> Suspend Account</button>
                 )}
                 {selected.verification_status === 'suspended' && (
-                  <button onClick={() => act(selected.id,'approved')} disabled={acting} className="btn btn-success btn-block mb-2 font-weight-bold">🔓 Reinstate Account</button>
+                  <button onClick={() => act(selected.id,'approved')} disabled={acting} style={{ ...ACTION_BTN, background:'var(--green)', color:'#fff' }}><BadgeCheck size={16} /> Reinstate Account</button>
                 )}
                 {selected.rejection_reason && (
-                  <div className="alert alert-danger py-2 text-xs mt-2"><strong>Rejection reason:</strong> {selected.rejection_reason}</div>
+                  <div style={{ background:'#FEE2E2', color:'#B91C1C', borderRadius:9, padding:'10px 12px', marginTop:8, fontSize:12 }}><strong>Rejection reason:</strong> {selected.rejection_reason}</div>
                 )}
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </motion.div>
     );
   }
+
+  const ROLE_FILTERS = [
+    { k:'all', label:'All Roles' }, { k:'worker', label:'Workers', Icon: Wrench }, { k:'vendor', label:'Vendors', Icon: Store },
+    { k:'rider', label:'Riders', Icon: Bike }, { k:'supplier', label:'Suppliers', Icon: Package },
+    { k:'mover', label:'Movers', Icon: Truck }, { k:'water_carrier', label:'Water Carriers', Icon: Droplets },
+  ];
+  const STATUS_FILTERS = [
+    { k:'pending', label:'Pending', Icon: ClipboardList }, { k:'approved', label:'Approved', Icon: BadgeCheck },
+    { k:'rejected', label:'Rejected', Icon: ShieldAlert }, { k:'suspended', label:'Suspended', Icon: Lock }, { k:'all', label:'All' },
+  ];
 
   return (
     <>
       <PageHeader title="Partner Management" sub="Review applications and manage all partner accounts" />
-      <div className="mb-2">
-        {[{k:'all',label:'All Roles'},{k:'worker',label:'🔧 Workers'},{k:'vendor',label:'🏪 Vendors'},{k:'rider',label:'🚗 Riders'},{k:'supplier',label:'📦 Suppliers'},{k:'mover',label:'🚚 Movers'},{k:'water_carrier',label:'🚰 Water Carriers'}]
-          .map(f => <FilterPill key={f.k} active={roleFilter===f.k} onClick={() => setRole(f.k)}>{f.label}</FilterPill>)}
+      <div style={{ marginBottom:8 }}>
+        {ROLE_FILTERS.map(f => (
+          <FilterPill key={f.k} active={roleFilter===f.k} onClick={() => setRole(f.k)}>
+            <span style={{ display:'inline-flex', alignItems:'center', gap:6 }}>{f.Icon && <f.Icon size={13} />}{f.label}</span>
+          </FilterPill>
+        ))}
       </div>
-      <div className="mb-3">
-        {[{k:'pending',label:'⏳ Pending'},{k:'approved',label:'✅ Approved'},{k:'rejected',label:'❌ Rejected'},{k:'suspended',label:'🚫 Suspended'},{k:'all',label:'All'}]
-          .map(f => <FilterPill key={f.k} active={statusFilter===f.k} onClick={() => setStatus(f.k)}>{f.label}</FilterPill>)}
+      <div style={{ marginBottom:14 }}>
+        {STATUS_FILTERS.map(f => (
+          <FilterPill key={f.k} active={statusFilter===f.k} onClick={() => setStatus(f.k)}>
+            <span style={{ display:'inline-flex', alignItems:'center', gap:6 }}>{f.Icon && <f.Icon size={13} />}{f.label}</span>
+          </FilterPill>
+        ))}
       </div>
-      <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍 Search by name or email..." className="form-control form-control-sm mb-3" style={{ maxWidth:400 }} />
+      <label className="topbar-search" style={{ maxWidth:340, marginBottom:18 }}>
+        <Search size={15} />
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name or email…" />
+      </label>
 
       {loading ? <Spinner /> : filtered.length === 0 ? (
-        <div className="text-center py-5"><div style={{fontSize:48}}>📭</div><p className="text-gray-500 mt-2">No partners found</p></div>
+        <div style={{ textAlign:'center', padding:'56px 0' }}>
+          <div style={{ width:56, height:56, borderRadius:16, background:'var(--line)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 14px' }}><Users size={26} color="var(--muted)" /></div>
+          <p style={{ color:'var(--muted)', margin:0 }}>No partners found</p>
+        </div>
       ) : (
         <div className="admin-card">
-          <div className="table-responsive">
+          <div style={{ overflowX:'auto' }}>
             <table className="admin-table">
               <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>City</th><th>Joined</th><th>Agreement</th><th>Status</th><th></th></tr></thead>
               <tbody>
                 {filtered.map(p => (
                   <tr key={p.id} style={{ cursor:'pointer' }} onClick={() => setSelected(p)}>
-                    <td className="font-weight-bold text-gray-800">{p.full_name || 'Unknown'}</td>
-                    <td className="text-gray-600">{p.email}</td>
+                    <td style={{ fontWeight:700, color:'var(--ink)' }}>{p.full_name || 'Unknown'}</td>
+                    <td style={{ color:'var(--ink-2)' }}>{p.email}</td>
                     <td><RoleBadge role={p.partner_role || 'worker'} /></td>
-                    <td className="text-gray-600">{p.city || '—'}</td>
-                    <td className="text-gray-600">{new Date(p.created_at).toLocaleDateString('en-KE')}</td>
-                    <td className="text-xs">
+                    <td style={{ color:'var(--ink-2)' }}>{p.city || '—'}</td>
+                    <td style={{ color:'var(--ink-2)' }}>{new Date(p.created_at).toLocaleDateString('en-KE')}</td>
+                    <td style={{ fontSize:12 }}>
                       {p.agreement_accepted_at
-                        ? <span style={{color:'#48BB78',fontWeight:700}}>✅ {new Date(p.agreement_accepted_at).toLocaleDateString('en-KE')}{p.agreement_version ? ` v${p.agreement_version}` : ''}</span>
-                        : <span style={{color:'#FC8181',fontWeight:700}}>⚠️ Not signed</span>}
+                        ? <span style={{ display:'inline-flex', alignItems:'center', gap:4, color:'var(--green)', fontWeight:700 }}><BadgeCheck size={13} /> {new Date(p.agreement_accepted_at).toLocaleDateString('en-KE')}{p.agreement_version ? ` v${p.agreement_version}` : ''}</span>
+                        : <span style={{ display:'inline-flex', alignItems:'center', gap:4, color:'var(--red)', fontWeight:700 }}><ShieldAlert size={13} /> Not signed</span>}
                     </td>
                     <td><SBBadge status={p.verification_status || 'pending'} /></td>
-                    <td className="text-xs font-weight-bold" style={{ color:'#C9A020' }}>Review →</td>
+                    <td style={{ fontSize:12, fontWeight:700, color:'var(--gold)' }}>Review →</td>
                   </tr>
                 ))}
               </tbody>
