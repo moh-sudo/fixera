@@ -7933,7 +7933,7 @@ export default function AdminDashboard() {
         {/* Brand */}
         <div className="sidebar-brand">
           <div className="sidebar-brand-mark">
-            <Wrench size={20} color="#C9A020" strokeWidth={2.2} />
+            <img src="/logo-mark-sm.png" alt="Fixera" style={{ width: 26, height: 26, objectFit: 'contain' }} />
           </div>
           <div>
             <div className="sidebar-brand-name">FIXERA</div>
