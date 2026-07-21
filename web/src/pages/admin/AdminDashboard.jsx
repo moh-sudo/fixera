@@ -4264,58 +4264,64 @@ function ServicesCatalogSection() {
   return (
     <>
       <PageHeader title="Services Catalog" sub="Manage service categories and individual services" />
-      {toast && <div className="alert alert-success py-2">{toast}</div>}
-      <div className="row">
+      {toast && <div style={{ display:'flex', alignItems:'center', gap:8, background:'rgba(22,163,74,.1)', color:'var(--green)', borderRadius:9, padding:'9px 14px', marginBottom:16, fontSize:12.5, fontWeight:700 }}><BadgeCheck size={15} /> {toast}</div>}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1.6fr', gap:18 }}>
         {/* Categories column */}
-        <div className="col-md-4">
-          <div className="d-flex justify-content-between align-items-center mb-2">
-            <h6 className="font-weight-bold text-gray-700 mb-0">Categories</h6>
-            <button className="btn btn-sm btn-warning" style={{background:'#C9A020',border:'none',color:'#0A0E1A'}} onClick={()=>setCatForm({...BLANK_CAT})}>+ Add</button>
+        <div>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
+            <div style={{ fontWeight:800, color:'var(--ink-2)', fontSize:13 }}>Categories</div>
+            <button onClick={()=>setCatForm({...BLANK_CAT})} style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'6px 12px', borderRadius:8, border:'none', background:'var(--gold)', color:'#fff', fontSize:11.5, fontWeight:700, cursor:'pointer' }}><Plus size={12} /> Add</button>
           </div>
           {loading ? <Spinner/> : cats.map(c=>(
-            <div key={c.id} onClick={()=>setSelCat(c.id)} className="admin-card mb-2" style={{cursor:'pointer',borderLeft:`4px solid ${selCat===c.id?c.color:'transparent'}`,transition:'border 0.15s'}}>
-              <div className="card-body py-2 d-flex justify-content-between align-items-center">
-                <div><span style={{fontSize:18}}>{c.icon}</span> <span className="text-sm font-weight-bold">{c.name}</span> {!c.is_active&&<span className="sb-badge sb-badge-secondary ml-1">off</span>}</div>
-                <div className="d-flex gap-1" style={{gap:4}} onClick={e=>e.stopPropagation()}>
-                  <button className="btn btn-sm btn-outline-warning" onClick={()=>setCatForm(c)}>✏️</button>
-                  <button className="btn btn-sm btn-outline-danger" onClick={async()=>{if(confirm('Delete category + all its services?')){await deleteCategory(c.id);loadCats();if(selCat===c.id)setSelCat(null);}}}>🗑️</button>
+            <div key={c.id} onClick={()=>setSelCat(c.id)} className="admin-card" style={{ cursor:'pointer', borderLeft:`4px solid ${selCat===c.id?c.color:'var(--line)'}` }}>
+              <div style={{ padding:13, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                  <span style={{ fontSize:16 }}>{c.icon}</span>
+                  <span style={{ fontSize:13, fontWeight:700, color:'var(--ink)' }}>{c.name}</span>
+                  {!c.is_active && <span className="sb-badge sb-badge-secondary">off</span>}
+                </div>
+                <div style={{ display:'flex', gap:5 }} onClick={e=>e.stopPropagation()}>
+                  <button onClick={()=>setCatForm(c)} style={{ padding:'5px 8px', borderRadius:7, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--ink-2)', cursor:'pointer', display:'flex' }}><FileText size={12} /></button>
+                  <button onClick={async()=>{if(confirm('Delete category + all its services?')){await deleteCategory(c.id);loadCats();if(selCat===c.id)setSelCat(null);}}} style={{ padding:'5px 8px', borderRadius:7, border:'1px solid rgba(239,68,68,.3)', background:'rgba(239,68,68,.06)', color:'var(--red)', cursor:'pointer', display:'flex' }}><X size={12} /></button>
                 </div>
               </div>
             </div>
           ))}
         </div>
         {/* Services column */}
-        <div className="col-md-8">
+        <div>
           {selCat ? (
             <>
-              <div className="d-flex justify-content-between align-items-center mb-2">
-                <h6 className="font-weight-bold text-gray-700 mb-0">Services in {cats.find(c=>c.id===selCat)?.name}</h6>
-                <button className="btn btn-sm btn-warning" style={{background:'#C9A020',border:'none',color:'#0A0E1A'}} onClick={()=>setSvcForm({...BLANK_SVC,category_id:selCat})}>+ Add Service</button>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
+                <div style={{ fontWeight:800, color:'var(--ink-2)', fontSize:13 }}>Services in {cats.find(c=>c.id===selCat)?.name}</div>
+                <button onClick={()=>setSvcForm({...BLANK_SVC,category_id:selCat})} style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'6px 12px', borderRadius:8, border:'none', background:'var(--gold)', color:'#fff', fontSize:11.5, fontWeight:700, cursor:'pointer' }}><Plus size={12} /> Add Service</button>
               </div>
-              {svcs.length===0 ? <p className="text-gray-500 text-sm">No services in this category yet.</p> : svcs.map(s=>(
-                <div key={s.id} className="admin-card mb-2">
-                  <div className="card-body py-2 d-flex justify-content-between align-items-center">
+              {svcs.length===0 ? <p style={{ fontSize:12.5, color:'var(--muted)' }}>No services in this category yet.</p> : svcs.map(s=>(
+                <div key={s.id} className="admin-card">
+                  <div style={{ padding:13, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                     <div>
-                      <div className="text-sm font-weight-bold">{s.icon} {s.name} {!s.is_active&&<span className="sb-badge sb-badge-secondary">off</span>} {s.is_featured&&<span className="sb-badge sb-badge-warning">⭐ Featured</span>}</div>
-                      <div className="text-xs text-gray-500">{s.is_quotation?'Quote on inspection':s.price_label||`KSh ${s.price_min||'?'}–${s.price_max||'?'}`}</div>
+                      <div style={{ fontSize:13, fontWeight:700, color:'var(--ink)', display:'flex', alignItems:'center', gap:6 }}>
+                        {s.icon} {s.name} {!s.is_active&&<span className="sb-badge sb-badge-secondary">off</span>} {s.is_featured&&<span style={{ display:'inline-flex', alignItems:'center', gap:3, background:'var(--gold-soft)', color:'var(--gold-2)', fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:6 }}><Star size={10} fill="var(--gold-2)" /> Featured</span>}
+                      </div>
+                      <div style={{ fontSize:11.5, color:'var(--muted)', marginTop:3 }}>{s.is_quotation?'Quote on inspection':s.price_label||`KSh ${s.price_min||'?'}–${s.price_max||'?'}`}</div>
                     </div>
-                    <div className="d-flex gap-1" style={{gap:4}}>
-                      <button className="btn btn-sm btn-outline-warning" onClick={()=>setSvcForm(s)}>✏️</button>
-                      <button className="btn btn-sm btn-outline-danger" onClick={async()=>{if(confirm('Delete?')){await deleteService(s.id);loadSvcs(selCat);}}}>🗑️</button>
+                    <div style={{ display:'flex', gap:5 }}>
+                      <button onClick={()=>setSvcForm(s)} style={{ padding:'5px 8px', borderRadius:7, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--ink-2)', cursor:'pointer', display:'flex' }}><FileText size={12} /></button>
+                      <button onClick={async()=>{if(confirm('Delete?')){await deleteService(s.id);loadSvcs(selCat);}}} style={{ padding:'5px 8px', borderRadius:7, border:'1px solid rgba(239,68,68,.3)', background:'rgba(239,68,68,.06)', color:'var(--red)', cursor:'pointer', display:'flex' }}><X size={12} /></button>
                     </div>
                   </div>
                 </div>
               ))}
             </>
-          ) : <div className="text-center py-5 text-gray-500 text-sm">← Select a category to manage its services</div>}
+          ) : <div className="admin-card" style={{ minHeight:180, display:'flex', alignItems:'center', justifyContent:'center', color:'var(--muted)', fontSize:13 }}>Select a category to manage its services</div>}
         </div>
       </div>
 
       {/* Category form modal */}
       {catForm && (
-        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',zIndex:999,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={()=>setCatForm(null)}>
-          <div onClick={e=>e.stopPropagation()} style={{background:'#fff',borderRadius:16,padding:28,width:'100%',maxWidth:480}}>
-            <h6 className="font-weight-bold mb-3">{catForm.id?'Edit Category':'New Category'}</h6>
+        <div style={{position:'fixed',inset:0,background:'rgba(15,27,45,.5)',zIndex:999,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={()=>setCatForm(null)}>
+          <div onClick={e=>e.stopPropagation()} style={{background:'var(--surface)',borderRadius:16,padding:26,width:'100%',maxWidth:480,boxShadow:'var(--shadow)'}}>
+            <div style={{ fontSize:14.5, fontWeight:800, color:'var(--ink)', marginBottom:14 }}>{catForm.id?'Edit Category':'New Category'}</div>
             <div className="row">
               <div className="col-6 mb-2"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Name</label><input className="form-control" value={catForm.name} onChange={e=>setCatForm(f=>({...f,name:e.target.value}))}/></div>
               <div className="col-6 mb-2"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Slug</label><input className="form-control" value={catForm.slug} onChange={e=>setCatForm(f=>({...f,slug:e.target.value}))}/></div>
@@ -4323,7 +4329,10 @@ function ServicesCatalogSection() {
               <div className="col-4 mb-2"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Color</label><input type="color" className="form-control" value={catForm.color} onChange={e=>setCatForm(f=>({...f,color:e.target.value}))}/></div>
               <div className="col-4 mb-2"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Sort</label><input type="number" className="form-control" value={catForm.sort_order} onChange={e=>setCatForm(f=>({...f,sort_order:Number(e.target.value)}))}/></div>
               <div className="col-12 mb-3"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Description</label><input className="form-control" value={catForm.description||''} onChange={e=>setCatForm(f=>({...f,description:e.target.value}))}/></div>
-              <div className="col-12 d-flex gap-2"><button className="btn btn-warning font-weight-bold" style={{background:'#C9A020',border:'none',color:'#0A0E1A'}} disabled={saving} onClick={saveCat}>{saving?'…':'Save'}</button><button className="btn btn-outline-secondary" onClick={()=>setCatForm(null)}>Cancel</button></div>
+              <div className="col-12" style={{ display:'flex', gap:8 }}>
+                <button disabled={saving} onClick={saveCat} style={{ padding:'9px 18px', borderRadius:9, border:'none', background:'var(--gold)', color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer' }}>{saving?'…':'Save'}</button>
+                <button onClick={()=>setCatForm(null)} style={{ padding:'9px 18px', borderRadius:9, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--ink-2)', fontSize:13, fontWeight:700, cursor:'pointer' }}>Cancel</button>
+              </div>
             </div>
           </div>
         </div>
@@ -4331,9 +4340,9 @@ function ServicesCatalogSection() {
 
       {/* Service form modal */}
       {svcForm && (
-        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',zIndex:999,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={()=>setSvcForm(null)}>
-          <div onClick={e=>e.stopPropagation()} style={{background:'#fff',borderRadius:16,padding:28,width:'100%',maxWidth:560,maxHeight:'90vh',overflowY:'auto'}}>
-            <h6 className="font-weight-bold mb-3">{svcForm.id?'Edit Service':'New Service'}</h6>
+        <div style={{position:'fixed',inset:0,background:'rgba(15,27,45,.5)',zIndex:999,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={()=>setSvcForm(null)}>
+          <div onClick={e=>e.stopPropagation()} style={{background:'var(--surface)',borderRadius:16,padding:26,width:'100%',maxWidth:560,maxHeight:'90vh',overflowY:'auto',boxShadow:'var(--shadow)'}}>
+            <div style={{ fontSize:14.5, fontWeight:800, color:'var(--ink)', marginBottom:14 }}>{svcForm.id?'Edit Service':'New Service'}</div>
             <div className="row">
               <div className="col-6 mb-2"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Name</label><input className="form-control" value={svcForm.name} onChange={e=>setSvcForm(f=>({...f,name:e.target.value}))}/></div>
               <div className="col-6 mb-2"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Slug</label><input className="form-control" value={svcForm.slug} onChange={e=>setSvcForm(f=>({...f,slug:e.target.value}))}/></div>
@@ -4349,7 +4358,10 @@ function ServicesCatalogSection() {
                 <div className="form-check"><input className="form-check-input" type="checkbox" id="svc-quote" checked={svcForm.is_quotation} onChange={e=>setSvcForm(f=>({...f,is_quotation:e.target.checked}))}/><label className="form-check-label text-sm" htmlFor="svc-quote">Quotation-based</label></div>
                 <div className="form-check"><input className="form-check-input" type="checkbox" id="svc-feat" checked={svcForm.is_featured} onChange={e=>setSvcForm(f=>({...f,is_featured:e.target.checked}))}/><label className="form-check-label text-sm" htmlFor="svc-feat">Featured</label></div>
               </div>
-              <div className="col-12 d-flex gap-2"><button className="btn btn-warning font-weight-bold" style={{background:'#C9A020',border:'none',color:'#0A0E1A'}} disabled={saving} onClick={saveSvc}>{saving?'…':'Save'}</button><button className="btn btn-outline-secondary" onClick={()=>setSvcForm(null)}>Cancel</button></div>
+              <div className="col-12" style={{ display:'flex', gap:8 }}>
+                <button disabled={saving} onClick={saveSvc} style={{ padding:'9px 18px', borderRadius:9, border:'none', background:'var(--gold)', color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer' }}>{saving?'…':'Save'}</button>
+                <button onClick={()=>setSvcForm(null)} style={{ padding:'9px 18px', borderRadius:9, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--ink-2)', fontSize:13, fontWeight:700, cursor:'pointer' }}>Cancel</button>
+              </div>
             </div>
           </div>
         </div>
@@ -4391,16 +4403,16 @@ function ContentSection() {
   return (
     <>
       <PageHeader title="Content Management" sub="Homepage banners and FAQ management" />
-      {toast && <div className="alert alert-success py-2">{toast}</div>}
-      <div className="mb-3 d-flex justify-content-between align-items-center">
-        <div>{['banners','faqs'].map(t=><FilterPill key={t} active={tab===t} onClick={()=>{setTab(t);setForm(null);}}>{t==='banners'?'🖼️ Banners':'❓ FAQs'}</FilterPill>)}</div>
-        <button className="btn btn-warning font-weight-bold" style={{background:'#C9A020',border:'none',color:'#0A0E1A'}} onClick={()=>setForm(tab==='banners'?{...BLANK_BANNER}:{...BLANK_FAQ})}>+ Add {tab==='banners'?'Banner':'FAQ'}</button>
+      {toast && <div style={{ display:'flex', alignItems:'center', gap:8, background:'rgba(22,163,74,.1)', color:'var(--green)', borderRadius:9, padding:'9px 14px', marginBottom:16, fontSize:12.5, fontWeight:700 }}><BadgeCheck size={15} /> {toast}</div>}
+      <div style={{ marginBottom:16, display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:10 }}>
+        <div>{['banners','faqs'].map(t=><FilterPill key={t} active={tab===t} onClick={()=>{setTab(t);setForm(null);}}><span style={{ display:'inline-flex', alignItems:'center', gap:6 }}>{t==='banners'?<><ImageIcon size={13} /> Banners</>:<><HelpCircle size={13} /> FAQs</>}</span></FilterPill>)}</div>
+        <button onClick={()=>setForm(tab==='banners'?{...BLANK_BANNER}:{...BLANK_FAQ})} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'8px 14px', borderRadius:9, border:'none', background:'var(--gold)', color:'#fff', fontSize:12.5, fontWeight:700, cursor:'pointer' }}><Plus size={14} /> Add {tab==='banners'?'Banner':'FAQ'}</button>
       </div>
 
       {form && (
-        <div className="admin-card mb-4" style={{borderLeft:'4px solid #C9A020'}}>
-          <div className="card-body">
-            <h6 className="font-weight-bold mb-3">{form.id?'Edit':'New'} {tab==='banners'?'Banner':'FAQ'}</h6>
+        <div className="admin-card" style={{ borderLeft:'4px solid var(--gold)' }}>
+          <div style={{ padding:18 }}>
+            <div style={{ fontSize:14.5, fontWeight:800, color:'var(--ink)', marginBottom:14 }}>{form.id?'Edit':'New'} {tab==='banners'?'Banner':'FAQ'}</div>
             {tab === 'banners' ? (
               <div className="row">
                 <div className="col-md-6 mb-2"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Title</label><input className="form-control" value={form.title} onChange={e=>f('title',e.target.value)}/></div>
@@ -4423,40 +4435,47 @@ function ContentSection() {
                 <div className="col-md-4 mb-3"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Sort</label><input type="number" className="form-control" value={form.sort_order} onChange={e=>f('sort_order',Number(e.target.value))}/></div>
               </div>
             )}
-            <div className="d-flex gap-2"><button className="btn btn-warning font-weight-bold" style={{background:'#C9A020',border:'none',color:'#0A0E1A'}} disabled={saving} onClick={saveCurrent}>{saving?'…':'Save'}</button><button className="btn btn-outline-secondary" onClick={()=>setForm(null)}>Cancel</button></div>
+            <div style={{ display:'flex', gap:8 }}>
+              <button disabled={saving} onClick={saveCurrent} style={{ padding:'9px 18px', borderRadius:9, border:'none', background:'var(--gold)', color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer' }}>{saving?'…':'Save'}</button>
+              <button onClick={()=>setForm(null)} style={{ padding:'9px 18px', borderRadius:9, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--ink-2)', fontSize:13, fontWeight:700, cursor:'pointer' }}>Cancel</button>
+            </div>
           </div>
         </div>
       )}
 
       {loading ? <Spinner/> : tab === 'banners' ? (
         banners.map(b=>(
-          <div key={b.id} className="admin-card mb-2" style={{borderLeft:'4px solid #C9A020'}}>
-            <div className="card-body py-2 d-flex justify-content-between align-items-center">
-              <div style={{flex:1}}>
-                <div style={{background:b.bg,color:b.text_color,borderRadius:8,padding:'8px 14px',display:'inline-block',maxWidth:'100%'}}>
-                  <span style={{fontSize:16}}>{b.emoji}</span> <strong>{b.title}</strong>{b.subtitle&&<span style={{opacity:0.8}}> · {b.subtitle}</span>}
+          <div key={b.id} className="admin-card" style={{ borderLeft:'4px solid var(--gold)' }}>
+            <div style={{ padding:13, display:'flex', justifyContent:'space-between', alignItems:'center', gap:10 }}>
+              <div style={{ flex:1 }}>
+                <div style={{ background:b.bg, color:b.text_color, borderRadius:8, padding:'8px 14px', display:'inline-block', maxWidth:'100%' }}>
+                  <span style={{ fontSize:16 }}>{b.emoji}</span> <strong>{b.title}</strong>{b.subtitle&&<span style={{ opacity:0.8 }}> · {b.subtitle}</span>}
                 </div>
-                <div className="text-xs text-gray-500 mt-1">{b.tag&&<span className="sb-badge sb-badge-warning mr-2">{b.tag}</span>}{b.promo_code&&<code className="mr-2">{b.promo_code}</code>}{!b.is_active&&<span className="sb-badge sb-badge-secondary">Inactive</span>}</div>
+                <div style={{ fontSize:11.5, color:'var(--muted)', marginTop:6, display:'flex', gap:8, alignItems:'center', flexWrap:'wrap' }}>
+                  {b.tag&&<span className="sb-badge sb-badge-warning">{b.tag}</span>}
+                  {b.promo_code&&<code>{b.promo_code}</code>}
+                  {!b.is_active&&<span className="sb-badge sb-badge-secondary">Inactive</span>}
+                </div>
               </div>
-              <div className="d-flex gap-2 ml-2" style={{gap:6,flexShrink:0}}>
-                <button className="btn btn-sm btn-outline-warning" onClick={()=>setForm(b)}>✏️</button>
-                <button className="btn btn-sm btn-outline-danger" onClick={async()=>{if(confirm('Delete?')){await deleteBanner(b.id);loadBanners();}}}>🗑️</button>
+              <div style={{ display:'flex', gap:6, flexShrink:0 }}>
+                <button onClick={()=>setForm(b)} style={{ padding:'5px 8px', borderRadius:7, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--ink-2)', cursor:'pointer', display:'flex' }}><FileText size={12} /></button>
+                <button onClick={async()=>{if(confirm('Delete?')){await deleteBanner(b.id);loadBanners();}}} style={{ padding:'5px 8px', borderRadius:7, border:'1px solid rgba(239,68,68,.3)', background:'rgba(239,68,68,.06)', color:'var(--red)', cursor:'pointer', display:'flex' }}><X size={12} /></button>
               </div>
             </div>
           </div>
         ))
       ) : (
         faqs.map(q=>(
-          <div key={q.id} className="admin-card mb-2" style={{borderLeft:'4px solid #4A90D9'}}>
-            <div className="card-body py-2 d-flex justify-content-between align-items-center">
-              <div style={{flex:1}}>
-                <div className="text-sm font-weight-bold text-gray-800">{q.question}</div>
-                <div className="text-xs text-gray-600 mt-1" style={{maxWidth:500}}>{q.answer.slice(0,100)}{q.answer.length>100?'…':''}</div>
-                <div className="mt-1"><span className="sb-badge sb-badge-info mr-1">{q.category}</span><span className="sb-badge sb-badge-secondary">{q.audience}</span></div>
+          <div key={q.id} className="admin-card" style={{ borderLeft:'4px solid var(--blue)' }}>
+            <div style={{ padding:13, display:'flex', justifyContent:'space-between', alignItems:'center', gap:10 }}>
+              <div style={{ flex:1 }}>
+                <div style={{ fontSize:13, fontWeight:700, color:'var(--ink)' }}>{q.question}</div>
+                <div style={{ fontSize:11.5, color:'var(--ink-2)', marginTop:5, maxWidth:500 }}>{q.answer.slice(0,100)}{q.answer.length>100?'…':''}</div>
+                <div style={{ marginTop:7, display:'flex', gap:6 }}><span className="sb-badge sb-badge-info">{q.category}</span><span className="sb-badge sb-badge-secondary">{q.audience}</span></div>
               </div>
-              <div className="d-flex gap-2 ml-2" style={{gap:6,flexShrink:0}}>
-                <button className="btn btn-sm btn-outline-warning" onClick={()=>setForm(q)}>✏️</button>
-                <button className="btn btn-sm btn-outline-danger" onClick={async()=>{if(confirm('Delete?')){await deleteFAQ(q.id);loadFAQs();}}}>🗑️</button>
+              <div style={{ display:'flex', gap:6, flexShrink:0 }}>
+                <button onClick={()=>setForm(q)} style={{ padding:'5px 8px', borderRadius:7, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--ink-2)', cursor:'pointer', display:'flex' }}><FileText size={12} /></button>
+                <button onClick={async()=>{if(confirm('Delete?')){await deleteFAQ(q.id);loadFAQs();}}} style={{ padding:'5px 8px', borderRadius:7, border:'1px solid rgba(239,68,68,.3)', background:'rgba(239,68,68,.06)', color:'var(--red)', cursor:'pointer', display:'flex' }}><X size={12} /></button>
               </div>
             </div>
           </div>
