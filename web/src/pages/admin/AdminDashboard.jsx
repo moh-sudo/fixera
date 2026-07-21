@@ -198,7 +198,6 @@ const STATUS_MAP = {
 };
 
 const ROLE_COLOR = { worker: '#C9A020', vendor: '#3B82F6', rider: '#16A34A', supplier: '#F59E0B', mover: '#7C6CF0', water_carrier: '#06B6D4' };
-const ROLE_ICON  = { worker: '🔧', vendor: '🏪', rider: '🚗', supplier: '📦', mover: '🚚', water_carrier: '🚰' }; // legacy emoji (kept for a few not-yet-migrated call sites)
 const ROLE_ICON_COMP = { worker: Wrench, vendor: Store, rider: Bike, supplier: Package, mover: Truck, water_carrier: Droplets };
 const ROLE_LABEL = { worker: 'Service Worker', vendor: 'Vendor', rider: 'Rider', supplier: 'Supplier', mover: 'Mover', water_carrier: 'Water Carrier' };
 
@@ -281,21 +280,33 @@ function ServiceDetailsView({ details }) {
   const renderVal = (k, v) => {
     if (!v || v === false) return null;
     const label = k.replace(/([A-Z])/g, ' $1').trim();
-    if (typeof v === 'boolean') return <div key={k} className="py-1 border-bottom text-xs text-success">✓ {label}</div>;
+    if (typeof v === 'boolean') return (
+      <div key={k} style={{ padding:'6px 0', borderBottom:'1px solid var(--line)', fontSize:12, color:'var(--green)', display:'flex', alignItems:'center', gap:5 }}>
+        <CheckCircle2 size={12} /> {label}
+      </div>
+    );
     if (typeof v === 'object' && !Array.isArray(v)) return (
-      <div key={k} className="mb-2">
-        <div className="text-xs font-weight-bold text-uppercase mb-1" style={{ color:'#C9A020', letterSpacing:'0.05rem' }}>{label}</div>
-        <div className="pl-3 border-left">{Object.entries(v).map(([kk,vv]) => renderVal(kk,vv))}</div>
+      <div key={k} style={{ marginBottom:10 }}>
+        <div style={{ fontSize:11, fontWeight:800, textTransform:'uppercase', color:'var(--gold)', letterSpacing:0.5, marginBottom:4 }}>{label}</div>
+        <div style={{ paddingLeft:12, borderLeft:'2px solid var(--line-2)' }}>{Object.entries(v).map(([kk,vv]) => renderVal(kk,vv))}</div>
       </div>
     );
-    if (Array.isArray(v)) return <div key={k} className="d-flex justify-content-between py-1 border-bottom text-xs"><span className="text-gray-500">{label}:</span><span>{v.join(', ')}</span></div>;
+    if (Array.isArray(v)) return (
+      <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'6px 0', borderBottom:'1px solid var(--line)', fontSize:12 }}>
+        <span style={{ color:'var(--muted)' }}>{label}:</span><span style={{ color:'var(--ink-2)' }}>{v.join(', ')}</span>
+      </div>
+    );
     if (typeof v === 'string' && v.startsWith('http')) return (
-      <div key={k} className="d-flex justify-content-between py-1 border-bottom text-xs">
-        <span className="text-gray-500">{label}:</span>
-        <a href={v} target="_blank" rel="noreferrer" style={{color:'#C9A020'}}>📄 View →</a>
+      <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'6px 0', borderBottom:'1px solid var(--line)', fontSize:12 }}>
+        <span style={{ color:'var(--muted)' }}>{label}:</span>
+        <a href={v} target="_blank" rel="noreferrer" style={{ color:'var(--gold)', display:'inline-flex', alignItems:'center', gap:4, textDecoration:'none' }}><FileText size={11} /> View →</a>
       </div>
     );
-    return <div key={k} className="d-flex justify-content-between py-1 border-bottom text-xs"><span className="text-gray-500">{label}</span><span className="font-weight-bold">{String(v)}</span></div>;
+    return (
+      <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'6px 0', borderBottom:'1px solid var(--line)', fontSize:12 }}>
+        <span style={{ color:'var(--muted)' }}>{label}</span><span style={{ fontWeight:700, color:'var(--ink)' }}>{String(v)}</span>
+      </div>
+    );
   };
   return <div>{Object.entries(details).filter(([k]) => !skip.has(k)).map(([k,v]) => renderVal(k,v))}</div>;
 }
@@ -324,33 +335,35 @@ function PartnerCrewPanel({ partnerId }) {
   };
 
   return (
-    <div className="admin-card mb-3">
-      <div className="admin-card-header">👥 Registered Crew {crew.length > 0 && `(${crew.length})`}</div>
-      <div className="card-body py-2">
-        {loading && <p className="text-xs text-gray-500 mb-0">Loading crew…</p>}
-        {!loading && crew.length === 0 && <p className="text-xs text-gray-500 mb-0">No crew registered yet.</p>}
+    <div className="admin-card" style={{ marginBottom:16 }}>
+      <div className="admin-card-header"><span style={{ display:'flex', alignItems:'center', gap:7 }}><Users size={14} color="var(--gold)" /> Registered Crew {crew.length > 0 && `(${crew.length})`}</span></div>
+      <div style={{ padding:'10px 20px' }}>
+        {loading && <p style={{ fontSize:12, color:'var(--muted)', margin:0 }}>Loading crew…</p>}
+        {!loading && crew.length === 0 && <p style={{ fontSize:12, color:'var(--muted)', margin:0 }}>No crew registered yet.</p>}
         {!loading && crew.map(m => {
           const isLead = ['team_leader','supervisor'].includes(m.default_position);
           return (
-            <div key={m.id} className="d-flex align-items-center py-2 border-bottom">
-              <div className="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                style={{ width:40, height:40, background:isLead?'#C9A02020':'#f0f0f0', border:`2px solid ${isLead?'#C9A020':'#dee2e6'}`, overflow:'hidden' }}>
+            <div key={m.id} style={{ display:'flex', alignItems:'center', padding:'10px 0', borderBottom:'1px solid var(--line)' }}>
+              <div style={{ width:40, height:40, borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0,
+                background:isLead?'var(--gold-soft)':'var(--canvas)', border:`2px solid ${isLead?'var(--gold)':'var(--line-2)'}`, overflow:'hidden' }}>
                 {m.photo_url
                   ? <img src={m.photo_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-                  : <span style={{ fontSize:18 }}>👤</span>}
+                  : <UserRound size={17} color="var(--muted)" />}
               </div>
-              <div className="ml-2 flex-grow-1" style={{ minWidth: 0 }}>
-                <div className="font-weight-bold text-xs text-gray-800">
+              <div style={{ marginLeft:10, flex:1, minWidth:0 }}>
+                <div style={{ fontWeight:700, fontSize:12.5, color:'var(--ink)', display:'flex', alignItems:'center', gap:6 }}>
                   {m.full_name}
-                  {isLead && <span className="badge badge-warning ml-2" style={{ fontSize:9 }}>⭐ SUPERVISOR</span>}
-                  {m.fixera_verified && <span className="badge badge-success ml-2" style={{ fontSize:9 }}>✓ VERIFIED</span>}
+                  {isLead && <span style={{ fontSize:9, fontWeight:800, background:'var(--gold-soft)', color:'var(--gold-2)', padding:'1px 7px', borderRadius:999 }}>SUPERVISOR</span>}
+                  {m.fixera_verified && <span style={{ fontSize:9, fontWeight:800, background:'rgba(22,163,74,0.1)', color:'var(--green)', padding:'1px 7px', borderRadius:999 }}>VERIFIED</span>}
                 </div>
-                <div className="text-xs text-gray-500">{m.default_position?.replace(/_/g,' ')} · ID {m.national_id}{m.phone ? ' · ' + m.phone : ''}</div>
+                <div style={{ fontSize:11.5, color:'var(--muted)' }}>{m.default_position?.replace(/_/g,' ')} · ID {m.national_id}{m.phone ? ' · ' + m.phone : ''}</div>
               </div>
               <button onClick={() => toggleVerify(m.id, !m.fixera_verified)}
-                className={`btn btn-sm ${m.fixera_verified ? 'btn-outline-danger' : 'btn-success'}`}
-                style={{ fontSize:11, fontWeight:700 }}>
-                {m.fixera_verified ? 'Unverify' : '✓ Verify'}
+                style={{ fontSize:11, fontWeight:700, padding:'6px 12px', borderRadius:8, cursor:'pointer',
+                  border: m.fixera_verified ? '1px solid rgba(239,68,68,.3)' : 'none',
+                  background: m.fixera_verified ? 'rgba(239,68,68,.06)' : 'var(--green)',
+                  color: m.fixera_verified ? 'var(--red)' : '#fff' }}>
+                {m.fixera_verified ? 'Unverify' : 'Verify'}
               </button>
             </div>
           );
@@ -383,50 +396,52 @@ function PartnerFleetPanel({ moverId }) {
   };
 
   const insBadge = (expiry) => {
-    if (!expiry) return { color:'#dc3545', label:'No insurance on file' };
+    if (!expiry) return { color:'var(--red)', label:'No insurance on file' };
     const days = Math.ceil((new Date(expiry) - new Date()) / (1000*60*60*24));
-    if (days < 0)  return { color:'#dc3545', label:`Expired ${-days}d ago` };
-    if (days < 30) return { color:'#fd7e14', label:`Expires in ${days}d` };
-    return { color:'#28a745', label:`Valid · ${days}d left` };
+    if (days < 0)  return { color:'var(--red)', label:`Expired ${-days}d ago` };
+    if (days < 30) return { color:'var(--amber)', label:`Expires in ${days}d` };
+    return { color:'var(--green)', label:`Valid · ${days}d left` };
   };
 
   return (
-    <div className="admin-card mb-3">
-      <div className="admin-card-header">🚚 Fleet (Registered Vehicles) {fleet.length > 0 && `(${fleet.length})`}</div>
-      <div className="card-body py-2">
-        {loading && <p className="text-xs text-gray-500 mb-0">Loading fleet…</p>}
-        {!loading && fleet.length === 0 && <p className="text-xs text-gray-500 mb-0">No vehicles registered yet.</p>}
+    <div className="admin-card" style={{ marginBottom:16 }}>
+      <div className="admin-card-header"><span style={{ display:'flex', alignItems:'center', gap:7 }}><Truck size={14} color="var(--gold)" /> Fleet (Registered Vehicles) {fleet.length > 0 && `(${fleet.length})`}</span></div>
+      <div style={{ padding:'10px 20px' }}>
+        {loading && <p style={{ fontSize:12, color:'var(--muted)', margin:0 }}>Loading fleet…</p>}
+        {!loading && fleet.length === 0 && <p style={{ fontSize:12, color:'var(--muted)', margin:0 }}>No vehicles registered yet.</p>}
         {!loading && fleet.map(v => {
           const ins = insBadge(v.insurance_expiry);
           return (
-            <div key={v.id} className="py-2 border-bottom">
-              <div className="d-flex align-items-center">
-                <div className="flex-grow-1" style={{ minWidth: 0 }}>
-                  <div className="font-weight-bold text-xs text-gray-800">
+            <div key={v.id} style={{ padding:'10px 0', borderBottom:'1px solid var(--line)' }}>
+              <div style={{ display:'flex', alignItems:'center' }}>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ fontWeight:700, fontSize:12.5, color:'var(--ink)', display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
                     {v.vehicle_type?.replace(/_/g,' ')?.toUpperCase()}
-                    <span className="ml-2 px-2 py-1 d-inline-block" style={{ background:'#000', color:'#fff', fontFamily:'monospace', fontSize:11, borderRadius:4, letterSpacing:1.5 }}>{v.plate_number}</span>
-                    {v.fixera_verified && <span className="badge badge-success ml-2" style={{ fontSize:9 }}>✓ VERIFIED</span>}
+                    <span style={{ background:'var(--navy)', color:'#fff', fontFamily:'monospace', fontSize:11, borderRadius:4, letterSpacing:1.5, padding:'2px 8px' }}>{v.plate_number}</span>
+                    {v.fixera_verified && <span style={{ fontSize:9, fontWeight:800, background:'rgba(22,163,74,0.1)', color:'var(--green)', padding:'1px 7px', borderRadius:999 }}>VERIFIED</span>}
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div style={{ fontSize:11.5, color:'var(--muted)', marginTop:4 }}>
                     {[v.year, v.make, v.model, v.color].filter(Boolean).join(' ')}
                     {v.capacity_tons && ` · ${v.capacity_tons}t`}
                   </div>
-                  <div className="text-xs mt-1" style={{ color: ins.color, fontWeight:600 }}>🛡️ {ins.label}{v.insurance_provider ? ` · ${v.insurance_provider}` : ''}</div>
+                  <div style={{ fontSize:11.5, marginTop:4, color: ins.color, fontWeight:600, display:'flex', alignItems:'center', gap:5 }}><ShieldCheck size={12} /> {ins.label}{v.insurance_provider ? ` · ${v.insurance_provider}` : ''}</div>
                 </div>
                 <button onClick={() => toggleVerify(v.id, !v.fixera_verified)}
-                  className={`btn btn-sm ${v.fixera_verified ? 'btn-outline-danger' : 'btn-success'}`}
-                  style={{ fontSize:11, fontWeight:700 }}>
-                  {v.fixera_verified ? 'Unverify' : '✓ Verify'}
+                  style={{ fontSize:11, fontWeight:700, padding:'6px 12px', borderRadius:8, cursor:'pointer',
+                    border: v.fixera_verified ? '1px solid rgba(239,68,68,.3)' : 'none',
+                    background: v.fixera_verified ? 'rgba(239,68,68,.06)' : 'var(--green)',
+                    color: v.fixera_verified ? 'var(--red)' : '#fff' }}>
+                  {v.fixera_verified ? 'Unverify' : 'Verify'}
                 </button>
               </div>
-              <div className="d-flex gap-2 mt-2 flex-wrap">
+              <div style={{ display:'flex', gap:8, marginTop:10, flexWrap:'wrap' }}>
                 {Array.isArray(v.photo_urls) && v.photo_urls.slice(0, 4).map((url, i) => (
                   <a key={i} href={url} target="_blank" rel="noreferrer">
-                    <img src={url} alt="" style={{ width:48, height:48, objectFit:'cover', borderRadius:6, border:'1px solid #dee2e6' }} />
+                    <img src={url} alt="" style={{ width:48, height:48, objectFit:'cover', borderRadius:6, border:'1px solid var(--line-2)' }} />
                   </a>
                 ))}
-                {v.insurance_doc_url && <a href={v.insurance_doc_url} target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-warning" style={{ fontSize:10 }}>📄 Insurance</a>}
-                {v.logbook_url       && <a href={v.logbook_url}       target="_blank" rel="noreferrer" className="btn btn-sm btn-outline-warning" style={{ fontSize:10 }}>📄 Logbook</a>}
+                {v.insurance_doc_url && <a href={v.insurance_doc_url} target="_blank" rel="noreferrer" style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:10.5, fontWeight:700, color:'var(--amber)', border:'1px solid var(--line-2)', borderRadius:7, padding:'4px 9px', textDecoration:'none' }}><FileText size={10} /> Insurance</a>}
+                {v.logbook_url       && <a href={v.logbook_url}       target="_blank" rel="noreferrer" style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:10.5, fontWeight:700, color:'var(--amber)', border:'1px solid var(--line-2)', borderRadius:7, padding:'4px 9px', textDecoration:'none' }}><FileText size={10} /> Logbook</a>}
               </div>
             </div>
           );
@@ -1651,11 +1666,11 @@ function WorkforceSection() {
   const verifyVeh  = async (id, next) => { await supabase.from('mover_vehicles').update({ fixera_verified: next }).eq('id', id); load(); };
 
   const insBadge = (expiry) => {
-    if (!expiry) return { c:'#e74a3b', t:'No insurance' };
+    if (!expiry) return { c:'var(--red)', t:'No insurance' };
     const d = Math.ceil((new Date(expiry) - new Date()) / 86400000);
-    if (d < 0) return { c:'#e74a3b', t:`Expired ${-d}d` };
-    if (d < 30) return { c:'#fd7e14', t:`${d}d left` };
-    return { c:'#1cc88a', t:`Valid ${d}d` };
+    if (d < 0) return { c:'var(--red)', t:`Expired ${-d}d` };
+    if (d < 30) return { c:'var(--amber)', t:`${d}d left` };
+    return { c:'var(--green)', t:`Valid ${d}d` };
   };
 
   const crewFiltered = crew.filter(m =>
@@ -2217,10 +2232,10 @@ function PayoutsSection() {
     <>
       <PageHeader title="Payout Requests" sub="Worker withdrawal requests via M-Pesa" />
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', gap:14, marginBottom:20 }}>
-        <StatCard icon="⏳" label="Pending"    value={stats.pending}  color="var(--amber)" />
-        <StatCard icon="✅" label="Approved"   value={stats.approved} color="var(--blue)" />
-        <StatCard icon="💚" label="Paid Out"   value={stats.paid}     color="var(--green)" />
-        <StatCard icon="💰" label="Total Paid" value={`KSh ${(stats.total||0).toLocaleString()}`} color="var(--gold)" />
+        <StatCard icon={<Clock size={22} color="var(--amber)" />} label="Pending" value={stats.pending} color="var(--amber)" />
+        <StatCard icon={<CheckCircle2 size={22} color="var(--blue)" />} label="Approved" value={stats.approved} color="var(--blue)" />
+        <StatCard icon={<Wallet size={22} color="var(--green)" />} label="Paid Out" value={stats.paid} color="var(--green)" />
+        <StatCard icon={<Wallet size={22} color="var(--gold)" />} label="Total Paid" value={`KSh ${(stats.total||0).toLocaleString()}`} color="var(--gold)" />
       </div>
 
       <div style={{ marginBottom:18 }}>
@@ -2361,17 +2376,20 @@ function AnnouncementsSection() {
         <div className="admin-card" style={{ borderLeft:'4px solid var(--gold)' }}>
           <div style={{ padding:18 }}>
             <div style={{ fontSize:14.5, fontWeight:800, color:'var(--ink)', marginBottom:14 }}>{form.id ? 'Edit Announcement' : 'New Announcement'}</div>
-            <div className="row">
-              <div className="col-12 mb-3"><label className="text-xs font-weight-bold text-gray-600 text-uppercase" style={{ letterSpacing:'0.05rem' }}>Title *</label><input className="form-control" value={form.title} onChange={e => set('title', e.target.value)} placeholder="Short, clear headline" /></div>
-              <div className="col-12 mb-3"><label className="text-xs font-weight-bold text-gray-600 text-uppercase" style={{ letterSpacing:'0.05rem' }}>Message *</label><textarea className="form-control" rows={3} value={form.body} onChange={e => set('body', e.target.value)} placeholder="Full announcement text…" /></div>
-              <div className="col-md-4 mb-3"><label className="text-xs font-weight-bold text-gray-600 text-uppercase" style={{ letterSpacing:'0.05rem' }}>Type</label><select className="form-control" value={form.type} onChange={e => set('type', e.target.value)}>{Object.entries(TYPE_META).map(([k, v]) => <option key={k} value={k}>{v.icon} {v.label}</option>)}</select></div>
-              <div className="col-md-4 mb-3"><label className="text-xs font-weight-bold text-gray-600 text-uppercase" style={{ letterSpacing:'0.05rem' }}>Audience</label><select className="form-control" value={form.target} onChange={e => set('target', e.target.value)}>{Object.entries(TARGET_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></div>
-              <div className="col-md-4 mb-3 d-flex align-items-end">
-                <div className="form-check mb-2"><input className="form-check-input" type="checkbox" id="pin-check" checked={form.is_pinned} onChange={e => set('is_pinned', e.target.checked)} /><label className="form-check-label text-sm font-weight-bold" htmlFor="pin-check" style={{ display:'inline-flex', alignItems:'center', gap:5 }}><Star size={12} /> Pin to top</label></div>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 }}>
+              <div style={{ gridColumn:'1 / -1' }}><label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Title *</label><input className="form-control" value={form.title} onChange={e => set('title', e.target.value)} placeholder="Short, clear headline" /></div>
+              <div style={{ gridColumn:'1 / -1' }}><label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Message *</label><textarea className="form-control" rows={3} value={form.body} onChange={e => set('body', e.target.value)} placeholder="Full announcement text…" /></div>
+              <div><label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Type</label><select className="form-control" value={form.type} onChange={e => set('type', e.target.value)}>{Object.entries(TYPE_META).map(([k, v]) => <option key={k} value={k}>{v.icon} {v.label}</option>)}</select></div>
+              <div><label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Audience</label><select className="form-control" value={form.target} onChange={e => set('target', e.target.value)}>{Object.entries(TARGET_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></div>
+              <div style={{ display:'flex', alignItems:'flex-end' }}>
+                <label style={{ display:'flex', alignItems:'center', gap:7, fontSize:12.5, fontWeight:700, color:'var(--ink-2)', cursor:'pointer' }}>
+                  <input type="checkbox" checked={form.is_pinned} onChange={e => set('is_pinned', e.target.checked)} style={{ width:15, height:15 }} />
+                  <Star size={12} /> Pin to top
+                </label>
               </div>
-              <div className="col-md-6 mb-3"><label className="text-xs font-weight-bold text-gray-600 text-uppercase" style={{ letterSpacing:'0.05rem' }}>Publish Date (leave blank = now)</label><input type="datetime-local" className="form-control" value={form.publish_at ? form.publish_at.slice(0,16) : ''} onChange={e => set('publish_at', e.target.value ? new Date(e.target.value).toISOString() : '')} /></div>
-              <div className="col-md-6 mb-3"><label className="text-xs font-weight-bold text-gray-600 text-uppercase" style={{ letterSpacing:'0.05rem' }}>Expiry Date (leave blank = never)</label><input type="datetime-local" className="form-control" value={form.expires_at ? form.expires_at.slice(0,16) : ''} onChange={e => set('expires_at', e.target.value ? new Date(e.target.value).toISOString() : '')} /></div>
-              <div className="col-12" style={{ display:'flex', gap:8 }}>
+              <div><label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Publish Date (leave blank = now)</label><input type="datetime-local" className="form-control" value={form.publish_at ? form.publish_at.slice(0,16) : ''} onChange={e => set('publish_at', e.target.value ? new Date(e.target.value).toISOString() : '')} /></div>
+              <div><label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Expiry Date (leave blank = never)</label><input type="datetime-local" className="form-control" value={form.expires_at ? form.expires_at.slice(0,16) : ''} onChange={e => set('expires_at', e.target.value ? new Date(e.target.value).toISOString() : '')} /></div>
+              <div style={{ gridColumn:'1 / -1', display:'flex', gap:8 }}>
                 <button disabled={saving} onClick={save} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'9px 18px', borderRadius:9, border:'none', background:'var(--gold)', color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer' }}><Megaphone size={14} /> {saving ? 'Saving…' : form.id ? 'Update' : 'Publish'}</button>
                 <button onClick={() => setForm(null)} style={{ padding:'9px 18px', borderRadius:9, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--ink-2)', fontSize:13, fontWeight:700, cursor:'pointer' }}>Cancel</button>
               </div>
@@ -2399,7 +2417,7 @@ function AnnouncementsSection() {
             const expired   = isExpired(item);
             const scheduled = isScheduled(item);
             return (
-              <div key={item.id} className="admin-card" style={{ borderLeft: `4px solid ${TYPE_META[item.type]?.color || '#4A90D9'}`, opacity: expired ? 0.6 : 1 }}>
+              <div key={item.id} className="admin-card" style={{ borderLeft: `4px solid ${TYPE_META[item.type]?.color || 'var(--blue)'}`, opacity: expired ? 0.6 : 1 }}>
                 <div style={{ padding:16 }}>
                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12 }}>
                     <div style={{ flex:1 }}>
@@ -2491,10 +2509,10 @@ function QuotationsSection() {
     <>
       <PageHeader title="Quotations" sub="Inspection requests and quote pipeline" />
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', gap:14, marginBottom:20 }}>
-        <StatCard icon="🔍" label="Total Inspections" value={inspections.length}                                        color="var(--blue)"/>
-        <StatCard icon="⏳" label="Awaiting Review"   value={inspections.filter(i=>i.status==='under_review').length}   color="var(--amber)"/>
-        <StatCard icon="📄" label="Total Quotations"  value={quotations.length}                                         color="var(--gold)"/>
-        <StatCard icon="⏰" label="Pending Approval"  value={quotations.filter(q=>q.status==='pending_approval').length}color="var(--red)"/>
+        <StatCard icon={<Search size={22} color="var(--blue)" />} label="Total Inspections" value={inspections.length} color="var(--blue)"/>
+        <StatCard icon={<Clock size={22} color="var(--amber)" />} label="Awaiting Review" value={inspections.filter(i=>i.status==='under_review').length} color="var(--amber)"/>
+        <StatCard icon={<FileText size={22} color="var(--gold)" />} label="Total Quotations" value={quotations.length} color="var(--gold)"/>
+        <StatCard icon={<Clock size={22} color="var(--red)" />} label="Pending Approval" value={quotations.filter(q=>q.status==='pending_approval').length} color="var(--red)"/>
       </div>
 
       <div style={{ marginBottom:18, display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:8 }}>
@@ -3900,19 +3918,40 @@ function MarketingSection() {
         <div className="admin-card" style={{ borderLeft:'4px solid var(--gold)' }}>
           <div style={{ padding:18 }}>
             <div style={{ fontSize:14.5, fontWeight:800, color:'var(--ink)', marginBottom:14 }}>{form.id?'Edit Promo Code':'New Promo Code'}</div>
-            <div className="row">
-              <div className="col-md-4 mb-3"><label className="text-xs font-weight-bold text-uppercase text-gray-600" style={{letterSpacing:'0.05rem'}}>Code *</label><input className="form-control" value={form.code} onChange={e=>set('code',e.target.value.toUpperCase())} placeholder="e.g. SAVE20" /></div>
-              <div className="col-md-4 mb-3"><label className="text-xs font-weight-bold text-uppercase text-gray-600" style={{letterSpacing:'0.05rem'}}>Discount Type</label><select className="form-control" value={form.discount_type} onChange={e=>set('discount_type',e.target.value)}><option value="percent">Percentage (%)</option><option value="fixed">Fixed (KSh)</option></select></div>
-              <div className="col-md-4 mb-3"><label className="text-xs font-weight-bold text-uppercase text-gray-600" style={{letterSpacing:'0.05rem'}}>Discount Value *</label><input type="number" className="form-control" value={form.discount_value} onChange={e=>set('discount_value',e.target.value)} placeholder={form.discount_type==='percent'?'e.g. 20 (%)':'e.g. 200 (KSh)'} /></div>
-              <div className="col-md-4 mb-3"><label className="text-xs font-weight-bold text-uppercase text-gray-600" style={{letterSpacing:'0.05rem'}}>Min Order (KSh)</label><input type="number" className="form-control" value={form.min_order} onChange={e=>set('min_order',e.target.value)} placeholder="0 = no minimum" /></div>
-              <div className="col-md-4 mb-3"><label className="text-xs font-weight-bold text-uppercase text-gray-600" style={{letterSpacing:'0.05rem'}}>Max Discount (KSh)</label><input type="number" className="form-control" value={form.max_discount} onChange={e=>set('max_discount',e.target.value)} placeholder="Cap for % discounts" /></div>
-              <div className="col-md-4 mb-3"><label className="text-xs font-weight-bold text-uppercase text-gray-600" style={{letterSpacing:'0.05rem'}}>Max Uses</label><input type="number" className="form-control" value={form.max_uses} onChange={e=>set('max_uses',e.target.value)} placeholder="Leave blank = unlimited" /></div>
-              <div className="col-md-4 mb-3"><label className="text-xs font-weight-bold text-uppercase text-gray-600" style={{letterSpacing:'0.05rem'}}>Valid From</label><input type="datetime-local" className="form-control" value={form.valid_from?form.valid_from.slice(0,16):''} onChange={e=>set('valid_from',e.target.value?new Date(e.target.value).toISOString():'')} /></div>
-              <div className="col-md-4 mb-3"><label className="text-xs font-weight-bold text-uppercase text-gray-600" style={{letterSpacing:'0.05rem'}}>Valid Until</label><input type="datetime-local" className="form-control" value={form.valid_until?form.valid_until.slice(0,16):''} onChange={e=>set('valid_until',e.target.value?new Date(e.target.value).toISOString():'')} /></div>
-              <div className="col-md-4 mb-3"><label className="text-xs font-weight-bold text-uppercase text-gray-600" style={{letterSpacing:'0.05rem'}}>Target Service</label><input className="form-control" value={form.target_service} onChange={e=>set('target_service',e.target.value)} placeholder="Leave blank = all services" /></div>
-              <div className="col-md-4 mb-3"><label className="text-xs font-weight-bold text-uppercase text-gray-600" style={{letterSpacing:'0.05rem'}}>Description</label><input className="form-control" value={form.description} onChange={e=>set('description',e.target.value)} placeholder="Internal note" /></div>
-              <div className="col-md-4 mb-3 d-flex align-items-end"><div className="form-check mb-2"><input className="form-check-input" type="checkbox" id="active-check" checked={form.is_active} onChange={e=>set('is_active',e.target.checked)}/><label className="form-check-label text-sm font-weight-bold" htmlFor="active-check">Active</label></div></div>
-              <div className="col-12" style={{ display:'flex', gap:8 }}>
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:14 }}>
+              {[
+                ['Code *', 'code', 'text', 'e.g. SAVE20', v => v.toUpperCase()],
+                null, // discount type handled separately (select)
+                ['Discount Value *', 'discount_value', 'number', form.discount_type==='percent'?'e.g. 20 (%)':'e.g. 200 (KSh)'],
+                ['Min Order (KSh)', 'min_order', 'number', '0 = no minimum'],
+                ['Max Discount (KSh)', 'max_discount', 'number', 'Cap for % discounts'],
+                ['Max Uses', 'max_uses', 'number', 'Leave blank = unlimited'],
+                ['Target Service', 'target_service', 'text', 'Leave blank = all services'],
+                ['Description', 'description', 'text', 'Internal note'],
+              ].filter(Boolean).map(([lbl,key,type,placeholder,transform]) => (
+                <div key={key}>
+                  <label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>{lbl}</label>
+                  <input type={type} className="form-control" value={form[key]} onChange={e=>set(key, transform ? transform(e.target.value) : e.target.value)} placeholder={placeholder} />
+                </div>
+              ))}
+              <div>
+                <label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Discount Type</label>
+                <select className="form-control" value={form.discount_type} onChange={e=>set('discount_type',e.target.value)}><option value="percent">Percentage (%)</option><option value="fixed">Fixed (KSh)</option></select>
+              </div>
+              <div>
+                <label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Valid From</label>
+                <input type="datetime-local" className="form-control" value={form.valid_from?form.valid_from.slice(0,16):''} onChange={e=>set('valid_from',e.target.value?new Date(e.target.value).toISOString():'')} />
+              </div>
+              <div>
+                <label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Valid Until</label>
+                <input type="datetime-local" className="form-control" value={form.valid_until?form.valid_until.slice(0,16):''} onChange={e=>set('valid_until',e.target.value?new Date(e.target.value).toISOString():'')} />
+              </div>
+              <div style={{ display:'flex', alignItems:'flex-end' }}>
+                <label style={{ display:'flex', alignItems:'center', gap:7, fontSize:12.5, fontWeight:700, color:'var(--ink-2)', cursor:'pointer' }}>
+                  <input type="checkbox" checked={form.is_active} onChange={e=>set('is_active',e.target.checked)} style={{ width:15, height:15 }} /> Active
+                </label>
+              </div>
+              <div style={{ gridColumn:'1 / -1', display:'flex', gap:8 }}>
                 <button className="btn-navy" style={{ background:'var(--gold)' }} disabled={saving} onClick={save}>{saving?'Saving…':form.id?'Update':'Create Code'}</button>
                 <button onClick={()=>setForm(null)} style={{ padding:'9px 16px', borderRadius:10, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--ink-2)', fontSize:13, fontWeight:700, cursor:'pointer' }}>Cancel</button>
               </div>
@@ -4155,25 +4194,29 @@ function ContentSection() {
           <div style={{ padding:18 }}>
             <div style={{ fontSize:14.5, fontWeight:800, color:'var(--ink)', marginBottom:14 }}>{form.id?'Edit':'New'} {tab==='banners'?'Banner':'FAQ'}</div>
             {tab === 'banners' ? (
-              <div className="row">
-                <div className="col-md-6 mb-2"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Title</label><input className="form-control" value={form.title} onChange={e=>f('title',e.target.value)}/></div>
-                <div className="col-md-6 mb-2"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Tag (e.g. NEW SERVICE)</label><input className="form-control" value={form.tag||''} onChange={e=>f('tag',e.target.value)}/></div>
-                <div className="col-md-6 mb-2"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Subtitle</label><input className="form-control" value={form.subtitle||''} onChange={e=>f('subtitle',e.target.value)}/></div>
-                <div className="col-md-3 mb-2"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Emoji</label><input className="form-control" value={form.emoji} onChange={e=>f('emoji',e.target.value)}/></div>
-                <div className="col-md-3 mb-2"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Text Color</label><input type="color" className="form-control" value={form.text_color} onChange={e=>f('text_color',e.target.value)}/></div>
-                <div className="col-md-6 mb-2"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Background (CSS gradient or color)</label><input className="form-control" value={form.bg} onChange={e=>f('bg',e.target.value)}/></div>
-                <div className="col-md-3 mb-2"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Promo Code</label><input className="form-control" value={form.promo_code||''} onChange={e=>f('promo_code',e.target.value)}/></div>
-                <div className="col-md-3 mb-2"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Link Path</label><input className="form-control" value={form.link_path||''} onChange={e=>f('link_path',e.target.value)} placeholder="/movers"/></div>
-                <div className="col-md-3 mb-2"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Sort</label><input type="number" className="form-control" value={form.sort_order} onChange={e=>f('sort_order',Number(e.target.value))}/></div>
-                <div className="col-md-3 mb-3 d-flex align-items-end"><div className="form-check mb-2"><input className="form-check-input" type="checkbox" id="b-active" checked={form.is_active} onChange={e=>f('is_active',e.target.checked)}/><label className="form-check-label text-sm" htmlFor="b-active">Active</label></div></div>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(2,1fr)', gap:14, marginBottom:14 }}>
+                <div><label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Title</label><input className="form-control" value={form.title} onChange={e=>f('title',e.target.value)}/></div>
+                <div><label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Tag (e.g. NEW SERVICE)</label><input className="form-control" value={form.tag||''} onChange={e=>f('tag',e.target.value)}/></div>
+                <div style={{ gridColumn:'1 / -1' }}><label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Subtitle</label><input className="form-control" value={form.subtitle||''} onChange={e=>f('subtitle',e.target.value)}/></div>
+                <div><label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Emoji</label><input className="form-control" value={form.emoji} onChange={e=>f('emoji',e.target.value)}/></div>
+                <div><label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Text Color</label><input type="color" className="form-control" value={form.text_color} onChange={e=>f('text_color',e.target.value)}/></div>
+                <div style={{ gridColumn:'1 / -1' }}><label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Background (CSS gradient or color)</label><input className="form-control" value={form.bg} onChange={e=>f('bg',e.target.value)}/></div>
+                <div><label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Promo Code</label><input className="form-control" value={form.promo_code||''} onChange={e=>f('promo_code',e.target.value)}/></div>
+                <div><label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Link Path</label><input className="form-control" value={form.link_path||''} onChange={e=>f('link_path',e.target.value)} placeholder="/movers"/></div>
+                <div><label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Sort</label><input type="number" className="form-control" value={form.sort_order} onChange={e=>f('sort_order',Number(e.target.value))}/></div>
+                <div style={{ display:'flex', alignItems:'flex-end' }}>
+                  <label style={{ display:'flex', alignItems:'center', gap:7, fontSize:12.5, fontWeight:700, color:'var(--ink-2)', cursor:'pointer' }}>
+                    <input type="checkbox" checked={form.is_active} onChange={e=>f('is_active',e.target.checked)} style={{ width:15, height:15 }} /> Active
+                  </label>
+                </div>
               </div>
             ) : (
-              <div className="row">
-                <div className="col-12 mb-2"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Question</label><input className="form-control" value={form.question} onChange={e=>f('question',e.target.value)}/></div>
-                <div className="col-12 mb-2"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Answer</label><textarea className="form-control" rows={3} value={form.answer} onChange={e=>f('answer',e.target.value)}/></div>
-                <div className="col-md-4 mb-2"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Category</label><select className="form-control" value={form.category} onChange={e=>f('category',e.target.value)}>{FAQ_CATEGORIES.map(c=><option key={c} value={c}>{c}</option>)}</select></div>
-                <div className="col-md-4 mb-2"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Audience</label><select className="form-control" value={form.audience} onChange={e=>f('audience',e.target.value)}><option value="customers">Customers</option><option value="partners">Partners</option><option value="all">All</option></select></div>
-                <div className="col-md-4 mb-3"><label className="text-xs font-weight-bold text-uppercase" style={{letterSpacing:'0.05rem'}}>Sort</label><input type="number" className="form-control" value={form.sort_order} onChange={e=>f('sort_order',Number(e.target.value))}/></div>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:14, marginBottom:14 }}>
+                <div style={{ gridColumn:'1 / -1' }}><label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Question</label><input className="form-control" value={form.question} onChange={e=>f('question',e.target.value)}/></div>
+                <div style={{ gridColumn:'1 / -1' }}><label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Answer</label><textarea className="form-control" rows={3} value={form.answer} onChange={e=>f('answer',e.target.value)}/></div>
+                <div><label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Category</label><select className="form-control" value={form.category} onChange={e=>f('category',e.target.value)}>{FAQ_CATEGORIES.map(c=><option key={c} value={c}>{c}</option>)}</select></div>
+                <div><label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Audience</label><select className="form-control" value={form.audience} onChange={e=>f('audience',e.target.value)}><option value="customers">Customers</option><option value="partners">Partners</option><option value="all">All</option></select></div>
+                <div><label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Sort</label><input type="number" className="form-control" value={form.sort_order} onChange={e=>f('sort_order',Number(e.target.value))}/></div>
               </div>
             )}
             <div style={{ display:'flex', gap:8 }}>
@@ -4228,11 +4271,11 @@ function ContentSection() {
 
 // ── SECTION: Wallets & Security Deposits ─────────────────────────
 const DEPOSIT_STATUS_META = {
-  not_paid:  { label: 'Not Paid',  color: '#e74a3b', bg: '#fde8e8' },
-  pending:   { label: 'Pending',   color: '#f59e0b', bg: '#fef3c7' },
-  held:      { label: 'Held ✓',    color: '#1cc88a', bg: '#d1fae5' },
-  refunded:  { label: 'Refunded',  color: '#4e73df', bg: '#e8eeff' },
-  forfeited: { label: 'Forfeited', color: '#6c757d', bg: '#f0f0f0' },
+  not_paid:  { label: 'Not Paid',  color: 'var(--red)',   bg: 'rgba(239,68,68,0.1)' },
+  pending:   { label: 'Pending',   color: 'var(--amber)', bg: 'rgba(245,158,11,0.1)' },
+  held:      { label: 'Held',      color: 'var(--green)', bg: 'rgba(22,163,74,0.1)' },
+  refunded:  { label: 'Refunded',  color: 'var(--blue)',  bg: 'rgba(59,130,246,0.1)' },
+  forfeited: { label: 'Forfeited', color: 'var(--muted)', bg: 'var(--canvas)' },
 };
 
 function WalletsSection() {
@@ -4406,10 +4449,10 @@ function WalletsSection() {
 
       {/* ── KPI strip ── */}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', gap:14, marginBottom:20 }}>
-        <StatCard icon="🔒" label="Blocked Partners" value={blocked} color={blocked > 0 ? 'var(--red)' : 'var(--green)'} />
-        <StatCard icon="💰" label="Wallet Balance (total)" value={`KSh ${(stats.totalWalletBalance||0).toLocaleString()}`} color="var(--gold)" />
-        <StatCard icon="🛡️" label="Deposits Held" value={`KSh ${(stats.totalDepositsHeld||0).toLocaleString()}`} color="var(--blue)" />
-        <StatCard icon="⚠️" label="Deposits Not Paid" value={stats.depositNotPaid||0} color={stats.depositNotPaid > 0 ? 'var(--amber)' : 'var(--green)'} />
+        <StatCard icon={<Lock size={22} color={blocked > 0 ? 'var(--red)' : 'var(--green)'} />} label="Blocked Partners" value={blocked} color={blocked > 0 ? 'var(--red)' : 'var(--green)'} />
+        <StatCard icon={<Wallet size={22} color="var(--gold)" />} label="Wallet Balance (total)" value={`KSh ${(stats.totalWalletBalance||0).toLocaleString()}`} color="var(--gold)" />
+        <StatCard icon={<ShieldCheck size={22} color="var(--blue)" />} label="Deposits Held" value={`KSh ${(stats.totalDepositsHeld||0).toLocaleString()}`} color="var(--blue)" />
+        <StatCard icon={<AlertCircle size={22} color={stats.depositNotPaid > 0 ? 'var(--amber)' : 'var(--green)'} />} label="Deposits Not Paid" value={stats.depositNotPaid||0} color={stats.depositNotPaid > 0 ? 'var(--amber)' : 'var(--green)'} />
       </div>
 
       {/* ── Tabs ── */}
@@ -5291,40 +5334,40 @@ function PartnerPerformanceSection() {
 
   const ratingBar = (val) => {
     const pct = val ? (parseFloat(val) / 5) * 100 : 0;
-    const color = pct >= 80 ? '#1cc88a' : pct >= 60 ? '#f6c23e' : '#e74a3b';
+    const color = pct >= 80 ? 'var(--green)' : pct >= 60 ? 'var(--amber)' : 'var(--red)';
     return (
       <div style={{ display:'flex',alignItems:'center',gap:6 }}>
-        <div style={{ flex:1,height:6,background:'#e3e6f0',borderRadius:3,overflow:'hidden' }}>
+        <div style={{ flex:1,height:6,background:'var(--line)',borderRadius:3,overflow:'hidden' }}>
           <div style={{ width:`${pct}%`,height:'100%',background:color,borderRadius:3 }} />
         </div>
-        <span className="text-xs font-weight-bold" style={{ color, minWidth:28 }}>{val||'—'}</span>
+        <span style={{ fontSize:11.5, fontWeight:700, color, minWidth:28 }}>{val||'—'}</span>
       </div>
     );
   };
 
   const pctBadge = (val, invert = false) => {
-    if (val === null) return <span className="text-xs text-gray-500">—</span>;
+    if (val === null) return <span style={{ fontSize:11.5, color:'var(--muted)' }}>—</span>;
     const good = invert ? val < 10 : val >= 80;
     const warn = invert ? val < 20 : val >= 60;
-    const color = good ? '#1cc88a' : warn ? '#f6c23e' : '#e74a3b';
-    return <span className="text-xs font-weight-bold" style={{ color }}>{val}%</span>;
+    const color = good ? 'var(--green)' : warn ? 'var(--amber)' : 'var(--red)';
+    return <span style={{ fontSize:11.5, fontWeight:700, color }}>{val}%</span>;
   };
 
   return (
     <>
       <PageHeader title="Partner Performance" sub="Ratings, completion rates and cancellation rates across all approved partners" />
-      <div className="d-flex flex-wrap gap-2 mb-3 align-items-center">
-        <div>
-          <span className="text-xs text-gray-500 mr-2">Role:</span>
+      <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:16, alignItems:'center' }}>
+        <div style={{ display:'flex', flexWrap:'wrap', alignItems:'center', gap:4 }}>
+          <span style={{ fontSize:11.5, color:'var(--muted)', marginRight:4 }}>Role:</span>
           {ROLES.map(r => (
             <FilterPill key={r} active={roleFilter===r} onClick={() => setRoleFilter(r)}>
               {r === 'all' ? 'All' : ROLE_LABEL[r] || r}
             </FilterPill>
           ))}
         </div>
-        <div className="ml-auto">
-          <span className="text-xs text-gray-500 mr-1">Sort:</span>
-          <select className="form-control form-control-sm d-inline-block" style={{ width:'auto',fontSize:12 }} value={sort} onChange={e => setSort(e.target.value)}>
+        <div style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:6 }}>
+          <span style={{ fontSize:11.5, color:'var(--muted)' }}>Sort:</span>
+          <select className="form-control form-control-sm" style={{ width:'auto',fontSize:12 }} value={sort} onChange={e => setSort(e.target.value)}>
             <option value="rating">Highest Rating</option>
             <option value="completion">Best Completion</option>
             <option value="jobs">Most Jobs</option>
@@ -5333,36 +5376,40 @@ function PartnerPerformanceSection() {
         </div>
       </div>
       {loading ? <Spinner /> : (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Partner</th>
-              <th>Role</th>
-              <th>Avg Rating</th>
-              <th>Completion</th>
-              <th>Cancellation</th>
-              <th>Total Jobs</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sorted.map(p => (
-              <tr key={p.id}>
-                <td>
-                  <div className="font-weight-bold text-gray-800 text-xs">{p.full_name || '—'}</div>
-                  <div className="text-xs text-gray-500">Since {new Date(p.created_at).toLocaleDateString('en-KE')}</div>
-                </td>
-                <td><RoleBadge role={p.partner_role} /></td>
-                <td style={{ minWidth:120 }}>{ratingBar(p.avg_rating)}</td>
-                <td>{pctBadge(p.completion_rate)}</td>
-                <td>{pctBadge(p.cancellation_rate, true)}</td>
-                <td className="font-weight-bold text-gray-800">{p.total}</td>
-              </tr>
-            ))}
-            {sorted.length === 0 && (
-              <tr><td colSpan={6} className="text-center text-gray-500 py-4">No approved partners found.</td></tr>
-            )}
-          </tbody>
-        </table>
+        <div className="admin-card">
+          <div style={{ overflowX:'auto' }}>
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Partner</th>
+                  <th>Role</th>
+                  <th>Avg Rating</th>
+                  <th>Completion</th>
+                  <th>Cancellation</th>
+                  <th>Total Jobs</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sorted.map(p => (
+                  <tr key={p.id}>
+                    <td>
+                      <div style={{ fontWeight:700, color:'var(--ink)', fontSize:12.5 }}>{p.full_name || '—'}</div>
+                      <div style={{ fontSize:11, color:'var(--muted)' }}>Since {new Date(p.created_at).toLocaleDateString('en-KE')}</div>
+                    </td>
+                    <td><RoleBadge role={p.partner_role} /></td>
+                    <td style={{ minWidth:120 }}>{ratingBar(p.avg_rating)}</td>
+                    <td>{pctBadge(p.completion_rate)}</td>
+                    <td>{pctBadge(p.cancellation_rate, true)}</td>
+                    <td style={{ fontWeight:700, color:'var(--ink)' }}>{p.total}</td>
+                  </tr>
+                ))}
+                {sorted.length === 0 && (
+                  <tr><td colSpan={6} style={{ textAlign:'center', color:'var(--muted)', padding:24 }}>No approved partners found.</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
     </>
   );
@@ -5421,10 +5468,10 @@ function ReconciliationSection() {
     <>
       <PageHeader title="Financial Reconciliation" sub="30-day revenue vs payouts — daily breakdown" />
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', gap:14, marginBottom:20 }}>
-        <StatCard icon="💰" label="Total Revenue"    value={fmt(summary.revenue)} color="var(--green)" />
-        <StatCard icon="💸" label="Total Payouts"    value={fmt(summary.payouts)} color="var(--red)" />
-        <StatCard icon="↩️" label="Refunds Approved" value={summary.refunds}      color="var(--amber)" />
-        <StatCard icon="🏦" label="Net Position"     value={fmt(summary.net)}     color={summary.net >= 0 ? 'var(--blue)' : 'var(--red)'} />
+        <StatCard icon={<Wallet size={22} color="var(--green)" />} label="Total Revenue" value={fmt(summary.revenue)} color="var(--green)" />
+        <StatCard icon={<Send size={22} color="var(--red)" />} label="Total Payouts" value={fmt(summary.payouts)} color="var(--red)" />
+        <StatCard icon={<RotateCcw size={22} color="var(--amber)" />} label="Refunds Approved" value={summary.refunds} color="var(--amber)" />
+        <StatCard icon={<Wallet size={22} color={summary.net >= 0 ? 'var(--blue)' : 'var(--red)'} />} label="Net Position" value={fmt(summary.net)} color={summary.net >= 0 ? 'var(--blue)' : 'var(--red)'} />
       </div>
       {loading ? <Spinner /> : rows.length === 0 ? (
         <div style={{ textAlign:'center', padding:'56px 0', color:'var(--muted)' }}>No payment data in the last 30 days.</div>
@@ -6164,7 +6211,7 @@ function DispatchSection() {
         ))}
         <button onClick={() => window.dispatchEvent(new CustomEvent('fixera-nav', { detail:'live_ops' }))}
           style={{ marginLeft:'auto', background:'var(--navy)', border:'1px solid rgba(255,255,255,0.15)',
-            color:'#48BB78', fontSize:12, fontWeight:700, padding:'6px 14px', borderRadius:8,
+            color:'var(--green)', fontSize:12, fontWeight:700, padding:'6px 14px', borderRadius:8,
             cursor:'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', gap:6 }}>
           <MapIcon size={13} /> Live Map
         </button>
@@ -7453,93 +7500,97 @@ function TeamManagementSection() {
     catch (e) { alert(e.message); }
   };
 
-  const inputSt = { width: '100%', boxSizing: 'border-box', padding: '10px 12px', borderRadius: 8, border: '1px solid #d9dee7', fontSize: 13, fontFamily: 'inherit', outline: 'none' };
+  const inputSt = { width: '100%', boxSizing: 'border-box', padding: '10px 12px', borderRadius: 9, border: '1px solid var(--line-2)', fontSize: 13, fontFamily: 'inherit', outline: 'none' };
 
   return (
-    <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6, flexWrap: 'wrap', gap: 10 }}>
-        <div>
-          <h2 style={{ margin: 0 }}>Team &amp; Agents</h2>
-          <p style={{ margin: '4px 0 0', color: '#858796', fontSize: 13 }}>Create staff accounts and assign each one to a department. Agents only see the tools for their department.</p>
-        </div>
-        <button className="btn btn-primary" onClick={() => { setShowAdd(s => !s); setErr(''); }}>
-          {showAdd ? 'Cancel' : '+ Add Agent'}
-        </button>
-      </div>
+    <>
+      <PageHeader title="Team & Agents" sub="Create staff accounts and assign each one to a department. Agents only see the tools for their department."
+        action={<button onClick={() => { setShowAdd(s => !s); setErr(''); }}
+          style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'8px 14px', borderRadius:9, background: showAdd ? 'var(--surface)' : 'var(--gold)', color: showAdd ? 'var(--ink-2)' : '#fff', border: showAdd ? '1px solid var(--line-2)' : 'none', fontSize:12.5, fontWeight:700, cursor:'pointer' }}>
+          {showAdd ? <><X size={14} /> Cancel</> : <><Plus size={14} /> Add Agent</>}
+        </button>} />
 
-      {err && <div style={{ background: 'rgba(231,74,59,0.08)', border: '1px solid rgba(231,74,59,0.3)', color: '#e74a3b', padding: '10px 14px', borderRadius: 8, fontSize: 13, margin: '12px 0' }}>{err}</div>}
+      {err && <div style={{ display:'flex', alignItems:'center', gap:8, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.3)', color: 'var(--red)', padding: '10px 14px', borderRadius: 9, fontSize: 13, marginBottom: 16 }}><AlertCircle size={14} /> {err}</div>}
 
       {showAdd && (
-        <div style={{ background: '#fff', border: '1px solid #e3e6f0', borderRadius: 12, padding: 18, margin: '14px 0' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 12 }}>
-            <div>
-              <label style={{ fontSize: 12, fontWeight: 700, color: '#5a5c69' }}>Full name</label>
-              <input style={inputSt} value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} placeholder="e.g. Jane Wanjiru" />
+        <div className="admin-card" style={{ borderLeft:'4px solid var(--gold)', marginBottom:20 }}>
+          <div style={{ padding:18 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 14 }}>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Full name</label>
+                <input style={inputSt} value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} placeholder="e.g. Jane Wanjiru" />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Email</label>
+                <input style={inputSt} type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="agent@fixera.africa" />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Temporary password</label>
+                <input style={inputSt} value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} placeholder="min 8 characters" />
+              </div>
+              <div>
+                <label style={{ fontSize: 11, fontWeight: 700, color: 'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, display:'block', marginBottom:5 }}>Department</label>
+                <select style={inputSt} value={form.admin_role} onChange={e => setForm(f => ({ ...f, admin_role: e.target.value }))}>
+                  {AGENT_ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+                </select>
+              </div>
             </div>
-            <div>
-              <label style={{ fontSize: 12, fontWeight: 700, color: '#5a5c69' }}>Email</label>
-              <input style={inputSt} type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="agent@fixera.africa" />
+            <p style={{ color: 'var(--muted)', fontSize: 12, margin: '10px 0 0' }}>{AGENT_ROLES.find(r => r.value === form.admin_role)?.desc}</p>
+            <div style={{ marginTop: 14, display: 'flex', gap: 8 }}>
+              <button disabled={saving} onClick={handleCreate}
+                style={{ padding:'9px 18px', borderRadius:9, border:'none', background:'var(--gold)', color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer' }}>
+                {saving ? 'Creating…' : 'Create Agent'}
+              </button>
             </div>
-            <div>
-              <label style={{ fontSize: 12, fontWeight: 700, color: '#5a5c69' }}>Temporary password</label>
-              <input style={inputSt} value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} placeholder="min 8 characters" />
-            </div>
-            <div>
-              <label style={{ fontSize: 12, fontWeight: 700, color: '#5a5c69' }}>Department</label>
-              <select style={inputSt} value={form.admin_role} onChange={e => setForm(f => ({ ...f, admin_role: e.target.value }))}>
-                {AGENT_ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
-              </select>
-            </div>
+            <p style={{ color: 'var(--muted)', fontSize: 11, margin: '10px 0 0' }}>The agent logs in at <strong>/admin/login</strong> with this email + password. Ask them to reset their password after first login.</p>
           </div>
-          <p style={{ color: '#858796', fontSize: 12, margin: '10px 0 0' }}>{AGENT_ROLES.find(r => r.value === form.admin_role)?.desc}</p>
-          <div style={{ marginTop: 14, display: 'flex', gap: 8 }}>
-            <button className="btn btn-primary" disabled={saving} onClick={handleCreate}>{saving ? 'Creating…' : 'Create Agent'}</button>
-          </div>
-          <p style={{ color: '#858796', fontSize: 11, margin: '10px 0 0' }}>The agent logs in at <strong>/admin/login</strong> with this email + password. Ask them to reset their password after first login.</p>
         </div>
       )}
 
-      {loading ? <p style={{ color: '#858796' }}>Loading team…</p> : (
-        <div style={{ background: '#fff', border: '1px solid #e3e6f0', borderRadius: 12, overflow: 'hidden', marginTop: 8 }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-            <thead>
-              <tr style={{ background: '#f8f9fc', textAlign: 'left', color: '#5a5c69' }}>
-                <th style={{ padding: '12px 16px' }}>Name</th>
-                <th style={{ padding: '12px 16px' }}>Email</th>
-                <th style={{ padding: '12px 16px' }}>Department</th>
-                <th style={{ padding: '12px 16px' }}></th>
-              </tr>
-            </thead>
-            <tbody>
-              {agents.length === 0 ? (
-                <tr><td colSpan={4} style={{ padding: 20, color: '#858796', textAlign: 'center' }}>No staff accounts yet. Add your first agent above.</td></tr>
-              ) : agents.map(a => {
-                const isMe = a.id === user?.id;
-                return (
-                  <tr key={a.id} style={{ borderTop: '1px solid #eaecf4' }}>
-                    <td style={{ padding: '12px 16px', fontWeight: 700 }}>{a.full_name || '—'}{isMe && <span style={{ marginLeft: 8, fontSize: 10, color: '#4e73df', fontWeight: 700 }}>(you)</span>}</td>
-                    <td style={{ padding: '12px 16px', color: '#5a5c69' }}>{a.email || '—'}</td>
-                    <td style={{ padding: '12px 16px' }}>
-                      {isMe ? (
-                        <span style={{ fontWeight: 700 }}>{roleLabel(a.admin_role)}</span>
-                      ) : (
-                        <select value={a.admin_role || 'support'} onChange={e => handleRoleChange(a.id, e.target.value)}
-                          style={{ padding: '6px 10px', borderRadius: 8, border: '1px solid #d9dee7', fontSize: 12, fontFamily: 'inherit' }}>
-                          {AGENT_ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
-                        </select>
-                      )}
-                    </td>
-                    <td style={{ padding: '12px 16px', textAlign: 'right' }}>
-                      {!isMe && <button className="btn btn-sm" style={{ color: '#e74a3b', border: '1px solid rgba(231,74,59,0.3)', background: 'rgba(231,74,59,0.06)' }} onClick={() => handleRevoke(a)}>Remove</button>}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+      {loading ? <Spinner /> : (
+        <div className="admin-card">
+          <div style={{ overflowX:'auto' }}>
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Department</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {agents.length === 0 ? (
+                  <tr><td colSpan={4} style={{ padding: 24, color: 'var(--muted)', textAlign: 'center' }}>No staff accounts yet. Add your first agent above.</td></tr>
+                ) : agents.map(a => {
+                  const isMe = a.id === user?.id;
+                  return (
+                    <tr key={a.id}>
+                      <td style={{ fontWeight: 700, color:'var(--ink)' }}>{a.full_name || '—'}{isMe && <span style={{ marginLeft: 8, fontSize: 10, color: 'var(--blue)', fontWeight: 700 }}>(you)</span>}</td>
+                      <td style={{ color: 'var(--muted)' }}>{a.email || '—'}</td>
+                      <td>
+                        {isMe ? (
+                          <span style={{ fontWeight: 700, color:'var(--ink)' }}>{roleLabel(a.admin_role)}</span>
+                        ) : (
+                          <select value={a.admin_role || 'support'} onChange={e => handleRoleChange(a.id, e.target.value)}
+                            style={{ padding: '6px 10px', borderRadius: 8, border: '1px solid var(--line-2)', fontSize: 12, fontFamily: 'inherit' }}>
+                            {AGENT_ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+                          </select>
+                        )}
+                      </td>
+                      <td style={{ textAlign: 'right' }}>
+                        {!isMe && <button onClick={() => handleRevoke(a)}
+                          style={{ fontSize:11, fontWeight:700, padding:'6px 12px', borderRadius:8, color: 'var(--red)', border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.06)', cursor:'pointer' }}>Remove</button>}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 
