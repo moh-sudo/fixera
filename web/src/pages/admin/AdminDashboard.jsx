@@ -30,7 +30,7 @@ import {
   Megaphone, Wrench, Image as ImageIcon, Tag, Star, BarChart3, Map as MapIcon,
   LineChart as LineChartIcon, Activity, MapPin, ShieldAlert, Lock, Settings, UserCog,
   Search, Mail, HelpCircle, ChevronDown, Home, LogOut, UserRound,
-  Handshake, Smartphone, Flag, Save, StickyNote, Clock, Plus, AlertCircle,
+  Handshake, Smartphone, Flag, Save, StickyNote, Clock, Plus, AlertCircle, ShieldCheck,
 } from 'lucide-react';
 
 // ── Audit helper ─────────────────────────────────────────────────
@@ -1863,62 +1863,67 @@ function WorkforceSection() {
     (!search || v.plate_number?.toLowerCase().includes(search.toLowerCase()))
   );
 
+  const verifyBtnSt = (verified) => ({ display:'inline-flex', alignItems:'center', gap:5, padding:'5px 11px', borderRadius:7, fontSize:11, fontWeight:700, cursor:'pointer', border: verified ? '1px solid rgba(239,68,68,.35)' : 'none', background: verified ? 'rgba(239,68,68,.08)' : 'var(--green)', color: verified ? 'var(--red)' : '#fff' });
+
   return (
     <>
       <PageHeader title="Workforce Directory" sub="Every crew member & vehicle across all partners — Fixera's permanent record" />
 
-      <div className="mb-2">
-        <FilterPill active={tab==='crew'} onClick={() => setTab('crew')}>👥 Crew ({crew.length})</FilterPill>
-        <FilterPill active={tab==='vehicles'} onClick={() => setTab('vehicles')}>🚚 Vehicles ({fleet.length})</FilterPill>
+      <div style={{ marginBottom:8 }}>
+        <FilterPill active={tab==='crew'} onClick={() => setTab('crew')}><span style={{ display:'inline-flex', alignItems:'center', gap:6 }}><Users size={13} /> Crew ({crew.length})</span></FilterPill>
+        <FilterPill active={tab==='vehicles'} onClick={() => setTab('vehicles')}><span style={{ display:'inline-flex', alignItems:'center', gap:6 }}><Truck size={13} /> Vehicles ({fleet.length})</span></FilterPill>
       </div>
-      <div className="mb-2">
-        {[{k:'all',l:'All'},{k:'yes',l:'✓ Verified'},{k:'no',l:'Unverified'}].map(f =>
-          <FilterPill key={f.k} active={verF===f.k} onClick={() => setVerF(f.k)}>{f.l}</FilterPill>)}
+      <div style={{ marginBottom:8 }}>
+        {[{k:'all',l:'All'},{k:'yes',l:'Verified',Icon:BadgeCheck},{k:'no',l:'Unverified'}].map(f =>
+          <FilterPill key={f.k} active={verF===f.k} onClick={() => setVerF(f.k)}><span style={{ display:'inline-flex', alignItems:'center', gap:6 }}>{f.Icon && <f.Icon size={13} />}{f.l}</span></FilterPill>)}
       </div>
       {tab === 'crew' && (
-        <div className="mb-2">
-          {[{k:'all',l:'All types'},{k:'mover',l:'🚚 Mover'},{k:'vendor',l:'🏪 Vendor'},{k:'water_carrier',l:'🚰 Water'},{k:'supplier',l:'📦 Supplier'}].map(f =>
-            <FilterPill key={f.k} active={roleF===f.k} onClick={() => setRoleF(f.k)}>{f.l}</FilterPill>)}
+        <div style={{ marginBottom:8 }}>
+          {[{k:'all',l:'All types'},{k:'mover',l:'Mover',Icon:Truck},{k:'vendor',l:'Vendor',Icon:Store},{k:'water_carrier',l:'Water',Icon:Droplets},{k:'supplier',l:'Supplier',Icon:Package}].map(f =>
+            <FilterPill key={f.k} active={roleF===f.k} onClick={() => setRoleF(f.k)}><span style={{ display:'inline-flex', alignItems:'center', gap:6 }}>{f.Icon && <f.Icon size={13} />}{f.l}</span></FilterPill>)}
         </div>
       )}
-      <input value={search} onChange={e => setSearch(e.target.value)} placeholder={tab==='crew'?'🔍 Name or ID…':'🔍 Plate…'} className="form-control form-control-sm mb-3" style={{ maxWidth: 360 }} />
+      <label className="topbar-search" style={{ maxWidth:300, marginBottom:18 }}>
+        <Search size={15} />
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder={tab==='crew'?'Name or ID…':'Plate…'} />
+      </label>
 
       {loading ? <Spinner /> : tab === 'crew' ? (
-        crewFiltered.length === 0 ? <Empty /> : (
-          <div className="admin-card"><div className="table-responsive"><table className="admin-table">
+        crewFiltered.length === 0 ? <Empty Icon={Contact} /> : (
+          <div className="admin-card"><div style={{ overflowX:'auto' }}><table className="admin-table">
             <thead><tr><th>Worker</th><th>Partner</th><th>Position</th><th>ID</th><th>Verified</th><th></th></tr></thead>
             <tbody>{crewFiltered.map(m => {
               const lead = ['team_leader','supervisor'].includes(m.default_position);
               return (
                 <tr key={m.id}>
-                  <td className="d-flex align-items-center" style={{ gap: 8 }}>
-                    <div style={{ width:32, height:32, borderRadius:'50%', overflow:'hidden', background:'#f0f0f0', display:'flex', alignItems:'center', justifyContent:'center' }}>
-                      {m.photo_url ? <img src={m.photo_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : '👤'}
+                  <td style={{ display:'flex', alignItems:'center', gap:9 }}>
+                    <div style={{ width:32, height:32, borderRadius:'50%', overflow:'hidden', background:'var(--line)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                      {m.photo_url ? <img src={m.photo_url} alt="" style={{ width:'100%', height:'100%', objectFit:'cover' }} /> : <UserRound size={15} color="var(--muted)" />}
                     </div>
-                    <span className="font-weight-bold text-xs">{m.full_name}{lead && ' ⭐'}</span>
+                    <span style={{ fontWeight:700, color:'var(--ink)', display:'inline-flex', alignItems:'center', gap:5 }}>{m.full_name}{lead && <Star size={12} color="var(--gold)" fill="var(--gold)" />}</span>
                   </td>
-                  <td className="text-xs">{m.partner?.business_name || m.partner?.full_name || '—'}<div className="text-gray-500">{(m.partner_type||m.partner?.partner_role||'').replace(/_/g,' ')}</div></td>
-                  <td className="text-xs">{(m.default_position||'').replace(/_/g,' ')}</td>
-                  <td className="text-xs">{m.national_id || '—'}</td>
-                  <td>{m.fixera_verified ? <span className="sb-badge sb-badge-success">✓</span> : <span className="sb-badge sb-badge-secondary">—</span>}</td>
-                  <td><button onClick={() => verifyCrew(m.id, !m.fixera_verified)} className={`btn btn-sm ${m.fixera_verified?'btn-outline-danger':'btn-success'}`} style={{fontSize:11}}>{m.fixera_verified?'Unverify':'Verify'}</button></td>
+                  <td style={{ color:'var(--ink-2)' }}>{m.partner?.business_name || m.partner?.full_name || '—'}<div style={{ color:'var(--muted)', fontSize:11 }}>{(m.partner_type||m.partner?.partner_role||'').replace(/_/g,' ')}</div></td>
+                  <td style={{ color:'var(--ink-2)' }}>{(m.default_position||'').replace(/_/g,' ')}</td>
+                  <td style={{ color:'var(--ink-2)' }}>{m.national_id || '—'}</td>
+                  <td>{m.fixera_verified ? <span className="sb-badge sb-badge-success">Verified</span> : <span className="sb-badge sb-badge-secondary">—</span>}</td>
+                  <td><button onClick={() => verifyCrew(m.id, !m.fixera_verified)} style={verifyBtnSt(m.fixera_verified)}>{m.fixera_verified ? 'Unverify' : 'Verify'}</button></td>
                 </tr>
               );
             })}</tbody>
           </table></div></div>
         )
       ) : (
-        fleetFiltered.length === 0 ? <Empty /> : (
-          <div className="admin-card"><div className="table-responsive"><table className="admin-table">
+        fleetFiltered.length === 0 ? <Empty Icon={Truck} /> : (
+          <div className="admin-card"><div style={{ overflowX:'auto' }}><table className="admin-table">
             <thead><tr><th>Vehicle</th><th>Mover</th><th>Plate</th><th>Insurance</th><th>Verified</th><th></th></tr></thead>
             <tbody>{fleetFiltered.map(v => { const ins = insBadge(v.insurance_expiry); return (
               <tr key={v.id}>
-                <td className="text-xs">{(v.vehicle_type||'').replace(/_/g,' ').toUpperCase()}<div className="text-gray-500">{[v.year,v.make,v.model].filter(Boolean).join(' ')}</div></td>
-                <td className="text-xs">{v.owner?.business_name || v.owner?.full_name || '—'}</td>
-                <td><span style={{ background:'#000', color:'#fff', fontFamily:'monospace', fontSize:11, padding:'2px 8px', borderRadius:4, letterSpacing:1 }}>{v.plate_number}</span></td>
-                <td><span style={{ color: ins.c, fontSize:11, fontWeight:700 }}>🛡️ {ins.t}</span></td>
-                <td>{v.fixera_verified ? <span className="sb-badge sb-badge-success">✓</span> : <span className="sb-badge sb-badge-secondary">—</span>}</td>
-                <td><button onClick={() => verifyVeh(v.id, !v.fixera_verified)} className={`btn btn-sm ${v.fixera_verified?'btn-outline-danger':'btn-success'}`} style={{fontSize:11}}>{v.fixera_verified?'Unverify':'Verify'}</button></td>
+                <td style={{ color:'var(--ink-2)' }}>{(v.vehicle_type||'').replace(/_/g,' ').toUpperCase()}<div style={{ color:'var(--muted)', fontSize:11 }}>{[v.year,v.make,v.model].filter(Boolean).join(' ')}</div></td>
+                <td style={{ color:'var(--ink-2)' }}>{v.owner?.business_name || v.owner?.full_name || '—'}</td>
+                <td><span style={{ background:'var(--ink)', color:'#fff', fontFamily:'ui-monospace,monospace', fontSize:11, padding:'2px 9px', borderRadius:5, letterSpacing:1 }}>{v.plate_number}</span></td>
+                <td><span style={{ display:'inline-flex', alignItems:'center', gap:5, color: ins.c, fontSize:11, fontWeight:700 }}><ShieldCheck size={13} /> {ins.t}</span></td>
+                <td>{v.fixera_verified ? <span className="sb-badge sb-badge-success">Verified</span> : <span className="sb-badge sb-badge-secondary">—</span>}</td>
+                <td><button onClick={() => verifyVeh(v.id, !v.fixera_verified)} style={verifyBtnSt(v.fixera_verified)}>{v.fixera_verified ? 'Unverify' : 'Verify'}</button></td>
               </tr>
             );})}</tbody>
           </table></div></div>
@@ -1927,7 +1932,14 @@ function WorkforceSection() {
     </>
   );
 
-  function Empty() { return <div className="text-center py-5"><div style={{fontSize:48}}>🪪</div><p className="text-gray-500 mt-2">None found.</p></div>; }
+  function Empty({ Icon = Contact }) {
+    return (
+      <div style={{ textAlign:'center', padding:'56px 0' }}>
+        <div style={{ width:56, height:56, borderRadius:16, background:'var(--line)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 14px' }}><Icon size={26} color="var(--muted)" /></div>
+        <p style={{ color:'var(--muted)', margin:0 }}>None found.</p>
+      </div>
+    );
+  }
 }
 
 function ProductApprovalsSection() {
@@ -3045,7 +3057,7 @@ function OrdersSection() {
 }
 
 // ── SECTION: Dedicated Partner Type ──────────────────────────────
-function PartnerTypeSection({ role, label, icon, color }) {
+function PartnerTypeSection({ role, label, Icon, color }) {
   const [partners, setPartners] = useState([]);
   const [loading,  setLoading]  = useState(true);
   const [filter,   setFilter]   = useState('all');
@@ -3057,31 +3069,42 @@ function PartnerTypeSection({ role, label, icon, color }) {
     q.then(({data}) => { setPartners(data||[]); setLoading(false); });
   }, [role, filter]);
 
+  const FILTERS = [
+    { k:'all', label:'All' }, { k:'pending', label:'Pending' }, { k:'approved', label:'Approved' },
+    { k:'rejected', label:'Rejected' }, { k:'suspended', label:'Suspended' },
+  ];
+
   return (
     <>
-      <PageHeader title={`${icon} ${label}`} sub={`All ${label} registered on Fixera`} />
-      <div className="mb-3">
-        {['all','pending','approved','rejected','suspended'].map(f=>(
-          <FilterPill key={f} active={filter===f} onClick={()=>setFilter(f)}>{f==='all'?'All':f.charAt(0).toUpperCase()+f.slice(1)}</FilterPill>
-        ))}
+      <PageHeader title={label} sub={`All ${label} registered on Fixera`}
+        action={<div style={{ width:44, height:44, borderRadius:13, background:`${color}18`, display:'flex', alignItems:'center', justifyContent:'center' }}><Icon size={22} color={color} /></div>} />
+      <div style={{ marginBottom:16 }}>
+        {FILTERS.map(f => <FilterPill key={f.k} active={filter===f.k} onClick={()=>setFilter(f.k)}>{f.label}</FilterPill>)}
       </div>
       {loading ? <Spinner/> : partners.length === 0 ? (
-        <div className="text-center py-5"><div style={{fontSize:48}}>{icon}</div><p className="text-gray-500 mt-2">No {label} yet.</p></div>
+        <div style={{ textAlign:'center', padding:'56px 0' }}>
+          <div style={{ width:56, height:56, borderRadius:16, background:`${color}18`, display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 14px' }}><Icon size={26} color={color} /></div>
+          <p style={{ color:'var(--muted)', margin:0 }}>No {label} yet.</p>
+        </div>
       ) : (
-        <table className="admin-table">
-          <thead><tr><th>Name</th><th>Business</th><th>Status</th><th>Wallet</th><th>Joined</th></tr></thead>
-          <tbody>
-            {partners.map(p=>(
-              <tr key={p.id}>
-                <td className="text-xs font-weight-bold">{p.full_name||'—'}</td>
-                <td className="text-xs text-gray-600">{p.business_name||p.company_name||'—'}</td>
-                <td><SBBadge status={p.verification_status||'pending'}/></td>
-                <td className="text-xs">KSh {(p.wallet_balance||0).toLocaleString()}</td>
-                <td className="text-xs text-gray-500">{p.created_at ? new Date(p.created_at).toLocaleDateString('en-KE') : '—'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="admin-card">
+          <div style={{ overflowX:'auto' }}>
+            <table className="admin-table">
+              <thead><tr><th>Name</th><th>Business</th><th>Status</th><th>Wallet</th><th>Joined</th></tr></thead>
+              <tbody>
+                {partners.map(p=>(
+                  <tr key={p.id}>
+                    <td style={{ fontWeight:700, color:'var(--ink)' }}>{p.full_name||'—'}</td>
+                    <td style={{ color:'var(--ink-2)' }}>{p.business_name||p.company_name||'—'}</td>
+                    <td><SBBadge status={p.verification_status||'pending'}/></td>
+                    <td style={{ color:'var(--ink-2)' }}>KSh {(p.wallet_balance||0).toLocaleString()}</td>
+                    <td style={{ color:'var(--muted)' }}>{p.created_at ? new Date(p.created_at).toLocaleDateString('en-KE') : '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
     </>
   );
@@ -7938,9 +7961,9 @@ export default function AdminDashboard() {
     support:       <DisputesSection />,
     notifications: <NotificationsSection />,
     // ── Partner types ────────────────────────────────────────
-    vendors:       <PartnerTypeSection role="vendor"        label="Vendors"        icon="🏪" color="#fd7e14" />,
-    suppliers:     <PartnerTypeSection role="supplier"      label="Suppliers"      icon="📦" color="#20c997" />,
-    movers:        <PartnerTypeSection role="mover"         label="Movers"         icon="🚚" color="#9F7AEA" />,
+    vendors:       <PartnerTypeSection role="vendor"        label="Vendors"        Icon={Store} color="#3B82F6" />,
+    suppliers:     <PartnerTypeSection role="supplier"      label="Suppliers"      Icon={Package} color="#F59E0B" />,
+    movers:        <PartnerTypeSection role="mover"         label="Movers"         Icon={Truck} color="#7C6CF0" />,
     riders:        <RiderOpsSection />,
     water:         <WaterOpsSection />,
     // ── Monitoring sections ──────────────────────────────────
