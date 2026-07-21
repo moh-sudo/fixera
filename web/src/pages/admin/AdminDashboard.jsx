@@ -2781,12 +2781,12 @@ function OrdersSection() {
   const [selected, setSelected] = useState(null);
   const [updating, setUpdating] = useState(false);
 
-  const TYPE_ICON  = { booking:'🔧', moving:'🚚', supplier:'📦' };
-  const TYPE_COLOR = { booking:'#C9A020', moving:'#9F7AEA', supplier:'#fd7e14' };
+  const TYPE_ICON_COMP = { booking: Wrench, moving: Truck, supplier: Package };
+  const TYPE_COLOR = { booking:'var(--gold)', moving:'var(--violet)', supplier:'var(--amber)' };
   const STATUS_NEXT = {
-    pending:     { next:'confirmed',   label:'✅ Confirm' },
-    confirmed:   { next:'in_progress', label:'▶ Start' },
-    in_progress: { next:'completed',   label:'✅ Complete' },
+    pending:     { next:'confirmed',   label:'Confirm', Icon: BadgeCheck },
+    confirmed:   { next:'in_progress', label:'Start',   Icon: Radio },
+    in_progress: { next:'completed',   label:'Complete',Icon: CheckCircle2 },
     completed:   { label:null },
     cancelled:   { label:null },
   };
@@ -2845,165 +2845,148 @@ function OrdersSection() {
       <PageHeader title="Orders" sub="Unified view — bookings, moves, supplier orders — with status actions" />
 
       {/* KPI row */}
-      <div className="row mb-3">
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))', gap:12, marginBottom:20 }}>
         {[
-          { icon:'📋', label:'Total',     val:orders.length,                                      color:'#4e73df' },
-          { icon:'🔧', label:'Bookings',  val:orders.filter(o=>o._type==='booking').length,        color:'#C9A020' },
-          { icon:'🚚', label:'Moves',     val:orders.filter(o=>o._type==='moving').length,         color:'#9F7AEA' },
-          { icon:'📦', label:'Supplies',  val:orders.filter(o=>o._type==='supplier').length,       color:'#fd7e14' },
-          { icon:'⏳', label:'Pending',   val:orders.filter(o=>o.status==='pending').length,       color:'#F6AD55' },
-          { icon:'✅', label:'Completed', val:orders.filter(o=>o.status==='completed').length,     color:'#1cc88a' },
+          { Icon:ClipboardList, label:'Total',     val:orders.length,                                  color:'var(--blue)' },
+          { Icon:Wrench,        label:'Bookings',  val:orders.filter(o=>o._type==='booking').length,    color:'var(--gold)' },
+          { Icon:Truck,         label:'Moves',     val:orders.filter(o=>o._type==='moving').length,     color:'var(--violet)' },
+          { Icon:Package,       label:'Supplies',  val:orders.filter(o=>o._type==='supplier').length,   color:'var(--amber)' },
+          { Icon:Clock,         label:'Pending',   val:orders.filter(o=>o.status==='pending').length,   color:'var(--amber)' },
+          { Icon:CheckCircle2,  label:'Completed', val:orders.filter(o=>o.status==='completed').length, color:'var(--green)' },
         ].map(s => (
-          <div key={s.label} className="col-md-2 col-sm-4 mb-2">
-            <div className="admin-card"><div className="card-body py-2 text-center">
-              <div style={{ fontSize:16 }}>{s.icon}</div>
-              <div style={{ fontSize:20, fontWeight:900, color:s.color }}>{s.val}</div>
-              <div className="text-xs text-gray-500">{s.label}</div>
-            </div></div>
+          <div key={s.label} className="stat-card" style={{ textAlign:'center', padding:14 }}>
+            <div className="stat-ico" style={{ width:34, height:34, background:`${s.color}18`, margin:'0 auto 7px' }}><s.Icon size={16} color={s.color} /></div>
+            <div style={{ fontSize:18, fontWeight:800, color:'var(--ink)' }}>{s.val}</div>
+            <div style={{ fontSize:10.5, color:'var(--muted)', marginTop:2 }}>{s.label}</div>
           </div>
         ))}
       </div>
 
       {/* Filters */}
-      <div className="d-flex flex-wrap mb-3" style={{ gap:8 }}>
-        <input className="form-control form-control-sm" placeholder="🔍 Search service or address…"
-          value={search} onChange={e => setSearch(e.target.value)} style={{ fontSize:12, maxWidth:240 }} />
-        <div className="d-flex flex-wrap" style={{ gap:4 }}>
-          {['all','booking','moving','supplier'].map(t =>
-            <FilterPill key={t} active={type===t} onClick={()=>setType(t)}>
-              {t==='all'?'All Types':`${TYPE_ICON[t]||''} ${t.charAt(0).toUpperCase()+t.slice(1)}s`}
-            </FilterPill>)}
+      <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:18, alignItems:'center' }}>
+        <label className="topbar-search" style={{ maxWidth:220 }}>
+          <Search size={14} />
+          <input placeholder="Search service or address…" value={search} onChange={e => setSearch(e.target.value)} />
+        </label>
+        <div style={{ display:'flex', flexWrap:'wrap', gap:4 }}>
+          {['all','booking','moving','supplier'].map(t => {
+            const TIcon = TYPE_ICON_COMP[t];
+            return <FilterPill key={t} active={type===t} onClick={()=>setType(t)}><span style={{ display:'inline-flex', alignItems:'center', gap:6 }}>{TIcon && <TIcon size={12.5} />}{t==='all'?'All Types':`${t.charAt(0).toUpperCase()+t.slice(1)}s`}</span></FilterPill>;
+          })}
         </div>
-        <div className="d-flex flex-wrap" style={{ gap:4 }}>
+        <div style={{ display:'flex', flexWrap:'wrap', gap:4 }}>
           {['all','pending','confirmed','in_progress','completed','cancelled'].map(s =>
-            <FilterPill key={s} active={statusF===s} onClick={()=>setStatusF(s)}>
-              {s==='all'?'All Status':s.replace(/_/g,' ')}
-            </FilterPill>)}
+            <FilterPill key={s} active={statusF===s} onClick={()=>setStatusF(s)}>{s==='all'?'All Status':s.replace(/_/g,' ')}</FilterPill>)}
         </div>
-        <span className="text-xs text-gray-500 align-self-center ml-auto">{filtered.length} of {orders.length}</span>
+        <span style={{ fontSize:11.5, color:'var(--muted)', marginLeft:'auto' }}>{filtered.length} of {orders.length}</span>
       </div>
 
       {loading ? <Spinner /> : (
-        <div className="row">
+        <div style={{ display:'grid', gridTemplateColumns: selected ? '1.5fr 1fr' : '1fr', gap:18 }}>
           {/* Order list */}
-          <div className={selected ? 'col-md-7' : 'col-12'}>
-            <div className="admin-card">
-              <div className="table-responsive">
-                <table className="admin-table">
-                  <thead>
-                    <tr><th>Type</th><th>Description</th><th>Address</th><th>Worker</th><th>Status</th><th>Amount</th><th>Date</th></tr>
-                  </thead>
-                  <tbody>
-                    {filtered.length === 0
-                      ? <tr><td colSpan={7} className="text-center text-gray-500 py-4">No orders match</td></tr>
-                      : filtered.map(o => (
-                        <tr key={o.id+o._type}
-                          onClick={() => setSelected(selected?.id===o.id && selected?._type===o._type ? null : o)}
-                          style={{ cursor:'pointer', background: selected?.id===o.id && selected?._type===o._type ? '#f0f4ff' : undefined }}>
-                          <td>
-                            <span style={{ background:TYPE_COLOR[o._type]+'22', color:TYPE_COLOR[o._type], fontWeight:800,
-                              fontSize:11, padding:'2px 8px', borderRadius:999 }}>
-                              {TYPE_ICON[o._type]} {o._type}
-                            </span>
-                          </td>
-                          <td className="font-weight-bold text-xs text-gray-800">{o._label}</td>
-                          <td className="text-xs text-gray-500" style={{ maxWidth:140, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                            {o.address || o.pickup_address || '—'}
-                          </td>
-                          <td className="text-xs text-gray-600">{o.worker_name || '—'}</td>
-                          <td><SBBadge status={o.status}/></td>
-                          <td className="text-xs font-weight-bold" style={{ color:'#C9A020' }}>
-                            {o._amount ? `KSh ${Number(o._amount).toLocaleString()}` : '—'}
-                          </td>
-                          <td className="text-xs text-gray-500">
-                            {new Date(o.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short'})}
-                          </td>
-                        </tr>
-                      ))
-                    }
-                  </tbody>
-                </table>
-              </div>
+          <div className="admin-card" style={{ marginBottom:0 }}>
+            <div style={{ overflowX:'auto' }}>
+              <table className="admin-table">
+                <thead>
+                  <tr><th>Type</th><th>Description</th><th>Address</th><th>Worker</th><th>Status</th><th>Amount</th><th>Date</th></tr>
+                </thead>
+                <tbody>
+                  {filtered.length === 0
+                    ? <tr><td colSpan={7} style={{ textAlign:'center', color:'var(--muted)', padding:24 }}>No orders match</td></tr>
+                    : filtered.map(o => {
+                      const TIcon = TYPE_ICON_COMP[o._type];
+                      const isSel = selected?.id===o.id && selected?._type===o._type;
+                      return (
+                      <tr key={o.id+o._type} onClick={() => setSelected(isSel ? null : o)} style={{ cursor:'pointer', background: isSel ? 'var(--gold-soft)' : undefined }}>
+                        <td>
+                          <span style={{ display:'inline-flex', alignItems:'center', gap:4, background:`${TYPE_COLOR[o._type]}18`, color:TYPE_COLOR[o._type], fontWeight:700, fontSize:10.5, padding:'3px 9px', borderRadius:999 }}>
+                            {TIcon && <TIcon size={10} />} {o._type}
+                          </span>
+                        </td>
+                        <td style={{ fontWeight:700, color:'var(--ink)' }}>{o._label}</td>
+                        <td style={{ color:'var(--muted)', maxWidth:140, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{o.address || o.pickup_address || '—'}</td>
+                        <td style={{ color:'var(--ink-2)' }}>{o.worker_name || '—'}</td>
+                        <td><SBBadge status={o.status}/></td>
+                        <td style={{ fontWeight:700, color:'var(--gold)' }}>{o._amount ? `KSh ${Number(o._amount).toLocaleString()}` : '—'}</td>
+                        <td style={{ color:'var(--muted)' }}>{new Date(o.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short'})}</td>
+                      </tr>
+                    );})
+                  }
+                </tbody>
+              </table>
             </div>
           </div>
 
           {/* Detail panel */}
-          {selected && (
-            <div className="col-md-5">
-              <div className="admin-card" style={{ position:'sticky', top:0 }}>
-                <div className="admin-card-header d-flex justify-content-between align-items-center">
-                  <span>{TYPE_ICON[selected._type]} Order Detail</span>
-                  <button onClick={() => setSelected(null)} style={{ background:'none', border:'none', fontSize:18, cursor:'pointer', color:'#aaa' }}>×</button>
+          {selected && (() => { const SIcon = TYPE_ICON_COMP[selected._type]; return (
+            <div className="admin-card" style={{ position:'sticky', top:0, marginBottom:0 }}>
+              <div className="admin-card-header">
+                <span style={{ display:'flex', alignItems:'center', gap:7 }}>{SIcon && <SIcon size={15} color="var(--gold)" />} Order Detail</span>
+                <button onClick={() => setSelected(null)} style={{ background:'none', border:'none', cursor:'pointer', color:'var(--muted)', display:'flex' }}><X size={17} /></button>
+              </div>
+              <div style={{ padding:'14px 20px 18px' }}>
+                {/* Header */}
+                <div style={{ marginBottom:14 }}>
+                  <div style={{ fontWeight:800, fontSize:15, color:'var(--ink)', marginBottom:6 }}>{selected._label}</div>
+                  <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                    <span style={{ display:'inline-flex', alignItems:'center', gap:4, background:`${TYPE_COLOR[selected._type]}18`, color:TYPE_COLOR[selected._type], fontWeight:700, fontSize:10.5, padding:'3px 9px', borderRadius:999 }}>
+                      {SIcon && <SIcon size={10} />} {selected._type}
+                    </span>
+                    <SBBadge status={selected.status} />
+                  </div>
                 </div>
-                <div className="card-body">
-                  {/* Header */}
-                  <div className="mb-3">
-                    <div style={{ fontWeight:900, fontSize:15, color:'#2d3748', marginBottom:4 }}>{selected._label}</div>
-                    <div className="d-flex align-items-center gap-2" style={{ gap:8 }}>
-                      <span style={{ background:TYPE_COLOR[selected._type]+'22', color:TYPE_COLOR[selected._type], fontWeight:800, fontSize:11, padding:'2px 8px', borderRadius:999 }}>
-                        {TYPE_ICON[selected._type]} {selected._type}
-                      </span>
-                      <SBBadge status={selected.status} />
-                    </div>
+
+                {/* Fields */}
+                {[
+                  ['Address',     selected.address || selected.pickup_address || '—'],
+                  selected._type==='moving' && ['Destination', selected.destination_address || '—'],
+                  ['Date',        selected.booking_date || new Date(selected.created_at).toLocaleDateString('en-KE')],
+                  selected.booking_time && ['Time', selected.booking_time],
+                  ['Worker',      selected.worker_name || '—'],
+                  ['Amount',      selected._amount ? `KSh ${Number(selected._amount).toLocaleString()}` : '—'],
+                  selected.notes && ['Notes', selected.notes],
+                  selected.cancellation_reason && ['Cancel Reason', selected.cancellation_reason],
+                  ['ID',          selected.id?.slice(0,8).toUpperCase()],
+                  ['Created',     new Date(selected.created_at).toLocaleString('en-KE')],
+                ].filter(Boolean).map(([label, val]) => <InfoRow key={label} label={label} value={val} />)}
+
+                {/* Supplier items */}
+                {selected._type==='supplier' && selected.items?.length > 0 && (
+                  <div style={{ marginTop:12 }}>
+                    <div style={{ fontSize:11, fontWeight:800, color:'var(--ink-2)', marginBottom:6 }}>Items</div>
+                    {selected.items.map((item, i) => (
+                      <div key={i} style={{ fontSize:12, color:'var(--ink-2)', padding:'6px 0', borderBottom:'1px solid var(--line)', display:'flex', justifyContent:'space-between' }}>
+                        <span>{item.name || item.product_name || `Item ${i+1}`}</span>
+                        <span style={{ fontWeight:700 }}>×{item.qty||item.quantity||1}</span>
+                      </div>
+                    ))}
                   </div>
+                )}
 
-                  {/* Fields */}
-                  {[
-                    ['📍 Address',     selected.address || selected.pickup_address || '—'],
-                    selected._type==='moving' && ['🏁 Destination', selected.destination_address || '—'],
-                    ['📅 Date',        selected.booking_date || new Date(selected.created_at).toLocaleDateString('en-KE')],
-                    selected.booking_time && ['⏰ Time',        selected.booking_time],
-                    ['👤 Worker',      selected.worker_name || '—'],
-                    ['💰 Amount',      selected._amount ? `KSh ${Number(selected._amount).toLocaleString()}` : '—'],
-                    selected.notes && ['📝 Notes',       selected.notes],
-                    selected.cancellation_reason && ['❌ Cancel Reason', selected.cancellation_reason],
-                    ['🆔 ID',          selected.id?.slice(0,8).toUpperCase()],
-                    ['📅 Created',     new Date(selected.created_at).toLocaleString('en-KE')],
-                  ].filter(Boolean).map(([label, val]) => (
-                    <div key={label} className="d-flex justify-content-between py-1 border-bottom">
-                      <span className="text-xs text-gray-500">{label}</span>
-                      <span className="text-xs font-weight-bold text-gray-800" style={{ maxWidth:'55%', textAlign:'right' }}>{val}</span>
-                    </div>
-                  ))}
-
-                  {/* Supplier items */}
-                  {selected._type==='supplier' && selected.items?.length > 0 && (
-                    <div className="mt-2">
-                      <div className="text-xs font-weight-bold text-gray-600 mb-1">📦 Items</div>
-                      {selected.items.map((item, i) => (
-                        <div key={i} className="text-xs text-gray-700 py-1 border-bottom d-flex justify-content-between">
-                          <span>{item.name || item.product_name || `Item ${i+1}`}</span>
-                          <span className="font-weight-bold">×{item.qty||item.quantity||1}</span>
-                        </div>
-                      ))}
-                    </div>
+                {/* Actions */}
+                <div style={{ marginTop:16, display:'flex', flexDirection:'column', gap:8 }}>
+                  {STATUS_NEXT[selected.status]?.next && (() => { const NIcon = STATUS_NEXT[selected.status].Icon; return (
+                    <button disabled={updating} onClick={() => advanceStatus(selected)}
+                      style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:7, padding:'9px', borderRadius:9, border:'none', background:'var(--green)', color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer' }}>
+                      {updating ? '…' : <>{NIcon && <NIcon size={14} />} {STATUS_NEXT[selected.status].label}</>}
+                    </button>
+                  );})()}
+                  {!['completed','cancelled'].includes(selected.status) && (
+                    <button disabled={updating} onClick={() => cancelOrder(selected)}
+                      style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:7, padding:'9px', borderRadius:9, border:'1px solid rgba(239,68,68,.3)', background:'rgba(239,68,68,.06)', color:'var(--red)', fontSize:13, fontWeight:700, cursor:'pointer' }}>
+                      {updating ? '…' : <><X size={14} /> Cancel Order</>}
+                    </button>
                   )}
-
-                  {/* Actions */}
-                  <div className="mt-3 d-flex flex-column" style={{ gap:8 }}>
-                    {STATUS_NEXT[selected.status]?.next && (
-                      <button className="btn btn-success btn-sm" style={{ fontWeight:700 }}
-                        disabled={updating} onClick={() => advanceStatus(selected)}>
-                        {updating ? '…' : STATUS_NEXT[selected.status].label}
-                      </button>
-                    )}
-                    {!['completed','cancelled'].includes(selected.status) && (
-                      <button className="btn btn-outline-danger btn-sm" style={{ fontWeight:700 }}
-                        disabled={updating} onClick={() => cancelOrder(selected)}>
-                        {updating ? '…' : '❌ Cancel Order'}
-                      </button>
-                    )}
-                    {selected.status === 'completed' && (
-                      <div className="text-center text-xs py-2" style={{ color:'#1cc88a', fontWeight:700 }}>✅ Order completed</div>
-                    )}
-                    {selected.status === 'cancelled' && (
-                      <div className="text-center text-xs py-2" style={{ color:'#e74a3b', fontWeight:700 }}>❌ Order cancelled</div>
-                    )}
-                  </div>
+                  {selected.status === 'completed' && (
+                    <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:6, padding:'8px 0', color:'var(--green)', fontWeight:700, fontSize:12.5 }}><CheckCircle2 size={14} /> Order completed</div>
+                  )}
+                  {selected.status === 'cancelled' && (
+                    <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:6, padding:'8px 0', color:'var(--red)', fontWeight:700, fontSize:12.5 }}><X size={14} /> Order cancelled</div>
+                  )}
                 </div>
               </div>
             </div>
-          )}
+          );})()}
         </div>
       )}
     </>
