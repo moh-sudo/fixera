@@ -6769,7 +6769,7 @@ function PartnerEarningsSection() {
   return (
     <>
       <PageHeader title="Partner Earnings" sub="Total earnings and monthly payout statements per partner" />
-      <div className="d-flex gap-2 mb-3 flex-wrap">
+      <div style={{ display:'flex', flexWrap:'wrap', gap:4, marginBottom:16 }}>
         {['all','worker','vendor','rider','supplier','mover','water_carrier'].map(r => (
           <FilterPill key={r} active={roleFilter===r} onClick={() => setRoleFilter(r)}>
             {r==='all'?'All':ROLE_LABEL[r]||r}
@@ -6777,64 +6777,64 @@ function PartnerEarningsSection() {
         ))}
       </div>
       {loading ? <Spinner /> : (
-        <div className="row">
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1.4fr', gap:18 }}>
           {/* Partner list */}
-          <div className="col-md-5">
+          <div>
             {filtered.map((p,i) => (
-              <div key={p.id} className="admin-card mb-2" onClick={() => loadDetail(p)}
-                style={{ borderLeft:`4px solid ${ROLE_COLOR[p.partner_role]||'#aaa'}`, cursor:'pointer', background:selected?.id===p.id?'#f8f9fc':'#fff' }}>
-                <div className="card-body py-2 d-flex align-items-center justify-content-between">
+              <div key={p.id} className="admin-card" onClick={() => loadDetail(p)}
+                style={{ borderLeft:`4px solid ${ROLE_COLOR[p.partner_role]||'var(--muted)'}`, cursor:'pointer', background:selected?.id===p.id?'var(--gold-soft)':'var(--surface)', marginBottom:10 }}>
+                <div style={{ padding:'12px 16px', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
                   <div>
-                    <div className="font-weight-bold text-gray-800 text-xs">
-                      <span className="text-gray-400 mr-1">#{i+1}</span>{p.full_name}
+                    <div style={{ fontWeight:700, color:'var(--ink)', fontSize:12.5 }}>
+                      <span style={{ color:'var(--muted)', marginRight:5 }}>#{i+1}</span>{p.full_name}
                     </div>
-                    <div className="text-xs text-gray-500 mt-1"><RoleBadge role={p.partner_role} /> · {p.city||'—'}</div>
+                    <div style={{ fontSize:11.5, color:'var(--muted)', marginTop:4, display:'flex', alignItems:'center', gap:5 }}><RoleBadge role={p.partner_role} /> · {p.city||'—'}</div>
                   </div>
-                  <div className="text-right">
-                    <div className="font-weight-bold text-xs" style={{ color: ROLE_COLOR[p.partner_role]||'#4e73df' }}>{fmt(p.total_earned)}</div>
-                    <div className="text-xs text-gray-400">total paid out</div>
+                  <div style={{ textAlign:'right' }}>
+                    <div style={{ fontWeight:700, fontSize:12.5, color: ROLE_COLOR[p.partner_role]||'var(--blue)' }}>{fmt(p.total_earned)}</div>
+                    <div style={{ fontSize:10.5, color:'var(--muted)' }}>total paid out</div>
                   </div>
                 </div>
               </div>
             ))}
-            {filtered.length === 0 && <div className="text-center py-5 text-gray-500 text-xs">No partners found.</div>}
+            {filtered.length === 0 && <div style={{ textAlign:'center', padding:'48px 0', color:'var(--muted)', fontSize:12.5 }}>No partners found.</div>}
           </div>
 
           {/* Earnings detail */}
-          <div className="col-md-7">
+          <div>
             {!selected ? (
-              <div className="admin-card" style={{ minHeight:300, display:'flex', alignItems:'center', justifyContent:'center', color:'#a0aec0' }}>
-                <div className="text-center"><div style={{ fontSize:40, marginBottom:8 }}>💼</div><div>Select a partner to view their earnings statement</div></div>
+              <div className="admin-card" style={{ minHeight:300, display:'flex', alignItems:'center', justifyContent:'center', color:'var(--muted)' }}>
+                <div style={{ textAlign:'center' }}><Briefcase size={36} color="var(--line-2)" style={{ marginBottom:8 }} /><div>Select a partner to view their earnings statement</div></div>
               </div>
             ) : (
               <div className="admin-card">
-                <div className="admin-card-header d-flex justify-content-between align-items-center">
-                  <span>💼 {selected.full_name} — Earnings Statement</span>
-                  <button onClick={() => setSelected(null)} style={{ background:'none',border:'none',fontSize:18,cursor:'pointer',color:'#aaa' }}>×</button>
+                <div className="admin-card-header">
+                  <span style={{ display:'flex', alignItems:'center', gap:7 }}><Briefcase size={15} color="var(--gold)" /> {selected.full_name} — Earnings Statement</span>
+                  <button onClick={() => setSelected(null)} style={{ background:'none',border:'none',cursor:'pointer',color:'var(--muted)', display:'flex' }}><X size={17} /></button>
                 </div>
-                <div className="card-body">
-                  <div className="row mb-3">
-                    <div className="col-6 mb-2"><div className="text-xs text-gray-500">Role</div><div className="text-xs font-weight-bold"><RoleBadge role={selected.partner_role} /></div></div>
-                    <div className="col-6 mb-2"><div className="text-xs text-gray-500">Email</div><div className="text-xs font-weight-bold text-gray-800">{selected.email||'—'}</div></div>
-                    <div className="col-6 mb-2"><div className="text-xs text-gray-500">Total Earned</div><div className="font-weight-bold" style={{ color:'#1cc88a' }}>{fmt(selected.total_earned)}</div></div>
-                    <div className="col-6 mb-2"><div className="text-xs text-gray-500">Rating</div><div className="text-xs font-weight-bold text-gray-800">⭐ {selected.rating||'—'}</div></div>
+                <div style={{ padding:'14px 20px 18px' }}>
+                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:16 }}>
+                    <div><div style={{ fontSize:10.5, color:'var(--muted)' }}>Role</div><div style={{ fontSize:12.5, fontWeight:700 }}><RoleBadge role={selected.partner_role} /></div></div>
+                    <div><div style={{ fontSize:10.5, color:'var(--muted)' }}>Email</div><div style={{ fontSize:12.5, fontWeight:700, color:'var(--ink)' }}>{selected.email||'—'}</div></div>
+                    <div><div style={{ fontSize:10.5, color:'var(--muted)' }}>Total Earned</div><div style={{ fontWeight:800, color:'var(--green)' }}>{fmt(selected.total_earned)}</div></div>
+                    <div><div style={{ fontSize:10.5, color:'var(--muted)' }}>Rating</div><div style={{ fontSize:12.5, fontWeight:700, color:'var(--ink)', display:'flex', alignItems:'center', gap:4 }}><Star size={12} fill="var(--gold)" color="var(--gold)" /> {selected.rating||'—'}</div></div>
                   </div>
                   {detailLoading ? <Spinner /> : (
                     <>
                       {monthly.length === 0
-                        ? <div className="text-xs text-gray-500">No payout records found.</div>
+                        ? <div style={{ fontSize:12.5, color:'var(--muted)' }}>No payout records found.</div>
                         : (
                           <>
-                            <div className="admin-card mb-3">
-                              <div className="card-body p-2">
+                            <div className="admin-card" style={{ marginBottom:16 }}>
+                              <div style={{ padding:8 }}>
                                 <ResponsiveContainer width="100%" height={180}>
                                   <BarChart data={[...monthly].reverse()} margin={{ top:8, right:8, left:0, bottom:0 }}>
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#e3e6f0" />
+                                    <CartesianGrid strokeDasharray="3 3" stroke="var(--line)" />
                                     <XAxis dataKey="month" tick={{ fontSize:10 }} />
                                     <YAxis tick={{ fontSize:10 }} tickFormatter={v=>`${(v/1000).toFixed(0)}k`} />
                                     <Tooltip formatter={v => fmt(v)} />
-                                    <Bar dataKey="paid" fill="#1cc88a" name="Paid Out" radius={[3,3,0,0]} />
-                                    <Bar dataKey="pending" fill="#f6c23e" name="Pending" radius={[3,3,0,0]} />
+                                    <Bar dataKey="paid" fill="var(--green)" name="Paid Out" radius={[3,3,0,0]} />
+                                    <Bar dataKey="pending" fill="var(--amber)" name="Pending" radius={[3,3,0,0]} />
                                   </BarChart>
                                 </ResponsiveContainer>
                               </div>
@@ -6844,10 +6844,10 @@ function PartnerEarningsSection() {
                               <tbody>
                                 {monthly.map(m => (
                                   <tr key={m.month}>
-                                    <td className="text-xs font-weight-bold text-gray-700">{m.month}</td>
-                                    <td className="text-xs font-weight-bold" style={{ color:'#1cc88a' }}>{fmt(m.paid)}</td>
-                                    <td className="text-xs" style={{ color:'#f6c23e' }}>{fmt(m.pending)}</td>
-                                    <td className="text-xs text-gray-600">{m.count}</td>
+                                    <td style={{ fontWeight:700, color:'var(--ink-2)' }}>{m.month}</td>
+                                    <td style={{ fontWeight:700, color:'var(--green)' }}>{fmt(m.paid)}</td>
+                                    <td style={{ color:'var(--amber)' }}>{fmt(m.pending)}</td>
+                                    <td style={{ color:'var(--ink-2)' }}>{m.count}</td>
                                   </tr>
                                 ))}
                               </tbody>
@@ -6924,63 +6924,63 @@ function TaxReportSection() {
   return (
     <>
       <PageHeader title="Tax Report" sub={`VAT @ ${VAT_RATE*100}% · Platform commission @ 15% · Select period below`} />
-      <div className="d-flex gap-2 mb-4 flex-wrap align-items-center">
+      <div style={{ display:'flex', flexWrap:'wrap', gap:4, marginBottom:20 }}>
         {[['this_month','This Month'],['this_year','This Year'],['last_year','Last Year']].map(([val,lbl]) => (
           <FilterPill key={val} active={period===val} onClick={() => setPeriod(val)}>{lbl}</FilterPill>
         ))}
       </div>
       {loading ? <Spinner /> : (
         <>
-          <div className="row mb-4">
-            <div className="col-md-3 mb-2"><StatCard icon="💰" label="Gross Revenue"    value={fmt(totals.gross)}      color="#4e73df" /></div>
-            <div className="col-md-3 mb-2"><StatCard icon="🧾" label={`VAT (${VAT_RATE*100}%)`} value={fmt(totals.vat)} color="#e74a3b" sub="Collected on behalf of KRA" /></div>
-            <div className="col-md-3 mb-2"><StatCard icon="🏦" label="Net Revenue"      value={fmt(totals.net)}        color="#1cc88a" sub="After VAT" /></div>
-            <div className="col-md-3 mb-2"><StatCard icon="📊" label="Platform Commission (15%)" value={fmt(totals.commission)} color="#C9A020" /></div>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:12, marginBottom:22 }}>
+            <StatCard icon={<Wallet size={22} color="var(--blue)" />} label="Gross Revenue" value={fmt(totals.gross)} color="var(--blue)" />
+            <StatCard icon={<Receipt size={22} color="var(--red)" />} label={`VAT (${VAT_RATE*100}%)`} value={fmt(totals.vat)} color="var(--red)" sub="Collected on behalf of KRA" />
+            <StatCard icon={<Wallet size={22} color="var(--green)" />} label="Net Revenue" value={fmt(totals.net)} color="var(--green)" sub="After VAT" />
+            <StatCard icon={<BarChart3 size={22} color="var(--gold)" />} label="Platform Commission (15%)" value={fmt(totals.commission)} color="var(--gold)" />
           </div>
 
-          <div className="admin-card mb-4">
+          <div className="admin-card" style={{ marginBottom:20 }}>
             <div className="admin-card-header">Monthly Tax Breakdown</div>
-            <div className="card-body">
+            <div style={{ padding:16 }}>
               <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={rows} margin={{ top:8,right:8,left:0,bottom:0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e3e6f0" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--line)" />
                   <XAxis dataKey="month" tick={{ fontSize:10 }} />
                   <YAxis tick={{ fontSize:10 }} tickFormatter={v=>`${(v/1000).toFixed(0)}k`} />
                   <Tooltip formatter={v => fmt(v)} />
                   <Legend />
-                  <Bar dataKey="gross"      name="Gross"      fill="#4e73df" radius={[3,3,0,0]} />
-                  <Bar dataKey="vat"        name="VAT"        fill="#e74a3b" radius={[3,3,0,0]} />
-                  <Bar dataKey="commission" name="Commission" fill="#C9A020" radius={[3,3,0,0]} />
+                  <Bar dataKey="gross"      name="Gross"      fill="var(--blue)" radius={[3,3,0,0]} />
+                  <Bar dataKey="vat"        name="VAT"        fill="var(--red)" radius={[3,3,0,0]} />
+                  <Bar dataKey="commission" name="Commission" fill="var(--gold)" radius={[3,3,0,0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
           <div className="admin-card">
-            <div className="admin-card-header d-flex justify-content-between align-items-center">
+            <div className="admin-card-header">
               <span>Monthly Detail</span>
-              <span className="text-xs text-gray-500">VAT rate: {VAT_RATE*100}% · Commission: 15%</span>
+              <span style={{ fontSize:11.5, color:'var(--muted)' }}>VAT rate: {VAT_RATE*100}% · Commission: 15%</span>
             </div>
             <table className="admin-table">
               <thead><tr><th>Month</th><th>Transactions</th><th>Gross</th><th>VAT ({VAT_RATE*100}%)</th><th>Net (ex-VAT)</th><th>Commission (15%)</th></tr></thead>
               <tbody>
                 {[...rows].reverse().map(r => (
                   <tr key={r.month}>
-                    <td className="font-weight-bold text-xs text-gray-700">{r.month}</td>
-                    <td className="text-xs text-gray-600">{r.count}</td>
-                    <td className="text-xs font-weight-bold text-gray-800">{fmt(r.gross)}</td>
-                    <td className="text-xs font-weight-bold" style={{ color:'#e74a3b' }}>{fmt(r.vat)}</td>
-                    <td className="text-xs font-weight-bold" style={{ color:'#1cc88a' }}>{fmt(r.net)}</td>
-                    <td className="text-xs font-weight-bold" style={{ color:'#C9A020' }}>{fmt(r.commission)}</td>
+                    <td style={{ fontWeight:700, color:'var(--ink-2)' }}>{r.month}</td>
+                    <td style={{ color:'var(--ink-2)' }}>{r.count}</td>
+                    <td style={{ fontWeight:700, color:'var(--ink)' }}>{fmt(r.gross)}</td>
+                    <td style={{ fontWeight:700, color:'var(--red)' }}>{fmt(r.vat)}</td>
+                    <td style={{ fontWeight:700, color:'var(--green)' }}>{fmt(r.net)}</td>
+                    <td style={{ fontWeight:700, color:'var(--gold)' }}>{fmt(r.commission)}</td>
                   </tr>
                 ))}
-                <tr style={{ background:'#f8f9fc', fontWeight:900 }}>
-                  <td className="text-xs font-weight-bold">TOTAL</td>
-                  <td className="text-xs">—</td>
-                  <td className="text-xs font-weight-bold text-gray-800">{fmt(totals.gross)}</td>
-                  <td className="text-xs font-weight-bold" style={{ color:'#e74a3b' }}>{fmt(totals.vat)}</td>
-                  <td className="text-xs font-weight-bold" style={{ color:'#1cc88a' }}>{fmt(totals.net)}</td>
-                  <td className="text-xs font-weight-bold" style={{ color:'#C9A020' }}>{fmt(totals.commission)}</td>
+                <tr style={{ background:'var(--canvas)', fontWeight:800 }}>
+                  <td style={{ fontWeight:700, color:'var(--ink)' }}>TOTAL</td>
+                  <td style={{ color:'var(--muted)' }}>—</td>
+                  <td style={{ fontWeight:700, color:'var(--ink)' }}>{fmt(totals.gross)}</td>
+                  <td style={{ fontWeight:700, color:'var(--red)' }}>{fmt(totals.vat)}</td>
+                  <td style={{ fontWeight:700, color:'var(--green)' }}>{fmt(totals.net)}</td>
+                  <td style={{ fontWeight:700, color:'var(--gold)' }}>{fmt(totals.commission)}</td>
                 </tr>
               </tbody>
             </table>
@@ -6993,26 +6993,26 @@ function TaxReportSection() {
 
 // ── SECTION: Service Areas ────────────────────────────────────────
 const PHASE_META = {
-  launch:    { label: '🚀 Launch',    color: '#1cc88a', bg: '#d4f5e9' },
-  expansion: { label: '📈 Expansion', color: '#4A90D9', bg: '#ddeeff' },
-  future:    { label: '🔮 Future',    color: '#9F7AEA', bg: '#ede9ff' },
+  launch:    { label: 'Launch',    Icon: Navigation, color: 'var(--green)', bg: 'rgba(22,163,74,0.12)' },
+  expansion: { label: 'Expansion', Icon: TrendingUp, color: 'var(--blue)', bg: 'rgba(59,130,246,0.12)' },
+  future:    { label: 'Future',    Icon: Star,       color: 'var(--violet)', bg: 'rgba(124,108,240,0.12)' },
 };
 
 function PhaseBadge({ phase }) {
   const m = PHASE_META[phase] || PHASE_META.future;
   return (
-    <span style={{ fontSize:10, fontWeight:700, padding:'2px 7px', borderRadius:10,
-      color:m.color, background:m.bg, whiteSpace:'nowrap' }}>
-      {m.label}
+    <span style={{ fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:10,
+      color:m.color, background:m.bg, whiteSpace:'nowrap', display:'inline-flex', alignItems:'center', gap:4 }}>
+      <m.Icon size={10} /> {m.label}
     </span>
   );
 }
 
 function ReadinessBar({ value = 0 }) {
-  const color = value >= 70 ? '#1cc88a' : value >= 40 ? '#f6c23e' : '#e74a3b';
+  const color = value >= 70 ? 'var(--green)' : value >= 40 ? 'var(--amber)' : 'var(--red)';
   return (
     <div style={{ display:'flex', alignItems:'center', gap:6, minWidth:100 }}>
-      <div style={{ flex:1, height:4, background:'#e3e6f0', borderRadius:2, overflow:'hidden' }}>
+      <div style={{ flex:1, height:4, background:'var(--line)', borderRadius:2, overflow:'hidden' }}>
         <div style={{ width:`${value}%`, height:'100%', background:color, borderRadius:2, transition:'width 0.4s' }} />
       </div>
       <span style={{ fontSize:10, color, fontWeight:700, minWidth:26 }}>{value}%</span>
@@ -7111,9 +7111,9 @@ function ServiceAreasSection() {
 
   const TABS = [
     { id:'all',       label:`All (${areas.length})` },
-    { id:'launch',    label:`🚀 Launch (${launchAreas})` },
-    { id:'expansion', label:`📈 Expansion (${expansionAreas})` },
-    { id:'future',    label:`🔮 Future (${futureAreas})` },
+    { id:'launch',    label:`Launch (${launchAreas})` },
+    { id:'expansion', label:`Expansion (${expansionAreas})` },
+    { id:'future',    label:`Future (${futureAreas})` },
   ];
 
   return (
@@ -7124,30 +7124,22 @@ function ServiceAreasSection() {
       />
 
       {/* Stats */}
-      <div className="row mb-3">
-        <div className="col-6 col-md-3 mb-2"><StatCard icon="✅" label="Active Areas"    value={totalActive}            color="#1cc88a" /></div>
-        <div className="col-6 col-md-3 mb-2"><StatCard icon="🚀" label="Launch Areas"    value={launchAreas}            color="#1cc88a" /></div>
-        <div className="col-6 col-md-3 mb-2"><StatCard icon="📈" label="Expansion Areas" value={expansionAreas}         color="#4A90D9" /></div>
-        <div className="col-6 col-md-3 mb-2"><StatCard icon="🔮" label="Future Areas"    value={futureAreas}            color="#9F7AEA" /></div>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))', gap:12, marginBottom:20 }}>
+        <StatCard icon={<CheckCircle2 size={22} color="var(--green)" />} label="Active Areas" value={totalActive} color="var(--green)" />
+        <StatCard icon={<Navigation size={22} color="var(--green)" />} label="Launch Areas" value={launchAreas} color="var(--green)" />
+        <StatCard icon={<TrendingUp size={22} color="var(--blue)" />} label="Expansion Areas" value={expansionAreas} color="var(--blue)" />
+        <StatCard icon={<Star size={22} color="var(--violet)" />} label="Future Areas" value={futureAreas} color="var(--violet)" />
       </div>
 
       {/* Phase tabs + search */}
-      <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginBottom:14, alignItems:'center' }}>
+      <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginBottom:16, alignItems:'center' }}>
         {TABS.map(t => (
-          <button
-            key={t.id}
-            className={`btn btn-sm ${tab===t.id ? 'btn-primary' : 'btn-outline-secondary'}`}
-            style={{ fontSize:12 }}
-            onClick={() => setTab(t.id)}
-          >{t.label}</button>
+          <FilterPill key={t.id} active={tab===t.id} onClick={() => setTab(t.id)}>{t.label}</FilterPill>
         ))}
-        <input
-          className="form-control form-control-sm"
-          style={{ maxWidth:240, fontSize:12, marginLeft:'auto' }}
-          placeholder="🔍 Search area…"
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
+        <label className="topbar-search" style={{ maxWidth:220, marginLeft:'auto' }}>
+          <Search size={14} />
+          <input placeholder="Search area…" value={search} onChange={e => setSearch(e.target.value)} />
+        </label>
       </div>
 
       {loading ? <Spinner /> : (
@@ -7160,7 +7152,7 @@ function ServiceAreasSection() {
             const isOpen      = expanded === metroKey;
             const phase       = metroPhase[metroKey];
             const avgReady    = Math.round(subs.reduce((s, a) => s + (a.expansion_readiness || 0), 0) / subs.length);
-            const statusColor = noneActive ? '#6c757d' : allActive ? '#1cc88a' : '#f6c23e';
+            const statusColor = noneActive ? 'var(--muted)' : allActive ? 'var(--green)' : 'var(--amber)';
 
             // Group by county within this metro
             const countyMap = {};
@@ -7180,23 +7172,23 @@ function ServiceAreasSection() {
               : subs;
 
             return (
-              <div key={metroKey} className="admin-card mb-2" style={{ overflow:'hidden' }}>
+              <div key={metroKey} className="admin-card" style={{ overflow:'hidden', marginBottom:10 }}>
                 {/* Metro header */}
                 <div
                   style={{ display:'flex', alignItems:'center', gap:10, padding:'12px 16px',
-                    cursor:'pointer', userSelect:'none', background: isOpen ? '#f8f9fc' : '#fff' }}
+                    cursor:'pointer', userSelect:'none', background: isOpen ? 'var(--canvas)' : 'var(--surface)' }}
                   onClick={() => setExpanded(isOpen ? null : metroKey)}
                 >
-                  <span style={{ fontSize:11, color:'#aaa', transition:'transform 0.2s', display:'inline-block',
-                    transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }}>▶</span>
+                  <ChevronDown size={14} color="var(--muted)" style={{ transition:'transform 0.2s',
+                    transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)', flexShrink:0 }} />
 
                   {/* Name + phase badge */}
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
-                      <span style={{ fontSize:13, fontWeight:700, color:'#2d3748' }}>{metroKey}</span>
+                      <span style={{ fontSize:13, fontWeight:700, color:'var(--ink)' }}>{metroKey}</span>
                       <PhaseBadge phase={phase} />
                       {counties.length > 1 && (
-                        <span style={{ fontSize:10, color:'#888' }}>
+                        <span style={{ fontSize:10, color:'var(--muted)' }}>
                           {counties.join(' · ')}
                         </span>
                       )}
@@ -7207,7 +7199,7 @@ function ServiceAreasSection() {
                       </span>
                       {phase !== 'launch' && (
                         <div style={{ display:'flex', alignItems:'center', gap:4 }}>
-                          <span style={{ fontSize:10, color:'#888' }}>Readiness</span>
+                          <span style={{ fontSize:10, color:'var(--muted)' }}>Readiness</span>
                           <ReadinessBar value={avgReady} />
                         </div>
                       )}
@@ -7216,32 +7208,24 @@ function ServiceAreasSection() {
 
                   {/* Active coverage bar */}
                   <div style={{ width:70, textAlign:'right' }} onClick={e => e.stopPropagation()}>
-                    <div style={{ width:'100%', height:5, background:'#e3e6f0', borderRadius:3, overflow:'hidden' }}>
+                    <div style={{ width:'100%', height:5, background:'var(--line)', borderRadius:3, overflow:'hidden' }}>
                       <div style={{ width:`${subs.length ? (activeCount/subs.length)*100 : 0}%`,
                         height:'100%', background:statusColor, borderRadius:3, transition:'width 0.4s' }} />
                     </div>
                   </div>
 
                   {/* Bulk buttons */}
-                  <div className="d-flex gap-2" onClick={e => e.stopPropagation()}>
+                  <div style={{ display:'flex', gap:8 }} onClick={e => e.stopPropagation()}>
                     {!allActive && (
-                      <button
-                        className="btn btn-sm btn-success"
-                        style={{ fontSize:11, fontWeight:700, whiteSpace:'nowrap' }}
-                        disabled={bulkSaving === metroKey}
-                        onClick={() => bulkToggleMetro(metroKey, subs, true)}
-                      >
-                        {bulkSaving === metroKey ? '…' : '✅ Activate All'}
+                      <button disabled={bulkSaving === metroKey} onClick={() => bulkToggleMetro(metroKey, subs, true)}
+                        style={{ display:'flex', alignItems:'center', gap:5, fontSize:11, fontWeight:700, whiteSpace:'nowrap', padding:'6px 12px', borderRadius:8, border:'none', background:'var(--green)', color:'#fff', cursor:'pointer' }}>
+                        {bulkSaving === metroKey ? '…' : <><CheckCircle2 size={12} /> Activate All</>}
                       </button>
                     )}
                     {!noneActive && (
-                      <button
-                        className="btn btn-sm btn-outline-danger"
-                        style={{ fontSize:11, fontWeight:700, whiteSpace:'nowrap' }}
-                        disabled={bulkSaving === metroKey}
-                        onClick={() => bulkToggleMetro(metroKey, subs, false)}
-                      >
-                        {bulkSaving === metroKey ? '…' : '⏸ Pause All'}
+                      <button disabled={bulkSaving === metroKey} onClick={() => bulkToggleMetro(metroKey, subs, false)}
+                        style={{ display:'flex', alignItems:'center', gap:5, fontSize:11, fontWeight:700, whiteSpace:'nowrap', padding:'6px 12px', borderRadius:8, border:'1px solid rgba(239,68,68,.3)', background:'rgba(239,68,68,.06)', color:'var(--red)', cursor:'pointer' }}>
+                        {bulkSaving === metroKey ? '…' : <><X size={12} /> Pause All</>}
                       </button>
                     )}
                   </div>
@@ -7249,24 +7233,24 @@ function ServiceAreasSection() {
 
                 {/* Sub-county rows */}
                 {(isOpen || search) && (
-                  <div style={{ borderTop:'1px solid #e3e6f0', background:'#fafbfc' }}>
+                  <div style={{ borderTop:'1px solid var(--line)', background:'var(--canvas)' }}>
                     {visibleSubs.map((a, i) => (
                       <div key={a.id} style={{ display:'flex', alignItems:'center', gap:10,
                         padding:'8px 16px 8px 36px',
-                        borderBottom: i < visibleSubs.length-1 ? '1px solid #f0f0f5' : 'none' }}>
+                        borderBottom: i < visibleSubs.length-1 ? '1px solid var(--line)' : 'none' }}>
 
                         {/* Name + county label (when metro spans multiple counties) */}
                         <div style={{ flex:1, minWidth:0 }}>
-                          <span style={{ fontSize:12, color:'#2d3748' }}>{a.sub_county}</span>
+                          <span style={{ fontSize:12, color:'var(--ink)' }}>{a.sub_county}</span>
                           {counties.length > 1 && (
-                            <span style={{ fontSize:10, color:'#aaa', marginLeft:6 }}>{a.county}</span>
+                            <span style={{ fontSize:10, color:'var(--muted)', marginLeft:6 }}>{a.county}</span>
                           )}
                         </div>
 
                         {/* Radius */}
                         {a.service_radius_km && (
-                          <span style={{ fontSize:10, color:'#888', whiteSpace:'nowrap' }}>
-                            📍 {a.service_radius_km}km
+                          <span style={{ fontSize:10, color:'var(--muted)', whiteSpace:'nowrap', display:'flex', alignItems:'center', gap:3 }}>
+                            <MapPin size={10} /> {a.service_radius_km}km
                           </span>
                         )}
 
@@ -7276,8 +7260,8 @@ function ServiceAreasSection() {
                         )}
 
                         {/* Status dot */}
-                        <span style={{ fontSize:11, color: a.is_active ? '#1cc88a' : '#bbb', fontWeight:600, minWidth:56 }}>
-                          {a.is_active ? '● Active' : '○ Off'}
+                        <span style={{ fontSize:11, color: a.is_active ? 'var(--green)' : 'var(--muted)', fontWeight:600, minWidth:56, display:'flex', alignItems:'center', gap:4 }}>
+                          {a.is_active ? <Circle size={7} fill="var(--green)" color="var(--green)" /> : <Circle size={7} color="var(--muted)" />} {a.is_active ? 'Active' : 'Off'}
                         </span>
 
                         {/* Toggle switch */}
@@ -7285,7 +7269,7 @@ function ServiceAreasSection() {
                           onClick={() => toggling !== a.id && toggleOne(a.id, a.is_active)}
                           style={{
                             width:36, height:20, borderRadius:10, cursor:'pointer',
-                            background: a.is_active ? '#1cc88a' : '#dee2e6',
+                            background: a.is_active ? 'var(--green)' : 'var(--line-2)',
                             position:'relative', transition:'background 0.2s',
                             opacity: toggling === a.id ? 0.5 : 1, flexShrink:0,
                           }}
@@ -7305,7 +7289,7 @@ function ServiceAreasSection() {
           })}
 
           {visibleMetros.length === 0 && (
-            <div className="text-center py-5 text-gray-500">No areas match your filters.</div>
+            <div style={{ textAlign:'center', padding:'48px 0', color:'var(--muted)' }}>No areas match your filters.</div>
           )}
         </div>
       )}
