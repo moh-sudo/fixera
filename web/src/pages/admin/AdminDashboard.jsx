@@ -3074,10 +3074,10 @@ function NotificationsSection() {
 
   useEffect(() => { load(); }, [load]);
 
-  const TYPE_COLOR = { info:'#4A90D9', warning:'#F6AD55', alert:'#FC8181', promo:'#48BB78', update:'#9F7AEA' };
-  const TYPE_ICON  = { info:'ℹ️', warning:'⚠️', alert:'🚨', promo:'🎁', update:'🔄' };
+  const TYPE_COLOR = { info:'var(--blue)', warning:'var(--amber)', alert:'var(--red)', promo:'var(--green)', update:'var(--violet)' };
+  const TYPE_ICON_COMP = { info:AlertCircle, warning:AlertCircle, alert:Siren, promo:Tag, update:RotateCcw };
   const TARGET_LABEL = { all:'Everyone', customers:'Customers only', partners:'Partners only', riders:'Riders only', vendors:'Vendors only' };
-  const PRIORITY_COLOR = { urgent:'#e74a3b', high:'#F6AD55', normal:'#4e73df' };
+  const PRIORITY_COLOR = { urgent:'var(--red)', high:'var(--amber)', normal:'var(--blue)' };
 
   const openTickets  = tickets.filter(t => t.status === 'open').length;
   const urgentTickets= tickets.filter(t => t.priority === 'urgent').length;
@@ -3086,8 +3086,8 @@ function NotificationsSection() {
   const filteredTickets = ticketF === 'all' ? tickets : tickets.filter(t => t.status === ticketF);
 
   const TABS = [
-    { id:'broadcasts', label:`📢 Broadcasts (${broadcasts.length})` },
-    { id:'tickets',    label:`🎫 Support Tickets (${tickets.length})` },
+    { id:'broadcasts', label:`Broadcasts (${broadcasts.length})` },
+    { id:'tickets',    label:`Support Tickets (${tickets.length})` },
   ];
 
   return (
@@ -3095,39 +3095,37 @@ function NotificationsSection() {
       <PageHeader title="Notifications & Comms" sub="Broadcast reach stats and all support ticket communications" />
 
       {/* KPI row */}
-      <div className="row mb-3">
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))', gap:12, marginBottom:20 }}>
         {[
-          { icon:'📢', label:'Broadcasts Sent', val:broadcasts.length,  color:'#4A90D9' },
-          { icon:'👁️', label:'Total Reads',     val:totalReads,         color:'#48BB78' },
-          { icon:'🎫', label:'Open Tickets',    val:openTickets,         color:'#F6AD55' },
-          { icon:'🚨', label:'Urgent Tickets',  val:urgentTickets,       color: urgentTickets > 0 ? '#e74a3b' : '#6c757d' },
+          { Icon:Megaphone, label:'Broadcasts Sent', val:broadcasts.length, color:'var(--blue)' },
+          { Icon:Users,     label:'Total Reads',     val:totalReads,        color:'var(--green)' },
+          { Icon:LifeBuoy,  label:'Open Tickets',    val:openTickets,       color:'var(--amber)' },
+          { Icon:Siren,     label:'Urgent Tickets',  val:urgentTickets,     color: urgentTickets > 0 ? 'var(--red)' : 'var(--muted)' },
         ].map(s => (
-          <div key={s.label} className="col-md-3 mb-2">
-            <div className="admin-card"><div className="card-body py-2 text-center">
-              <div style={{ fontSize:18 }}>{s.icon}</div>
-              <div style={{ fontSize:22, fontWeight:900, color:s.color }}>{s.val}</div>
-              <div className="text-xs text-gray-500">{s.label}</div>
-            </div></div>
+          <div key={s.label} className="stat-card" style={{ textAlign:'center', padding:16 }}>
+            <div className="stat-ico" style={{ width:36, height:36, background:`${s.color}18`, margin:'0 auto 8px' }}><s.Icon size={17} color={s.color} /></div>
+            <div style={{ fontSize:20, fontWeight:800, color:'var(--ink)' }}>{s.val}</div>
+            <div style={{ fontSize:11, color:'var(--muted)', marginTop:2 }}>{s.label}</div>
           </div>
         ))}
       </div>
 
       {/* Realtime status bar */}
-      <div className="admin-card mb-3" style={{ borderLeft:'4px solid #1cc88a' }}>
-        <div className="card-body py-2 d-flex align-items-center" style={{ gap:8 }}>
-          <span style={{ width:8, height:8, borderRadius:'50%', background:'#1cc88a', display:'inline-block', flexShrink:0 }} />
-          <span className="text-xs font-weight-bold text-gray-700">Realtime Active</span>
-          <span className="text-xs text-gray-500">— Bookings · Announcements · Support Tickets broadcasting via Supabase Realtime</span>
+      <div className="admin-card" style={{ borderLeft:'4px solid var(--green)', marginBottom:18 }}>
+        <div style={{ padding:'12px 20px', display:'flex', alignItems:'center', gap:10 }}>
+          <span className="live-dot" style={{ width:8, height:8, borderRadius:'50%', background:'var(--green)', flexShrink:0 }} />
+          <span style={{ fontSize:12.5, fontWeight:700, color:'var(--ink-2)' }}>Realtime Active</span>
+          <span style={{ fontSize:12, color:'var(--muted)' }}>— Bookings · Announcements · Support Tickets broadcasting via Supabase Realtime</span>
         </div>
       </div>
 
       {/* Tab bar */}
-      <div className="d-flex mb-3" style={{ gap:6, borderBottom:'2px solid #e3e6f0', paddingBottom:0 }}>
+      <div style={{ display:'flex', gap:6, borderBottom:'2px solid var(--line)', marginBottom:18 }}>
         {TABS.map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
             style={{ background:'none', border:'none', fontFamily:'inherit', cursor:'pointer', padding:'8px 14px',
-              fontSize:13, fontWeight:700, color:tab===t.id?'#C9A020':'#6c757d',
-              borderBottom:tab===t.id?'3px solid #C9A020':'3px solid transparent', marginBottom:-2 }}>
+              fontSize:13, fontWeight:700, color:tab===t.id?'var(--gold)':'var(--muted)',
+              borderBottom:tab===t.id?'3px solid var(--gold)':'3px solid transparent', marginBottom:-2 }}>
             {t.label}
           </button>
         ))}
@@ -3138,35 +3136,29 @@ function NotificationsSection() {
           {/* ── Broadcasts tab ── */}
           {tab === 'broadcasts' && (
             broadcasts.length === 0
-              ? <div className="text-center py-5"><div style={{fontSize:48}}>📢</div><p className="text-gray-500 mt-2">No broadcasts sent yet</p></div>
+              ? <div style={{ textAlign:'center', padding:'48px 0' }}><Megaphone size={40} color="var(--line-2)" /><p style={{ color:'var(--muted)', marginTop:10 }}>No broadcasts sent yet</p></div>
               : broadcasts.map(b => {
                 const reads = readStats[b.id] || 0;
-                const color = TYPE_COLOR[b.type] || '#aaa';
+                const color = TYPE_COLOR[b.type] || 'var(--muted)';
+                const TIcon = TYPE_ICON_COMP[b.type] || AlertCircle;
                 return (
-                  <div key={b.id} className="admin-card mb-3"
-                    style={{ borderLeft:`4px solid ${color}` }}>
-                    <div className="card-body py-3">
-                      <div className="d-flex justify-content-between align-items-start">
+                  <div key={b.id} className="admin-card" style={{ borderLeft:`4px solid ${color}`, marginBottom:12 }}>
+                    <div style={{ padding:'14px 20px' }}>
+                      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
                         <div style={{ flex:1 }}>
-                          <div className="d-flex align-items-center mb-1" style={{ gap:8 }}>
-                            <span style={{ fontSize:16 }}>{TYPE_ICON[b.type] || 'ℹ️'}</span>
-                            <span className="font-weight-bold text-gray-800" style={{ fontSize:14 }}>{b.title}</span>
-                            {b.is_pinned && <span style={{ fontSize:10, fontWeight:800, background:'#ffe4b5', color:'#b7791f', padding:'2px 6px', borderRadius:4 }}>📌 Pinned</span>}
+                          <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6 }}>
+                            <TIcon size={15} color={color} />
+                            <span style={{ fontWeight:700, fontSize:14, color:'var(--ink)' }}>{b.title}</span>
+                            {b.is_pinned && <span style={{ fontSize:10, fontWeight:800, background:'var(--gold-soft)', color:'var(--gold-2)', padding:'2px 7px', borderRadius:4 }}>Pinned</span>}
                           </div>
-                          <p className="text-xs text-gray-600 mb-2" style={{ lineHeight:1.6 }}>{b.body}</p>
-                          <div className="d-flex flex-wrap" style={{ gap:8 }}>
-                            <span style={{ fontSize:10, fontWeight:700, background:`${color}18`, color, padding:'2px 8px', borderRadius:999 }}>
-                              {b.type?.toUpperCase()}
-                            </span>
-                            <span style={{ fontSize:10, fontWeight:700, background:'#f0f0f0', color:'#6c757d', padding:'2px 8px', borderRadius:999 }}>
-                              👥 {TARGET_LABEL[b.target] || b.target || 'All'}
-                            </span>
-                            <span style={{ fontSize:10, fontWeight:700, background:'rgba(72,187,120,0.1)', color:'#48BB78', padding:'2px 8px', borderRadius:999 }}>
-                              👁️ {reads} read{reads!==1?'s':''}
-                            </span>
+                          <p style={{ fontSize:12, color:'var(--ink-2)', marginBottom:10, lineHeight:1.6 }}>{b.body}</p>
+                          <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+                            <span style={{ fontSize:10, fontWeight:700, background:`${color}18`, color, padding:'2px 8px', borderRadius:999 }}>{b.type?.toUpperCase()}</span>
+                            <span style={{ fontSize:10, fontWeight:700, background:'var(--canvas)', color:'var(--ink-2)', padding:'2px 8px', borderRadius:999 }}>{TARGET_LABEL[b.target] || b.target || 'All'}</span>
+                            <span style={{ fontSize:10, fontWeight:700, background:'rgba(22,163,74,0.1)', color:'var(--green)', padding:'2px 8px', borderRadius:999 }}>{reads} read{reads!==1?'s':''}</span>
                           </div>
                         </div>
-                        <span className="text-xs text-gray-400 ml-3" style={{ whiteSpace:'nowrap', flexShrink:0 }}>
+                        <span style={{ fontSize:11, color:'var(--muted)', whiteSpace:'nowrap', flexShrink:0, marginLeft:12 }}>
                           {new Date(b.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'})}
                         </span>
                       </div>
@@ -3179,7 +3171,7 @@ function NotificationsSection() {
           {/* ── Support Tickets tab ── */}
           {tab === 'tickets' && (
             <>
-              <div className="mb-3 d-flex flex-wrap" style={{ gap:4 }}>
+              <div style={{ display:'flex', flexWrap:'wrap', gap:4, marginBottom:14 }}>
                 {['all','open','in_review','in_progress','resolved'].map(f => (
                   <FilterPill key={f} active={ticketF===f} onClick={() => setTicketF(f)}>
                     {f === 'all' ? 'All' : f.replace(/_/g,' ')}
@@ -3187,34 +3179,34 @@ function NotificationsSection() {
                 ))}
               </div>
               <div className="admin-card">
-                <div className="table-responsive">
+                <div style={{ overflowX:'auto' }}>
                   <table className="admin-table">
                     <thead>
                       <tr><th>Priority</th><th>Subject</th><th>From</th><th>Department</th><th>Status</th><th>Date</th></tr>
                     </thead>
                     <tbody>
                       {filteredTickets.length === 0
-                        ? <tr><td colSpan={6} className="text-center text-gray-500 py-4">No tickets</td></tr>
+                        ? <tr><td colSpan={6} style={{ textAlign:'center', color:'var(--muted)', padding:24 }}>No tickets</td></tr>
                         : filteredTickets.map(t => (
                           <tr key={t.id}>
                             <td>
                               <span style={{ fontSize:10, fontWeight:800,
-                                background:`${PRIORITY_COLOR[t.priority]||'#aaa'}18`,
-                                color:PRIORITY_COLOR[t.priority]||'#aaa',
-                                border:`1px solid ${PRIORITY_COLOR[t.priority]||'#aaa'}40`,
+                                background:`${PRIORITY_COLOR[t.priority]||'var(--muted)'}18`,
+                                color:PRIORITY_COLOR[t.priority]||'var(--muted)',
+                                border:`1px solid ${PRIORITY_COLOR[t.priority]||'var(--muted)'}40`,
                                 borderRadius:999, padding:'2px 8px' }}>
-                                {t.priority==='urgent'?'🚨':t.priority==='high'?'🔶':'🔵'} {(t.priority||'normal').toUpperCase()}
+                                {(t.priority||'normal').toUpperCase()}
                               </span>
                             </td>
-                            <td className="font-weight-bold text-xs text-gray-800">{t.subject || t.category || 'Support ticket'}</td>
+                            <td style={{ fontWeight:700, color:'var(--ink)' }}>{t.subject || t.category || 'Support ticket'}</td>
                             <td>
-                              <span style={{ fontSize:10, fontWeight:700, background:'#e3e6f0', color:'#495057', padding:'2px 8px', borderRadius:999 }}>
+                              <span style={{ fontSize:10, fontWeight:700, background:'var(--canvas)', color:'var(--ink-2)', padding:'2px 8px', borderRadius:999 }}>
                                 {t.user_type || 'customer'}
                               </span>
                             </td>
-                            <td className="text-xs text-gray-600">{t.department || '—'}</td>
+                            <td style={{ color:'var(--ink-2)' }}>{t.department || '—'}</td>
                             <td><SBBadge status={t.status || 'open'} /></td>
-                            <td className="text-xs text-gray-500">{new Date(t.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short'})}</td>
+                            <td style={{ color:'var(--muted)' }}>{new Date(t.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short'})}</td>
                           </tr>
                         ))
                       }
@@ -3847,9 +3839,9 @@ function SecuritySection() {
   const todayCount = rows.filter(r => r.created_at?.slice(0,10) === today).length;
 
   const ACTION_COLOR = {
-    login:'#48BB78', logout:'#6c757d', grant_admin:'#e74a3b', revoke_admin:'#e74a3b',
-    update_settings:'#F6AD55', approve_partner:'#48BB78', reject_partner:'#FC8181',
-    approve_payout:'#1cc88a', reject_payout:'#e74a3b', moderate_review:'#9F7AEA',
+    login:'var(--green)', logout:'var(--muted)', grant_admin:'var(--red)', revoke_admin:'var(--red)',
+    update_settings:'var(--amber)', approve_partner:'var(--green)', reject_partner:'var(--red)',
+    approve_payout:'var(--green)', reject_payout:'var(--red)', moderate_review:'var(--violet)',
   };
 
   return (
@@ -3857,39 +3849,37 @@ function SecuritySection() {
       <PageHeader title="Security & Audit" sub="Admin team, access control and full audit trail" />
 
       {/* KPI row */}
-      <div className="row mb-3">
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))', gap:12, marginBottom:20 }}>
         {[
-          { icon:'👥', label:'Admin Users',    val:admins.length,  color:'#4e73df' },
-          { icon:'🗒️', label:'Audit Events',   val:rows.length,    color:'#C9A020' },
-          { icon:'📅', label:'Events Today',   val:todayCount,     color: todayCount > 20 ? '#e74a3b' : '#1cc88a' },
-          { icon:'🛡️', label:'RLS Status',     val:'Active',       color:'#1cc88a' },
+          { Icon:Users,       label:'Admin Users',  val:admins.length, color:'var(--blue)' },
+          { Icon:FileText,    label:'Audit Events', val:rows.length,   color:'var(--gold)' },
+          { Icon:Clock,       label:'Events Today', val:todayCount,    color: todayCount > 20 ? 'var(--red)' : 'var(--green)' },
+          { Icon:ShieldCheck, label:'RLS Status',    val:'Active',      color:'var(--green)' },
         ].map(s => (
-          <div key={s.label} className="col-md-3 mb-2">
-            <div className="admin-card"><div className="card-body py-2 text-center">
-              <div style={{ fontSize:18 }}>{s.icon}</div>
-              <div style={{ fontSize:20, fontWeight:900, color:s.color }}>{s.val}</div>
-              <div className="text-xs text-gray-500">{s.label}</div>
-            </div></div>
+          <div key={s.label} className="stat-card" style={{ textAlign:'center', padding:16 }}>
+            <div className="stat-ico" style={{ width:36, height:36, background:`${s.color}18`, margin:'0 auto 8px' }}><s.Icon size={17} color={s.color} /></div>
+            <div style={{ fontSize:20, fontWeight:800, color:'var(--ink)' }}>{s.val}</div>
+            <div style={{ fontSize:11, color:'var(--muted)', marginTop:2 }}>{s.label}</div>
           </div>
         ))}
       </div>
 
       {/* Tab bar */}
-      <div className="d-flex mb-3" style={{ gap:6, borderBottom:'2px solid #e3e6f0', paddingBottom:0 }}>
+      <div style={{ display:'flex', alignItems:'center', gap:6, borderBottom:'2px solid var(--line)', marginBottom:18 }}>
         {[
-          { id:'audit',  label:`🗒️ Audit Log (${rows.length})` },
-          { id:'admins', label:`👥 Admin Team (${admins.length})` },
+          { id:'audit',  label:`Audit Log (${rows.length})` },
+          { id:'admins', label:`Admin Team (${admins.length})` },
         ].map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
             style={{ background:'none', border:'none', fontFamily:'inherit', cursor:'pointer', padding:'8px 14px',
-              fontSize:13, fontWeight:700, color:tab===t.id?'#C9A020':'#6c757d',
-              borderBottom:tab===t.id?'3px solid #C9A020':'3px solid transparent', marginBottom:-2 }}>
+              fontSize:13, fontWeight:700, color:tab===t.id?'var(--gold)':'var(--muted)',
+              borderBottom:tab===t.id?'3px solid var(--gold)':'3px solid transparent', marginBottom:-2 }}>
             {t.label}
           </button>
         ))}
         <a href="#settings" onClick={e => { e.preventDefault(); window.dispatchEvent(new CustomEvent('fixera-nav', { detail:'settings' })); }}
-          style={{ marginLeft:'auto', fontSize:12, fontWeight:700, color:'#C9A020', alignSelf:'center', cursor:'pointer', textDecoration:'none' }}>
-          ⚙️ Manage 2FA & Admins →
+          style={{ marginLeft:'auto', fontSize:12, fontWeight:700, color:'var(--gold)', alignSelf:'center', cursor:'pointer', textDecoration:'none', display:'flex', alignItems:'center', gap:5 }}>
+          <Settings size={13} /> Manage 2FA & Admins →
         </a>
       </div>
 
@@ -3898,9 +3888,11 @@ function SecuritySection() {
           {/* ── Audit Log ── */}
           {tab === 'audit' && (
             <>
-              <div className="d-flex flex-wrap mb-3" style={{ gap:8 }}>
-                <input className="form-control form-control-sm" placeholder="🔍 Search action or detail…"
-                  value={search} onChange={e => setSearch(e.target.value)} style={{ fontSize:12, maxWidth:220 }} />
+              <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:14, alignItems:'center' }}>
+                <label className="topbar-search" style={{ maxWidth:220 }}>
+                  <Search size={14} />
+                  <input placeholder="Search action or detail…" value={search} onChange={e => setSearch(e.target.value)} />
+                </label>
                 <select className="form-control form-control-sm" value={actionF} onChange={e => setActionF(e.target.value)} style={{ fontSize:12, width:'auto' }}>
                   <option value="all">All Actions</option>
                   {actionTypes.map(a => <option key={a} value={a}>{a}</option>)}
@@ -3910,32 +3902,32 @@ function SecuritySection() {
                   {actors.map(a => <option key={a} value={a}>{a}</option>)}
                 </select>
                 {(search||actionF!=='all'||actorF!=='all') &&
-                  <button className="btn btn-sm btn-outline-secondary" style={{ fontSize:11 }}
-                    onClick={() => { setSearch(''); setActionF('all'); setActorF('all'); }}>✕ Clear</button>}
-                <span className="text-xs text-gray-500 align-self-center ml-auto">{filtered.length} of {rows.length}</span>
+                  <button onClick={() => { setSearch(''); setActionF('all'); setActorF('all'); }}
+                    style={{ fontSize:11, fontWeight:700, background:'none', border:'1px solid var(--line-2)', borderRadius:8, padding:'5px 10px', color:'var(--ink-2)', cursor:'pointer' }}>Clear</button>}
+                <span style={{ fontSize:11.5, color:'var(--muted)', marginLeft:'auto' }}>{filtered.length} of {rows.length}</span>
               </div>
               <div className="admin-card">
-                <div className="table-responsive">
+                <div style={{ overflowX:'auto' }}>
                   <table className="admin-table">
                     <thead><tr><th>When</th><th>Admin</th><th>Action</th><th>Detail</th></tr></thead>
                     <tbody>
                       {filtered.length === 0
-                        ? <tr><td colSpan={4} className="text-center text-gray-500 py-4">No audit events match</td></tr>
+                        ? <tr><td colSpan={4} style={{ textAlign:'center', color:'var(--muted)', padding:24 }}>No audit events match</td></tr>
                         : filtered.map(r => {
-                          const color = ACTION_COLOR[r.action] || '#6c757d';
+                          const color = ACTION_COLOR[r.action] || 'var(--muted)';
                           return (
                             <tr key={r.id}>
-                              <td className="text-xs text-gray-500" style={{ whiteSpace:'nowrap' }}>
+                              <td style={{ color:'var(--muted)', whiteSpace:'nowrap' }}>
                                 {new Date(r.created_at).toLocaleString('en-KE',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}
                               </td>
-                              <td className="text-xs font-weight-bold text-gray-800">{r.actor_name || '—'}</td>
+                              <td style={{ fontWeight:700, color:'var(--ink)' }}>{r.actor_name || '—'}</td>
                               <td>
                                 <span style={{ fontSize:10, fontWeight:800, background:`${color}18`, color,
                                   border:`1px solid ${color}40`, borderRadius:999, padding:'2px 8px', whiteSpace:'nowrap' }}>
                                   {r.action || '—'}
                                 </span>
                               </td>
-                              <td className="text-xs text-gray-600" style={{ maxWidth:280, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                              <td style={{ color:'var(--ink-2)', maxWidth:280, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
                                 {r.detail || '—'}
                               </td>
                             </tr>
@@ -3952,29 +3944,29 @@ function SecuritySection() {
           {/* ── Admin Team ── */}
           {tab === 'admins' && (
             <>
-              <div className="mb-3 p-3" style={{ background:'rgba(201,160,32,0.08)', border:'1px solid rgba(201,160,32,0.2)', borderRadius:10, fontSize:12, color:'#b7791f' }}>
-                ⚙️ To grant or revoke admin access and manage 2FA, go to <strong>Settings → Admin Team</strong> and <strong>Settings → Security & 2FA</strong>.
+              <div style={{ marginBottom:14, padding:12, background:'var(--gold-soft)', border:'1px solid rgba(201,160,32,0.25)', borderRadius:10, fontSize:12, color:'var(--gold-2)', display:'flex', alignItems:'center', gap:8 }}>
+                <Settings size={14} /> To grant or revoke admin access and manage 2FA, go to <strong>Settings → Admin Team</strong> and <strong>Settings → Security & 2FA</strong>.
               </div>
               <div className="admin-card">
-                <div className="table-responsive">
+                <div style={{ overflowX:'auto' }}>
                   <table className="admin-table">
                     <thead><tr><th>Name</th><th>Email</th><th>Actions Today</th><th>Total Actions</th><th>Admin Since</th></tr></thead>
                     <tbody>
                       {admins.length === 0
-                        ? <tr><td colSpan={5} className="text-center text-gray-500 py-4">No admin profiles found</td></tr>
+                        ? <tr><td colSpan={5} style={{ textAlign:'center', color:'var(--muted)', padding:24 }}>No admin profiles found</td></tr>
                         : admins.map(a => {
                           const myRows     = rows.filter(r => r.actor_id === a.id || r.actor_name === a.full_name);
                           const myToday    = myRows.filter(r => r.created_at?.slice(0,10) === today).length;
                           return (
                             <tr key={a.id}>
-                              <td className="font-weight-bold text-xs text-gray-800">
+                              <td style={{ fontWeight:700, color:'var(--ink)' }}>
                                 {a.full_name || '—'}
-                                <span style={{ marginLeft:6, fontSize:9, fontWeight:800, background:'rgba(231,74,59,0.1)', color:'#e74a3b', padding:'1px 6px', borderRadius:999 }}>ADMIN</span>
+                                <span style={{ marginLeft:6, fontSize:9, fontWeight:800, background:'rgba(239,68,68,0.1)', color:'var(--red)', padding:'1px 6px', borderRadius:999 }}>ADMIN</span>
                               </td>
-                              <td className="text-xs text-gray-600">{a.email || '—'}</td>
-                              <td className="text-xs font-weight-bold" style={{ color: myToday > 0 ? '#C9A020' : '#6c757d' }}>{myToday}</td>
-                              <td className="text-xs font-weight-bold" style={{ color:'#4e73df' }}>{myRows.length}</td>
-                              <td className="text-xs text-gray-500">{a.created_at ? new Date(a.created_at).toLocaleDateString('en-KE') : '—'}</td>
+                              <td style={{ color:'var(--ink-2)' }}>{a.email || '—'}</td>
+                              <td style={{ fontWeight:700, color: myToday > 0 ? 'var(--gold)' : 'var(--muted)' }}>{myToday}</td>
+                              <td style={{ fontWeight:700, color:'var(--blue)' }}>{myRows.length}</td>
+                              <td style={{ color:'var(--muted)' }}>{a.created_at ? new Date(a.created_at).toLocaleDateString('en-KE') : '—'}</td>
                             </tr>
                           );
                         })
@@ -4922,8 +4914,8 @@ function AlertsFeedSection() {
   const channelRef = useRef(null);
 
   const DEPT_COLOR = {
-    trust_safety: '#ef4444', finance: '#10b981', operations: '#3b82f6',
-    accounts: '#C9A020', technical: '#a78bfa', partner_success: '#f59e0b',
+    trust_safety: 'var(--red)', finance: 'var(--green)', operations: 'var(--blue)',
+    accounts: 'var(--gold)', technical: 'var(--violet)', partner_success: 'var(--amber)',
   };
 
   const load = useCallback(async () => {
@@ -4990,63 +4982,57 @@ function AlertsFeedSection() {
       />
 
       {/* Summary row */}
-      <div className="row mb-4">
-        <div className="col-md-4 mb-2">
-          <StatCard icon="🚨" label="Urgent Tickets" value={urgentTickets.length} color="#ef4444" />
-        </div>
-        <div className="col-md-4 mb-2">
-          <StatCard icon="⏰" label="Stuck Bookings (>1h)" value={stuckBookings.length} color="#f59e0b" />
-        </div>
-        <div className="col-md-4 mb-2">
-          <StatCard icon="🔐" label="Pending Verification" value={pendingVerify.length} color="#C9A020" />
-        </div>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', gap:12, marginBottom:22 }}>
+        <StatCard icon={<Siren size={22} color="var(--red)" />} label="Urgent Tickets" value={urgentTickets.length} color="var(--red)" />
+        <StatCard icon={<Clock size={22} color="var(--amber)" />} label="Stuck Bookings (>1h)" value={stuckBookings.length} color="var(--amber)" />
+        <StatCard icon={<Lock size={22} color="var(--gold)" />} label="Pending Verification" value={pendingVerify.length} color="var(--gold)" />
       </div>
 
       {loading ? <Spinner /> : totalAlerts === 0 ? (
-        <div className="text-center py-5">
-          <div style={{ fontSize: 52 }}>✅</div>
-          <p className="text-gray-500 mt-3 font-weight-bold">All clear — no active alerts</p>
-          <p className="text-gray-400 text-sm">This feed auto-refreshes every 30 seconds</p>
+        <div style={{ textAlign:'center', padding:'48px 0' }}>
+          <CheckCircle2 size={44} color="var(--green)" />
+          <p style={{ color:'var(--ink-2)', fontWeight:700, marginTop:12 }}>All clear — no active alerts</p>
+          <p style={{ color:'var(--muted)', fontSize:12.5 }}>This feed auto-refreshes every 30 seconds</p>
         </div>
       ) : (
         <>
           {/* ── Urgent Tickets ── */}
           {urgentTickets.length > 0 && (
-            <div className="mb-4">
-              <h6 className="font-weight-bold mb-3" style={{ color: '#ef4444', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444', display: 'inline-block', boxShadow: '0 0 6px #ef4444' }} />
+            <div style={{ marginBottom:24 }}>
+              <h6 style={{ fontWeight:800, marginBottom:12, color:'var(--red)', display:'flex', alignItems:'center', gap:8, fontSize:12.5, letterSpacing:0.3 }}>
+                <span className="attn-pulse" style={{ width:8, height:8, borderRadius:'50%', background:'var(--red)', display:'inline-block' }} />
                 URGENT SUPPORT TICKETS
               </h6>
               {urgentTickets.map(t => {
-                const deptColor = DEPT_COLOR[t.department] || '#6b7280';
+                const deptColor = DEPT_COLOR[t.department] || 'var(--muted)';
                 const slaHours  = t.department === 'trust_safety' ? 1 : t.department === 'operations' ? 8 : 24;
                 const hoursOld  = (Date.now() - new Date(t.created_at)) / 3_600_000;
                 const breached  = hoursOld > slaHours;
                 return (
-                  <div key={t.id} className="admin-card mb-2" style={{ borderLeft: `4px solid ${breached ? '#ef4444' : '#f59e0b'}` }}>
-                    <div className="card-body py-2">
-                      <div className="d-flex justify-content-between align-items-start">
+                  <div key={t.id} className="admin-card" style={{ borderLeft: `4px solid ${breached ? 'var(--red)' : 'var(--amber)'}`, marginBottom:10 }}>
+                    <div style={{ padding:'12px 20px' }}>
+                      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
                         <div>
-                          <div className="font-weight-bold text-gray-800 mb-1">
-                            {breached && <span className="badge badge-danger mr-2" style={{ fontSize: 9 }}>⏰ SLA BREACHED</span>}
+                          <div style={{ fontWeight:700, color:'var(--ink)', marginBottom:5, display:'flex', alignItems:'center', gap:6 }}>
+                            {breached && <span style={{ fontSize:9, fontWeight:800, background:'rgba(239,68,68,0.12)', color:'var(--red)', padding:'2px 7px', borderRadius:999 }}>SLA BREACHED</span>}
                             {t.subject || 'Urgent Ticket'}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div style={{ fontSize:11.5, color:'var(--muted)' }}>
                             {t.user_name || 'Customer'} · {(t.user_type || 'user').toUpperCase()} · {timeAgo(t.created_at)}
                           </div>
-                          <div className="mt-1">
-                            <span className="sb-badge mr-1" style={{ background: `${deptColor}18`, color: deptColor, border: `1px solid ${deptColor}40`, fontSize: 10 }}>
+                          <div style={{ marginTop:6, display:'flex', gap:6 }}>
+                            <span style={{ fontSize:10, fontWeight:700, background: `${deptColor}18`, color: deptColor, border:`1px solid ${deptColor}40`, borderRadius:999, padding:'2px 8px' }}>
                               {t.department?.replace(/_/g, ' ').toUpperCase() || 'GENERAL'}
                             </span>
-                            <span className="sb-badge" style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)', fontSize: 10 }}>
-                              🚨 URGENT
+                            <span style={{ fontSize:10, fontWeight:700, background:'rgba(239,68,68,0.1)', color:'var(--red)', border:'1px solid rgba(239,68,68,0.3)', borderRadius:999, padding:'2px 8px' }}>
+                              URGENT
                             </span>
                           </div>
                         </div>
                         <SBBadge status={t.status} />
                       </div>
                       {t.message && (
-                        <div className="text-xs text-gray-500 mt-2 p-2 rounded" style={{ background: '#f8f9fc', border: '1px solid #e3e6f0' }}>
+                        <div style={{ fontSize:11.5, color:'var(--ink-2)', marginTop:10, padding:10, borderRadius:8, background:'var(--canvas)', border:'1px solid var(--line)' }}>
                           {t.message.length > 100 ? t.message.slice(0, 100) + '…' : t.message}
                         </div>
                       )}
@@ -5059,23 +5045,23 @@ function AlertsFeedSection() {
 
           {/* ── Stuck Bookings ── */}
           {stuckBookings.length > 0 && (
-            <div className="mb-4">
-              <h6 className="font-weight-bold mb-3" style={{ color: '#f59e0b', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b', display: 'inline-block' }} />
+            <div style={{ marginBottom:24 }}>
+              <h6 style={{ fontWeight:800, marginBottom:12, color:'var(--amber)', display:'flex', alignItems:'center', gap:8, fontSize:12.5, letterSpacing:0.3 }}>
+                <span style={{ width:8, height:8, borderRadius:'50%', background:'var(--amber)', display:'inline-block' }} />
                 STUCK BOOKINGS — CONFIRMED BUT NO PARTNER RESPONDED (&gt;1 HOUR)
               </h6>
               {stuckBookings.map(b => (
-                <div key={b.id} className="admin-card mb-2" style={{ borderLeft: '4px solid #f59e0b' }}>
-                  <div className="card-body py-2 d-flex justify-content-between align-items-center">
+                <div key={b.id} className="admin-card" style={{ borderLeft:'4px solid var(--amber)', marginBottom:10 }}>
+                  <div style={{ padding:'12px 20px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                     <div>
-                      <div className="font-weight-bold text-gray-800">{b.service || 'Booking'}</div>
-                      <div className="text-xs text-gray-500 mt-1">{b.address || '—'}</div>
-                      <div className="text-xs mt-1" style={{ color: '#f59e0b', fontWeight: 700 }}>
-                        ⏰ Stuck for {timeAgo(b.created_at)} — no partner on the way
+                      <div style={{ fontWeight:700, color:'var(--ink)' }}>{b.service || 'Booking'}</div>
+                      <div style={{ fontSize:11.5, color:'var(--muted)', marginTop:4 }}>{b.address || '—'}</div>
+                      <div style={{ fontSize:11.5, marginTop:4, color:'var(--amber)', fontWeight:700 }}>
+                        Stuck for {timeAgo(b.created_at)} — no partner on the way
                       </div>
                     </div>
-                    <span className="sb-badge" style={{ background: 'rgba(245,158,11,0.12)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.3)' }}>
-                      ⚠️ Stuck
+                    <span style={{ fontSize:10, fontWeight:700, background:'rgba(245,158,11,0.12)', color:'var(--amber)', border:'1px solid rgba(245,158,11,0.3)', borderRadius:999, padding:'3px 9px' }}>
+                      Stuck
                     </span>
                   </div>
                 </div>
@@ -5085,22 +5071,22 @@ function AlertsFeedSection() {
 
           {/* ── Pending Verifications ── */}
           {pendingVerify.length > 0 && (
-            <div className="mb-4">
-              <h6 className="font-weight-bold mb-3" style={{ color: '#C9A020', display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#C9A020', display: 'inline-block' }} />
+            <div style={{ marginBottom:24 }}>
+              <h6 style={{ fontWeight:800, marginBottom:12, color:'var(--gold)', display:'flex', alignItems:'center', gap:8, fontSize:12.5, letterSpacing:0.3 }}>
+                <span style={{ width:8, height:8, borderRadius:'50%', background:'var(--gold)', display:'inline-block' }} />
                 PARTNERS WAITING FOR VERIFICATION
               </h6>
               {pendingVerify.map(p => (
-                <div key={p.id} className="admin-card mb-2" style={{ borderLeft: '4px solid #C9A020' }}>
-                  <div className="card-body py-2 d-flex justify-content-between align-items-center">
+                <div key={p.id} className="admin-card" style={{ borderLeft:'4px solid var(--gold)', marginBottom:10 }}>
+                  <div style={{ padding:'12px 20px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                     <div>
-                      <div className="font-weight-bold text-gray-800">{p.full_name || 'Partner'}</div>
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div style={{ fontWeight:700, color:'var(--ink)' }}>{p.full_name || 'Partner'}</div>
+                      <div style={{ fontSize:11.5, color:'var(--muted)', marginTop:4, display:'flex', alignItems:'center', gap:6 }}>
                         <RoleBadge role={p.partner_role} /> · Applied {timeAgo(p.created_at)}
                       </div>
                     </div>
-                    <span className="sb-badge" style={{ background: 'rgba(201,160,32,0.12)', color: '#C9A020', border: '1px solid rgba(201,160,32,0.3)' }}>
-                      🔐 Pending
+                    <span style={{ fontSize:10, fontWeight:700, background:'var(--gold-soft)', color:'var(--gold-2)', border:'1px solid rgba(201,160,32,0.3)', borderRadius:999, padding:'3px 9px' }}>
+                      Pending
                     </span>
                   </div>
                 </div>
@@ -5160,13 +5146,13 @@ function VerificationQueueSection() {
   return (
     <>
       <PageHeader title="Verification Queue" sub="Review partner identity documents and approve or reject applications" />
-      <div className="row mb-4">
-        <div className="col-md-4 mb-2"><StatCard icon="⏳" label="Pending Review" value={counts.pending}  color="#f6c23e" /></div>
-        <div className="col-md-4 mb-2"><StatCard icon="✅" label="Approved"       value={counts.approved} color="#1cc88a" /></div>
-        <div className="col-md-4 mb-2"><StatCard icon="❌" label="Rejected"       value={counts.rejected} color="#e74a3b" /></div>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', gap:12, marginBottom:22 }}>
+        <StatCard icon={<Clock size={22} color="var(--amber)" />} label="Pending Review" value={counts.pending}  color="var(--amber)" />
+        <StatCard icon={<CheckCircle2 size={22} color="var(--green)" />} label="Approved" value={counts.approved} color="var(--green)" />
+        <StatCard icon={<X size={22} color="var(--red)" />} label="Rejected" value={counts.rejected} color="var(--red)" />
       </div>
 
-      <div className="mb-3">
+      <div style={{ display:'flex', flexWrap:'wrap', gap:4, marginBottom:16 }}>
         {['all','pending','approved','rejected'].map(f => (
           <FilterPill key={f} active={filter===f} onClick={() => setFilter(f)}>
             {f.charAt(0).toUpperCase()+f.slice(1)}
@@ -5175,48 +5161,48 @@ function VerificationQueueSection() {
       </div>
 
       {loading ? <Spinner /> : partners.length === 0 ? (
-        <div className="text-center py-5 text-gray-500">No partners in this queue.</div>
+        <div style={{ textAlign:'center', padding:'48px 0', color:'var(--muted)' }}>No partners in this queue.</div>
       ) : (
-        <div className="row">
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1.4fr', gap:18 }}>
           {/* List */}
-          <div className="col-md-5">
+          <div>
             {partners.map(p => (
-              <div key={p.id} className="admin-card mb-2" onClick={() => setSelected(p)}
-                style={{ borderLeft: `4px solid ${ROLE_COLOR[p.partner_role]||'#aaa'}`, cursor:'pointer', background: selected?.id===p.id?'#f8f9fc':'#fff' }}>
-                <div className="card-body py-2">
-                  <div className="d-flex align-items-center gap-2">
-                    <div style={{ width:38,height:38,borderRadius:'50%',overflow:'hidden',border:'2px solid #dee2e6',flexShrink:0 }}>
+              <div key={p.id} className="admin-card" onClick={() => setSelected(p)}
+                style={{ borderLeft: `4px solid ${ROLE_COLOR[p.partner_role]||'var(--muted)'}`, cursor:'pointer', background: selected?.id===p.id?'var(--gold-soft)':'var(--surface)', marginBottom:10 }}>
+                <div style={{ padding:'12px 16px' }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                    <div style={{ width:38,height:38,borderRadius:'50%',overflow:'hidden',border:'2px solid var(--line-2)',flexShrink:0 }}>
                       {p.profile_photo_url
                         ? <img src={p.profile_photo_url} alt="" style={{ width:'100%',height:'100%',objectFit:'cover' }} />
-                        : <div style={{ width:'100%',height:'100%',background:'#e3e6f0',display:'flex',alignItems:'center',justifyContent:'center',fontSize:16 }}>👤</div>}
+                        : <div style={{ width:'100%',height:'100%',background:'var(--canvas)',display:'flex',alignItems:'center',justifyContent:'center' }}><UserRound size={17} color="var(--muted)" /></div>}
                     </div>
-                    <div className="flex-grow-1" style={{ minWidth:0 }}>
-                      <div className="font-weight-bold text-gray-800 text-xs">{p.full_name || 'Unnamed'}</div>
-                      <div className="text-xs text-gray-500">{p.email} · <RoleBadge role={p.partner_role} /></div>
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <div style={{ fontWeight:700, color:'var(--ink)', fontSize:12.5 }}>{p.full_name || 'Unnamed'}</div>
+                      <div style={{ fontSize:11.5, color:'var(--muted)', display:'flex', alignItems:'center', gap:5 }}>{p.email} · <RoleBadge role={p.partner_role} /></div>
                     </div>
                     <SBBadge status={p.verification_status} />
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">Applied {new Date(p.created_at).toLocaleDateString('en-KE')}</div>
+                  <div style={{ fontSize:11, color:'var(--muted)', marginTop:6 }}>Applied {new Date(p.created_at).toLocaleDateString('en-KE')}</div>
                 </div>
               </div>
             ))}
           </div>
 
           {/* Detail panel */}
-          <div className="col-md-7">
+          <div>
             {!selected ? (
-              <div className="admin-card" style={{ minHeight:300,display:'flex',alignItems:'center',justifyContent:'center',color:'#a0aec0' }}>
-                <div className="text-center"><div style={{ fontSize:40,marginBottom:8 }}>👈</div><div>Select a partner to review their documents</div></div>
+              <div className="admin-card" style={{ minHeight:300,display:'flex',alignItems:'center',justifyContent:'center',color:'var(--muted)' }}>
+                <div style={{ textAlign:'center' }}><ClipboardList size={36} color="var(--line-2)" style={{ marginBottom:8 }} /><div>Select a partner to review their documents</div></div>
               </div>
             ) : (
               <div className="admin-card">
-                <div className="admin-card-header d-flex justify-content-between align-items-center">
-                  <span>📋 {selected.full_name} — Document Review</span>
-                  <button onClick={() => setSelected(null)} style={{ background:'none',border:'none',fontSize:18,cursor:'pointer',color:'#aaa' }}>×</button>
+                <div className="admin-card-header">
+                  <span style={{ display:'flex', alignItems:'center', gap:7 }}><FileText size={15} color="var(--gold)" /> {selected.full_name} — Document Review</span>
+                  <button onClick={() => setSelected(null)} style={{ background:'none',border:'none',cursor:'pointer',color:'var(--muted)', display:'flex' }}><X size={17} /></button>
                 </div>
-                <div className="card-body">
+                <div style={{ padding:'14px 20px 18px' }}>
                   {/* Basic info */}
-                  <div className="row mb-3">
+                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:16 }}>
                     {[
                       ['Phone',    selected.phone],
                       ['Email',    selected.email],
@@ -5225,64 +5211,59 @@ function VerificationQueueSection() {
                       ['Location', selected.county || '—'],
                       ['ID Number',selected.national_id_number || '—'],
                     ].map(([k,v]) => (
-                      <div key={k} className="col-6 mb-2">
-                        <div className="text-xs text-gray-500">{k}</div>
-                        <div className="text-xs font-weight-bold text-gray-800">{v||'—'}</div>
+                      <div key={k}>
+                        <div style={{ fontSize:10.5, color:'var(--muted)' }}>{k}</div>
+                        <div style={{ fontSize:12.5, fontWeight:700, color:'var(--ink)' }}>{v||'—'}</div>
                       </div>
                     ))}
                   </div>
                   {/* Documents */}
-                  <div className="font-weight-bold text-xs text-gray-800 mb-2">DOCUMENTS</div>
-                  <div className="d-flex flex-wrap gap-2 mb-3">
+                  <div style={{ fontSize:11, fontWeight:800, color:'var(--ink-2)', marginBottom:8 }}>DOCUMENTS</div>
+                  <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:16 }}>
                     {DOC_FIELDS.map(({ key, label }) => selected[key] ? (
                       <a key={key} href={selected[key]} target="_blank" rel="noreferrer"
-                        className="btn btn-sm btn-outline-primary" style={{ fontSize:11 }}>
-                        📄 {label}
+                        style={{ display:'flex', alignItems:'center', gap:5, fontSize:11.5, fontWeight:700, color:'var(--blue)', border:'1px solid var(--line-2)', borderRadius:8, padding:'6px 11px', textDecoration:'none' }}>
+                        <FileText size={12} /> {label}
                       </a>
                     ) : (
-                      <span key={key} className="btn btn-sm btn-outline-secondary disabled" style={{ fontSize:11,opacity:0.5 }}>
-                        ✗ {label}
+                      <span key={key} style={{ display:'flex', alignItems:'center', gap:5, fontSize:11.5, fontWeight:700, color:'var(--muted)', border:'1px solid var(--line)', borderRadius:8, padding:'6px 11px', opacity:0.6 }}>
+                        <X size={12} /> {label}
                       </span>
                     ))}
                   </div>
                   {/* Reject note */}
                   {selected.verification_status !== 'approved' && (
                     <textarea
-                      className="form-control mb-3"
                       rows={2}
                       placeholder="Rejection reason (required if rejecting)…"
-                      style={{ fontSize:12,resize:'none' }}
+                      style={{ width:'100%', fontSize:12, resize:'none', border:'1px solid var(--line-2)', borderRadius:9, padding:10, marginBottom:14, fontFamily:'inherit' }}
                       value={notes[selected.id]||''}
                       onChange={e => setNotes(n => ({ ...n, [selected.id]: e.target.value }))}
                     />
                   )}
                   {/* Actions */}
                   {selected.verification_status === 'pending' && (
-                    <div className="d-flex gap-2">
-                      <button
-                        className="btn btn-success btn-sm"
-                        style={{ fontWeight:700 }}
-                        disabled={acting===selected.id}
-                        onClick={() => act(selected.id, 'approved')}>
-                        ✅ Approve
+                    <div style={{ display:'flex', gap:8 }}>
+                      <button disabled={acting===selected.id} onClick={() => act(selected.id, 'approved')}
+                        style={{ display:'flex', alignItems:'center', gap:6, padding:'8px 16px', borderRadius:9, border:'none', background:'var(--green)', color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer' }}>
+                        <CheckCircle2 size={14} /> Approve
                       </button>
-                      <button
-                        className="btn btn-danger btn-sm"
-                        style={{ fontWeight:700 }}
-                        disabled={acting===selected.id || !notes[selected.id]?.trim()}
-                        onClick={() => act(selected.id, 'rejected')}>
-                        ❌ Reject
+                      <button disabled={acting===selected.id || !notes[selected.id]?.trim()} onClick={() => act(selected.id, 'rejected')}
+                        style={{ display:'flex', alignItems:'center', gap:6, padding:'8px 16px', borderRadius:9, border:'none', background:'var(--red)', color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer', opacity: !notes[selected.id]?.trim() ? 0.5 : 1 }}>
+                        <X size={14} /> Reject
                       </button>
                     </div>
                   )}
                   {selected.verification_status === 'approved' && (
-                    <button className="btn btn-outline-danger btn-sm" onClick={() => act(selected.id,'rejected')} disabled={acting===selected.id}>
-                      ↩ Revoke Approval
+                    <button onClick={() => act(selected.id,'rejected')} disabled={acting===selected.id}
+                      style={{ display:'flex', alignItems:'center', gap:6, padding:'8px 16px', borderRadius:9, border:'1px solid rgba(239,68,68,.3)', background:'rgba(239,68,68,.06)', color:'var(--red)', fontSize:13, fontWeight:700, cursor:'pointer' }}>
+                      <RotateCcw size={14} /> Revoke Approval
                     </button>
                   )}
                   {selected.verification_status === 'rejected' && (
-                    <button className="btn btn-success btn-sm" onClick={() => act(selected.id,'approved')} disabled={acting===selected.id}>
-                      ✅ Re-approve
+                    <button onClick={() => act(selected.id,'approved')} disabled={acting===selected.id}
+                      style={{ display:'flex', alignItems:'center', gap:6, padding:'8px 16px', borderRadius:9, border:'none', background:'var(--green)', color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer' }}>
+                      <CheckCircle2 size={14} /> Re-approve
                     </button>
                   )}
                 </div>
@@ -5748,28 +5729,28 @@ function FraudRiskSection() {
   return (
     <>
       <PageHeader title="Fraud & Risk" sub="Safety incidents, repeat claimants, and suspended partners" />
-      <div className="row mb-4">
-        <div className="col-md-4 mb-2"><StatCard icon="🚨" label="Safety Incidents (30d)" value={flagged.length}    color="#e74a3b" /></div>
-        <div className="col-md-4 mb-2"><StatCard icon="⚠️" label="Repeat Claimants"     value={repeaters.length}  color="#f6c23e" /></div>
-        <div className="col-md-4 mb-2"><StatCard icon="🚫" label="Suspended Partners"   value={suspended.length}  color="#9F7AEA" /></div>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', gap:12, marginBottom:22 }}>
+        <StatCard icon={<Siren size={22} color="var(--red)" />} label="Safety Incidents (30d)" value={flagged.length} color="var(--red)" />
+        <StatCard icon={<AlertCircle size={22} color="var(--amber)" />} label="Repeat Claimants" value={repeaters.length} color="var(--amber)" />
+        <StatCard icon={<ShieldAlert size={22} color="var(--violet)" />} label="Suspended Partners" value={suspended.length} color="var(--violet)" />
       </div>
 
       {loading ? <Spinner /> : (
         <>
           {/* Safety Incidents */}
           {flagged.length > 0 && (
-            <div className="admin-card mb-4">
-              <div className="admin-card-header" style={{ background:'rgba(231,74,59,0.08)', color:'#e74a3b', borderLeft:'4px solid #e74a3b' }}>
-                🚨 Safety Incidents (last 30 days)
+            <div className="admin-card" style={{ marginBottom:20 }}>
+              <div className="admin-card-header" style={{ background:'rgba(239,68,68,0.08)', color:'var(--red)', borderLeft:'4px solid var(--red)' }}>
+                <span style={{ display:'flex', alignItems:'center', gap:7 }}><Siren size={14} /> Safety Incidents (last 30 days)</span>
               </div>
               <table className="admin-table">
                 <thead><tr><th>Customer</th><th>Email</th><th>Date</th></tr></thead>
                 <tbody>
                   {flagged.map((t,i) => (
                     <tr key={i}>
-                      <td className="font-weight-bold text-xs text-gray-800">{t.user_name||'—'}</td>
-                      <td className="text-xs text-gray-500">{t.user_email||'—'}</td>
-                      <td className="text-xs text-gray-500">{new Date(t.created_at).toLocaleDateString('en-KE')}</td>
+                      <td style={{ fontWeight:700, color:'var(--ink)' }}>{t.user_name||'—'}</td>
+                      <td style={{ color:'var(--muted)' }}>{t.user_email||'—'}</td>
+                      <td style={{ color:'var(--muted)' }}>{new Date(t.created_at).toLocaleDateString('en-KE')}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -5779,19 +5760,19 @@ function FraudRiskSection() {
 
           {/* Repeat claimants */}
           {repeaters.length > 0 && (
-            <div className="admin-card mb-4">
-              <div className="admin-card-header" style={{ background:'rgba(246,194,62,0.08)', color:'#C9A020', borderLeft:'4px solid #f6c23e' }}>
-                ⚠️ Repeat Claimants — 3+ tickets in 30 days
+            <div className="admin-card" style={{ marginBottom:20 }}>
+              <div className="admin-card-header" style={{ background:'var(--gold-soft)', color:'var(--gold-2)', borderLeft:'4px solid var(--amber)' }}>
+                <span style={{ display:'flex', alignItems:'center', gap:7 }}><AlertCircle size={14} /> Repeat Claimants — 3+ tickets in 30 days</span>
               </div>
               <table className="admin-table">
                 <thead><tr><th>Customer</th><th>Email</th><th>Tickets</th><th>Categories</th></tr></thead>
                 <tbody>
                   {repeaters.map((r,i) => (
                     <tr key={i}>
-                      <td className="font-weight-bold text-xs text-gray-800">{r.user_name||'—'}</td>
-                      <td className="text-xs text-gray-500">{r.user_email||'—'}</td>
-                      <td><span className="sb-badge sb-badge-danger">{r.count}</span></td>
-                      <td className="text-xs text-gray-600">{r.categories.map(c => c.replace(/_/g,' ')).join(', ')}</td>
+                      <td style={{ fontWeight:700, color:'var(--ink)' }}>{r.user_name||'—'}</td>
+                      <td style={{ color:'var(--muted)' }}>{r.user_email||'—'}</td>
+                      <td><span style={{ fontSize:11, fontWeight:800, background:'rgba(239,68,68,0.1)', color:'var(--red)', padding:'2px 9px', borderRadius:999 }}>{r.count}</span></td>
+                      <td style={{ color:'var(--ink-2)' }}>{r.categories.map(c => c.replace(/_/g,' ')).join(', ')}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -5801,11 +5782,11 @@ function FraudRiskSection() {
 
           {/* Suspended / rejected partners */}
           <div className="admin-card">
-            <div className="admin-card-header" style={{ background:'rgba(159,122,234,0.08)', color:'#9F7AEA', borderLeft:'4px solid #9F7AEA' }}>
-              🚫 Suspended & Rejected Partners
+            <div className="admin-card-header" style={{ background:'rgba(124,108,240,0.08)', color:'var(--violet)', borderLeft:'4px solid var(--violet)' }}>
+              <span style={{ display:'flex', alignItems:'center', gap:7 }}><ShieldAlert size={14} /> Suspended & Rejected Partners</span>
             </div>
             {suspended.length === 0
-              ? <div className="card-body text-xs text-gray-500">No suspended or rejected partners.</div>
+              ? <div style={{ padding:'14px 20px', color:'var(--muted)', fontSize:12.5 }}>No suspended or rejected partners.</div>
               : (
                 <table className="admin-table">
                   <thead><tr><th>Partner</th><th>Role</th><th>Status</th><th>Since</th><th>Action</th></tr></thead>
@@ -5813,22 +5794,22 @@ function FraudRiskSection() {
                     {suspended.map(p => (
                       <tr key={p.id}>
                         <td>
-                          <div className="font-weight-bold text-xs text-gray-800">{p.full_name||'—'}</div>
-                          <div className="text-xs text-gray-500">{p.email}</div>
+                          <div style={{ fontWeight:700, color:'var(--ink)' }}>{p.full_name||'—'}</div>
+                          <div style={{ color:'var(--muted)', fontSize:11.5 }}>{p.email}</div>
                         </td>
                         <td><RoleBadge role={p.partner_role} /></td>
                         <td><SBBadge status={p.verification_status} /></td>
-                        <td className="text-xs text-gray-500">{new Date(p.created_at).toLocaleDateString('en-KE')}</td>
+                        <td style={{ color:'var(--muted)' }}>{new Date(p.created_at).toLocaleDateString('en-KE')}</td>
                         <td>
                           {p.verification_status === 'suspended' ? (
-                            <button className="btn btn-sm btn-success" style={{ fontSize:11,fontWeight:700 }}
-                              disabled={acting===p.id} onClick={() => reinstatePartner(p.id)}>
-                              ✅ Reinstate
+                            <button disabled={acting===p.id} onClick={() => reinstatePartner(p.id)}
+                              style={{ display:'flex', alignItems:'center', gap:5, fontSize:11, fontWeight:700, padding:'6px 12px', borderRadius:8, border:'none', background:'var(--green)', color:'#fff', cursor:'pointer' }}>
+                              <CheckCircle2 size={12} /> Reinstate
                             </button>
                           ) : (
-                            <button className="btn btn-sm btn-danger" style={{ fontSize:11,fontWeight:700 }}
-                              disabled={acting===p.id} onClick={() => suspendPartner(p.id)}>
-                              🚫 Suspend
+                            <button disabled={acting===p.id} onClick={() => suspendPartner(p.id)}
+                              style={{ display:'flex', alignItems:'center', gap:5, fontSize:11, fontWeight:700, padding:'6px 12px', borderRadius:8, border:'none', background:'var(--red)', color:'#fff', cursor:'pointer' }}>
+                              <ShieldAlert size={12} /> Suspend
                             </button>
                           )}
                         </td>
