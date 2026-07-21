@@ -121,7 +121,7 @@ export async function generateAndUploadReceipt(receipt) {
   doc.setTextColor(72, 187, 120);
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text(`KSh ${(receipt.amount || 1500).toLocaleString()}`, W - 28, y + 10, { align: 'right' });
+  doc.text(`KSh ${Number(receipt.amount || 0).toLocaleString()}`, W - 28, y + 10, { align: 'right' });
 
   y += 26;
 

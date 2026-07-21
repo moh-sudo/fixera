@@ -5,6 +5,7 @@ import { ArrowLeft, Download, CheckCircle2, AlertCircle, FileText } from 'lucide
 import { supabase } from '../../supabase';
 import { useAuth } from '../../hooks/useAuth';
 import { sendReceipt } from '../../services/emailService';
+import { generateAndUploadReceipt } from '../../utils/receiptPDF';
 
 import { useCL } from '../../hooks/useCL';
 
@@ -18,6 +19,7 @@ export default function ReceiptPage() {
   const [worker,  setWorker]  = useState(null);
   const [receipt, setReceipt] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [generating, setGenerating] = useState(false);
 
   useEffect(() => {
     supabase.from('bookings').select('*').eq('id', bookingId).single()
@@ -46,9 +48,38 @@ export default function ReceiptPage() {
         }
       });
 
-    supabase.from('receipts').select('pdf_url').eq('booking_id', bookingId).single()
+    supabase.from('receipts').select('id,pdf_url,amount,commission,service,address,generated_at').eq('booking_id', bookingId).maybeSingle()
       .then(({ data }) => { if (data) setReceipt(data); });
   }, [bookingId, profile]);
+
+  const handleDownload = async () => {
+    if (receipt?.pdf_url) {
+      window.open(receipt.pdf_url, '_blank');
+      return;
+    }
+    setGenerating(true);
+    try {
+      const url = await generateAndUploadReceipt({
+        bookingId,
+        receiptId: receipt?.id,
+        doc: {
+          number:   receiptNo,
+          date:     receipt?.generated_at || booking.completed_at || booking.created_at,
+          partner:  { name: worker?.full_name || booking.worker_name || 'Fixera Partner', role: 'worker' },
+          customer: { name: profile?.full_name || 'Fixera Customer' },
+          items: [{ name: booking.sub_service || booking.service || 'Service', qty: 1, price: Number(receipt?.amount || booking.price || booking.total || 0) }],
+          total:    Number(receipt?.amount || booking.price || booking.total || 0),
+          commission: receipt?.commission != null ? Number(receipt.commission) : undefined,
+          refId:    booking.id,
+        },
+      });
+      if (url) { setReceipt(r => ({ ...(r || {}), pdf_url: url })); window.open(url, '_blank'); }
+      else window.print();
+    } catch (e) {
+      console.error('Receipt PDF generation failed:', e.message);
+      window.print();
+    } finally { setGenerating(false); }
+  };
 
   /* Loading */
   if (loading) return (
@@ -101,36 +132,20 @@ export default function ReceiptPage() {
           Back
         </button>
         <div style={{ display: 'flex', gap: 10 }}>
-          {receipt?.pdf_url ? (
-            <a
-              href={receipt.pdf_url}
-              download
-              target="_blank"
-              rel="noreferrer"
-              style={{
-                padding: '9px 18px', borderRadius: 10, border: 'none',
-                background: CL.navy, color: '#fff',
-                fontWeight: 800, fontSize: 13, cursor: 'pointer',
-                textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 7,
-              }}
-            >
-              <Download size={14} />
-              Download PDF
-            </a>
-          ) : (
-            <button
-              onClick={() => window.print()}
-              style={{
-                padding: '9px 18px', borderRadius: 10, border: 'none',
-                background: CL.navy, color: '#fff',
-                fontWeight: 800, fontSize: 13, cursor: 'pointer',
-                display: 'flex', alignItems: 'center', gap: 7, fontFamily: 'inherit',
-              }}
-            >
-              <Download size={14} />
-              Download PDF
-            </button>
-          )}
+          <button
+            onClick={handleDownload}
+            disabled={generating}
+            style={{
+              padding: '9px 18px', borderRadius: 10, border: 'none',
+              background: CL.navy, color: '#fff',
+              fontWeight: 800, fontSize: 13, cursor: generating ? 'default' : 'pointer',
+              display: 'flex', alignItems: 'center', gap: 7, fontFamily: 'inherit',
+              opacity: generating ? 0.7 : 1,
+            }}
+          >
+            <Download size={14} />
+            {generating ? 'Preparing…' : 'Download PDF'}
+          </button>
         </div>
       </div>
 

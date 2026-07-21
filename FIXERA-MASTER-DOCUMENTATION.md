@@ -1,6 +1,25 @@
 # 🏗️ FIXERA - MASTER DOCUMENTATION
 **Last Updated:** July 21, 2026  
-**Status:** Admin dashboard full redesign COMPLETE (all ~36 sections + gap-scan cleanup + Live Ops map light theme) ✅ · Data erasure + data export built (Kenya DPA 2019 rights, plan items 3.2/3.3) — **NEEDS `migrations/create_data_privacy.sql` run in Supabase before it works** ⚠️ · **Found + fixed a real bug: approving a refund never actually credited the customer** — now wired to `createRefund()`+`execute_refund()` ✅ · Refund + dispute SLA tracking built (plan items 3.7/3.8) — visible on each ticket/dispute card + surfaced in Alerts Feed ✅ · Fixed duplicate-logo bug on customer Sign Up page ✅ · Earlier: email system overhaul (Resend on both apps), fixera.co.ke → fixera.africa, Zoho inboxes fixed, subdomains live, Agent/Team management built · SLA auto-escalation cron built (4.2) ✅ · **PENDING:** run create_data_privacy.sql AND add_sla_auto_escalation_cron.sql (both need Supabase SQL Editor), migrate broadcast-announcement.js off Gmail, 8x8 phone layer, workflow automation
+**Status:** Admin dashboard full redesign COMPLETE (all ~36 sections + gap-scan cleanup + Live Ops map light theme) ✅ · Data erasure + data export built (Kenya DPA 2019 rights, plan items 3.2/3.3) — **NEEDS `migrations/create_data_privacy.sql` run in Supabase before it works** ⚠️ · **Found + fixed a real bug: approving a refund never actually credited the customer** — now wired to `createRefund()`+`execute_refund()` ✅ · Refund + dispute SLA tracking built (plan items 3.7/3.8) — visible on each ticket/dispute card + surfaced in Alerts Feed ✅ · Fixed duplicate-logo bug on customer Sign Up page ✅ · Earlier: email system overhaul (Resend on both apps), fixera.co.ke → fixera.africa, Zoho inboxes fixed, subdomains live, Agent/Team management built · SLA auto-escalation cron built (4.2) ✅ · Invoice PDF generation wired for real on both apps (4.4) + fixed a hardcoded KSh 1,500 receipt-amount bug on the partner side ✅ · **PENDING:** run create_data_privacy.sql, add_sla_auto_escalation_cron.sql, AND add_receipt_pdf_storage.sql (all need Supabase SQL Editor), migrate broadcast-announcement.js off Gmail, 8x8 phone layer, workflow automation
+
+---
+
+## 🆕 SESSION SUMMARY (July 21, 2026 — Invoice PDF generation — plan item 4.4)
+
+### Discovered the PDF infrastructure already existed — it just wasn't wired up
+The plan described 4.4 as building a new `/api/generate-invoice` server endpoint. Before building anything, checked what actually existed and found the customer app already has a fully-built, polished branded PDF generator: `web/src/utils/fixeraDocument.js` (`buildDocumentPDF({type: 'receipt'|'invoice'|'quotation', ...})`, using `jsPDF` client-side) — already used for materials estimates and moving-request quotations, but **never wired to the actual booking receipt**. `ReceiptPage.jsx` (customer) only ever called `window.print()`. Separately, the **partner app already has its own working generate-and-upload flow** (`worker/src/utils/receiptPDF.js`, called from `ActiveJobPage.jsx` on job completion) that uploads a real PDF to a `receipts` Supabase Storage bucket and saves the URL — but neither the `receipts.pdf_url` column nor the storage bucket were ever captured in a tracked migration, so it was unclear whether they actually exist in the live database.
+
+### What shipped
+- **New migration** `add_receipt_pdf_storage.sql` — idempotent `ALTER TABLE receipts ADD COLUMN IF NOT EXISTS pdf_url`, idempotent `receipts` storage bucket creation + public-read/self-write policies (same pattern as the `avatars` bucket). Makes both apps' assumptions actually true regardless of what existed before.
+- **New** `web/src/utils/receiptPDF.js` — a customer-app `generateAndUploadReceipt()` mirroring the partner app's, but reusing the nicer existing `buildDocumentPDF` generator instead of a third hand-rolled PDF layout. Wired into `ReceiptPage.jsx`: "Download PDF" now generates a real branded PDF on first click, uploads it, caches the URL on the `receipts` row (if one exists) so it's a one-time cost, and falls back to `window.print()` only if generation fails.
+- **Bug found + fixed while in this code**: the partner app's `ActiveJobPage.jsx` was inserting `amount: 1500` **hardcoded** into every completion receipt, regardless of the job's actual price — every partner-completed job's receipt PDF and the partner-facing `ReceiptPage.jsx` "Total Earned" display showed a fake KSh 1,500. Fixed both to read the real `job.price`.
+
+### Scope note
+Did **not** touch the apparent double-receipt-creation path (a DB trigger auto-creates a `receipts` row when a payment turns `'paid'`, and `ActiveJobPage.jsx` *also* manually inserts one on job completion) — that's a separate, deeper question about the receipts data model that needs its own investigation, not something to fix as a side effect of wiring up PDF downloads.
+
+**PENDING — must run in Supabase before this is fully live:** `migrations/add_receipt_pdf_storage.sql`.
+
+Execution plan (`fixera-execution-plan` memory) updated: 4.4 marked complete.
 
 ---
 

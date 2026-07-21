@@ -145,7 +145,7 @@ export default function ActiveJobPage() {
         address:      job.address,
         booking_date: job.booking_date,
         booking_time: job.booking_time,
-        amount:       1500,
+        amount:       Number(job.price || job.amount || 0),
         generated_at: new Date().toISOString(),
       };
 

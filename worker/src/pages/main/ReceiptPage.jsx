@@ -168,7 +168,7 @@ export default function ReceiptPage() {
                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
               }}>
                 <div style={{ color: CL.muted, fontSize: 13, fontWeight: 600 }}>Total Earned</div>
-                <div style={{ color: CL.green, fontSize: 22, fontWeight: 900 }}>KSh 1,500</div>
+                <div style={{ color: CL.green, fontSize: 22, fontWeight: 900 }}>KSh {Number(job.price || job.amount || 0).toLocaleString()}</div>
               </div>
             </Section>
 
