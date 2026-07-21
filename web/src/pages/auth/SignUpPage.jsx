@@ -77,7 +77,7 @@ export default function SignUpPage() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: 'easeOut' }} style={{ width: '100%', maxWidth: 440 }}>
 
         {/* Logo (mobile only — desktop shows it on the photo panel) */}
-        <div className="auth-form-logo" style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
+        <div className="auth-form-logo" style={{ marginBottom: 18 }}>
           <BrandLogo height={64} onLight />
         </div>
 

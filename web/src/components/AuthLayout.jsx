@@ -51,7 +51,7 @@ export default function AuthLayout({ children }) {
         .auth-form-logo { display: none; }
         @media (max-width: 900px) {
           .auth-photo { display: none; }
-          .auth-form-logo { display: block; }
+          .auth-form-logo { display: flex; justify-content: center; }
         }
       `}</style>
 
