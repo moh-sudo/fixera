@@ -31,6 +31,7 @@ import {
   LineChart as LineChartIcon, Activity, MapPin, ShieldAlert, Lock, Settings, UserCog,
   Search, Mail, HelpCircle, ChevronDown, Home, LogOut, UserRound,
   Handshake, Smartphone, Flag, Save, StickyNote, Clock, Plus, AlertCircle, ShieldCheck,
+  Phone, X, CheckCircle2, Circle, ArrowLeft, RadioTower,
 } from 'lucide-react';
 
 // ── Audit helper ─────────────────────────────────────────────────
@@ -3306,13 +3307,13 @@ function RiderOpsSection() {
   const [queueRider, setQueueRider] = useState(null);   // rider selected in Rider Queue tab
 
   const LEG_STATUS = {
-    pending:           { label:'⏳ Pending',         color:'#6c757d' },
-    rider_assigned:    { label:'🚗 Assigned',        color:'#63B3ED' },
-    picked_up:         { label:'📦 Picked Up',       color:'#F6AD55' },
-    at_station:        { label:'🏪 At Station',      color:'#C9A020' },
-    out_for_delivery:  { label:'🚀 Out Delivering',  color:'#9F7AEA' },
-    delivered:         { label:'✅ Delivered',        color:'#48BB78' },
-    cancelled:         { label:'❌ Cancelled',        color:'#FC8181' },
+    pending:           { label:'Pending',         Icon: Clock,       color:'var(--muted)' },
+    rider_assigned:    { label:'Assigned',        Icon: Bike,        color:'var(--blue)' },
+    picked_up:         { label:'Picked Up',       Icon: Package,     color:'var(--amber)' },
+    at_station:        { label:'At Station',      Icon: Store,       color:'var(--gold)' },
+    out_for_delivery:  { label:'Out Delivering',  Icon: Navigation,  color:'var(--violet)' },
+    delivered:         { label:'Delivered',       Icon: CheckCircle2,color:'var(--green)' },
+    cancelled:         { label:'Cancelled',       Icon: X,           color:'var(--red)' },
   };
 
   const load = useCallback(() => {
@@ -3376,56 +3377,53 @@ function RiderOpsSection() {
   );
 
   const LegStatusBadge = ({ status }) => {
-    const meta = LEG_STATUS[status] || { label: status, color: '#aaa' };
+    const meta = LEG_STATUS[status] || { label: status, Icon: null, color: 'var(--muted)' };
     return (
-      <span style={{ background:`${meta.color}18`, color:meta.color, border:`1px solid ${meta.color}40`,
-        borderRadius:999, padding:'2px 10px', fontSize:11, fontWeight:800, whiteSpace:'nowrap' }}>
-        {meta.label}
+      <span style={{ display:'inline-flex', alignItems:'center', gap:5, background:`${meta.color}18`, color:meta.color,
+        borderRadius:999, padding:'3px 10px', fontSize:11, fontWeight:800, whiteSpace:'nowrap' }}>
+        {meta.Icon && <meta.Icon size={11} />} {meta.label}
       </span>
     );
   };
 
   const TABS = [
-    { id:'dispatch',   label:`📡 Dispatch`,       badge: unassigned.length,  badgeColor:'#e74a3b' },
-    { id:'legs',       label:`📦 All Legs`,        badge: legs.length,        badgeColor:'#4e73df' },
-    { id:'queue',      label:`👤 Rider Queue`,     badge: null },
-    { id:'riders',     label:`👥 Riders`,          badge: riders.length,      badgeColor:'#48BB78' },
+    { id:'dispatch',   label:'Dispatch',      Icon: RadioTower, badge: unassigned.length,  badgeColor:'var(--red)' },
+    { id:'legs',       label:'All Legs',      Icon: Package,    badge: legs.length,        badgeColor:'var(--blue)' },
+    { id:'queue',      label:'Rider Queue',   Icon: UserRound,  badge: null },
+    { id:'riders',     label:'Riders',        Icon: Users,      badge: riders.length,      badgeColor:'var(--green)' },
   ];
 
   return (
     <>
-      <PageHeader title="🚗 Rider Dispatch & Ops" sub="Assign riders to delivery legs, monitor queues and track live status" />
+      <PageHeader title="Rider Dispatch & Ops" sub="Assign riders to delivery legs, monitor queues and track live status" />
 
       {/* KPI bar */}
-      <div className="row mb-3">
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', gap:14, marginBottom:20 }}>
         {[
-          { icon:'📡', label:'Unassigned',  val:unassigned.length,                                           color:'#e74a3b' },
-          { icon:'🔧', label:'Active Legs', val:activeLeg,                                                   color:'#F6AD55' },
-          { icon:'✅', label:'Delivered',   val:legs.filter(l=>l.status==='delivered').length,               color:'#48BB78' },
-          { icon:'🚗', label:'Riders',      val:riders.filter(r=>r.verification_status==='approved').length, color:'#63B3ED' },
+          { Icon:RadioTower, label:'Unassigned',  val:unassigned.length,                                           color:'var(--red)' },
+          { Icon:Radio,      label:'Active Legs', val:activeLeg,                                                   color:'var(--amber)' },
+          { Icon:CheckCircle2,label:'Delivered',   val:legs.filter(l=>l.status==='delivered').length,               color:'var(--green)' },
+          { Icon:Bike,       label:'Riders',      val:riders.filter(r=>r.verification_status==='approved').length, color:'var(--blue)' },
         ].map(s => (
-          <div key={s.label} className="col-md-3 mb-2">
-            <div className="admin-card"><div className="card-body py-2 text-center">
-              <div style={{ fontSize:18 }}>{s.icon}</div>
-              <div style={{ fontSize:22, fontWeight:900, color:s.color }}>{s.val}</div>
-              <div className="text-xs text-gray-500">{s.label}</div>
-            </div></div>
+          <div key={s.label} className="stat-card" style={{ textAlign:'center' }}>
+            <div className="stat-ico" style={{ background:`${s.color}18`, margin:'0 auto 10px' }}><s.Icon size={20} color={s.color} /></div>
+            <div style={{ fontSize:22, fontWeight:800, color:'var(--ink)' }}>{s.val}</div>
+            <div style={{ fontSize:11.5, color:'var(--muted)', marginTop:2 }}>{s.label}</div>
           </div>
         ))}
       </div>
 
       {/* Tab bar */}
-      <div className="d-flex mb-3 flex-wrap" style={{ gap:6, borderBottom:'2px solid #e3e6f0', paddingBottom:0 }}>
+      <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginBottom:20, borderBottom:'1px solid var(--line)' }}>
         {TABS.map(t => (
           <button key={t.id} onClick={() => { setTab(t.id); setSelected(null); }}
-            style={{ background:'none', border:'none', fontFamily:'inherit', cursor:'pointer', padding:'8px 14px',
-              fontSize:13, fontWeight:700, color:tab===t.id?'#C9A020':'#6c757d',
-              borderBottom:tab===t.id?'3px solid #C9A020':'3px solid transparent', marginBottom:-2,
-              display:'flex', alignItems:'center', gap:6 }}>
-            {t.label}
+            style={{ background:'none', border:'none', fontFamily:'inherit', cursor:'pointer', padding:'9px 14px',
+              fontSize:13, fontWeight:700, color:tab===t.id?'var(--gold-2)':'var(--muted)',
+              borderBottom:tab===t.id?'2.5px solid var(--gold)':'2.5px solid transparent', marginBottom:-1,
+              display:'flex', alignItems:'center', gap:7 }}>
+            <t.Icon size={14} /> {t.label}
             {t.badge != null && (
-              <span style={{ background:t.badgeColor+'20', color:t.badgeColor, border:`1px solid ${t.badgeColor}40`,
-                fontSize:10, fontWeight:800, padding:'1px 7px', borderRadius:999 }}>{t.badge}</span>
+              <span style={{ background:`${t.badgeColor}18`, color:t.badgeColor, fontSize:10, fontWeight:800, padding:'2px 7px', borderRadius:999 }}>{t.badge}</span>
             )}
           </button>
         ))}
@@ -3435,40 +3433,36 @@ function RiderOpsSection() {
         <>
           {/* ── TAB: Dispatch ── */}
           {tab === 'dispatch' && (
-            <div className="row">
-              <div className="col-md-5">
-                <div className="font-weight-bold text-xs text-gray-600 mb-2 text-uppercase" style={{ letterSpacing:1 }}>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1.2fr', gap:18 }}>
+              <div>
+                <div style={{ fontSize:11, fontWeight:800, textTransform:'uppercase', letterSpacing:'.5px', color:'var(--muted)', marginBottom:10 }}>
                   Unassigned Delivery Legs ({unassigned.length})
                 </div>
                 {unassigned.length === 0
-                  ? <div className="admin-card p-4 text-center text-gray-500 text-xs">✅ All legs are assigned!</div>
+                  ? <div className="admin-card" style={{ padding:24, textAlign:'center', color:'var(--muted)', fontSize:12.5 }}><CheckCircle2 size={22} color="var(--green)" style={{ marginBottom:6 }} /><div>All legs are assigned!</div></div>
                   : unassigned.map(leg => {
                     const ageHrs = Math.round((new Date() - new Date(leg.created_at)) / 3600000);
+                    const isSel = selected?.id === leg.id;
                     return (
-                      <div key={leg.id} className="admin-card mb-2"
-                        onClick={() => setSelected(selected?.id === leg.id ? null : leg)}
-                        style={{ borderLeft:`4px solid ${selected?.id===leg.id?'#C9A020':ageHrs>2?'#e74a3b':'#e3e6f0'}`,
-                          cursor:'pointer', background:selected?.id===leg.id?'#fffbea':'#fff' }}>
-                        <div className="card-body py-2">
-                          <div className="d-flex justify-content-between align-items-start mb-1">
-                            <div className="font-weight-bold text-gray-800 text-xs">
-                              {leg.leg_type==='return'?'🔄 Return':'📦 Pickup'} · {leg.bookings?.sub_service||'Delivery'}
+                      <div key={leg.id} className="admin-card"
+                        onClick={() => setSelected(isSel ? null : leg)}
+                        style={{ borderLeft:`4px solid ${isSel?'var(--gold)':ageHrs>2?'var(--red)':'var(--line)'}`, cursor:'pointer', background: isSel ? 'var(--gold-soft)' : 'var(--surface)' }}>
+                        <div style={{ padding:14 }}>
+                          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:5 }}>
+                            <div style={{ fontWeight:700, color:'var(--ink)', fontSize:12.5, display:'flex', alignItems:'center', gap:5 }}>
+                              {leg.leg_type==='return' ? <RotateCcw size={12} /> : <Package size={12} />} {leg.leg_type==='return'?'Return':'Pickup'} · {leg.bookings?.sub_service||'Delivery'}
                             </div>
                             {ageHrs > 2 && (
-                              <span style={{ fontSize:9, fontWeight:800, background:'#ffe4e4', color:'#e74a3b', padding:'2px 6px', borderRadius:4 }}>
-                                ⏰ {ageHrs}h old
+                              <span style={{ display:'inline-flex', alignItems:'center', gap:3, fontSize:9.5, fontWeight:800, background:'#FEE2E2', color:'var(--red)', padding:'2px 7px', borderRadius:5 }}>
+                                <Clock size={10} /> {ageHrs}h old
                               </span>
                             )}
                           </div>
-                          <div className="text-xs text-gray-500">📍 {leg.pickup_address||leg.bookings?.address||'—'}</div>
-                          <div className="text-xs text-gray-500">🏁 {leg.dropoff_address||'—'}</div>
-                          <div className="d-flex justify-content-between align-items-center mt-1">
-                            <span className="text-xs font-weight-bold" style={{ color:'#C9A020' }}>
-                              KSh {(leg.amount||0).toLocaleString()}
-                            </span>
-                            <span className="text-xs text-gray-400">
-                              {ageHrs < 1 ? 'Just now' : `${ageHrs}h ago`}
-                            </span>
+                          <div style={{ fontSize:11.5, color:'var(--muted)', display:'flex', alignItems:'center', gap:4 }}><MapPin size={11} /> {leg.pickup_address||leg.bookings?.address||'—'}</div>
+                          <div style={{ fontSize:11.5, color:'var(--muted)', display:'flex', alignItems:'center', gap:4, marginTop:2 }}><Flag size={11} /> {leg.dropoff_address||'—'}</div>
+                          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:7 }}>
+                            <span style={{ fontSize:12, fontWeight:800, color:'var(--gold)' }}>KSh {(leg.amount||0).toLocaleString()}</span>
+                            <span style={{ fontSize:11, color:'var(--muted)' }}>{ageHrs < 1 ? 'Just now' : `${ageHrs}h ago`}</span>
                           </div>
                         </div>
                       </div>
@@ -3477,49 +3471,46 @@ function RiderOpsSection() {
                 }
               </div>
 
-              <div className="col-md-7">
+              <div>
                 {selected ? (
                   <div className="admin-card" style={{ position:'sticky', top:0 }}>
-                    <div className="admin-card-header d-flex justify-content-between align-items-center">
-                      <span>🚗 Assign Rider — {selected.bookings?.sub_service||'Delivery'}</span>
-                      <button onClick={() => setSelected(null)} style={{ background:'none', border:'none', fontSize:18, cursor:'pointer', color:'#aaa' }}>×</button>
+                    <div className="admin-card-header">
+                      <span style={{ display:'flex', alignItems:'center', gap:7 }}><Bike size={15} color="var(--gold)" /> Assign Rider — {selected.bookings?.sub_service||'Delivery'}</span>
+                      <button onClick={() => setSelected(null)} style={{ background:'none', border:'none', cursor:'pointer', color:'var(--muted)', display:'flex' }}><X size={17} /></button>
                     </div>
-                    <div className="card-body">
-                      <div className="mb-3 p-3" style={{ background:'#f8f9fc', borderRadius:8, fontSize:12 }}>
-                        <div><strong>{selected.leg_type==='return'?'🔄 Return leg':'📦 Pickup leg'}</strong></div>
-                        <div className="mt-1"><strong>📍 From:</strong> {selected.pickup_address||selected.bookings?.address||'—'}</div>
-                        <div><strong>🏁 To:</strong> {selected.dropoff_address||'—'}</div>
-                        <div><strong>💰 Amount:</strong> KSh {(selected.amount||0).toLocaleString()}</div>
+                    <div style={{ padding:'14px 20px 18px' }}>
+                      <div style={{ marginBottom:14, padding:12, background:'var(--canvas)', border:'1px solid var(--line)', borderRadius:10, fontSize:12 }}>
+                        <div style={{ fontWeight:700, color:'var(--ink)', display:'flex', alignItems:'center', gap:6, marginBottom:6 }}>{selected.leg_type==='return' ? <RotateCcw size={13} /> : <Package size={13} />} {selected.leg_type==='return'?'Return leg':'Pickup leg'}</div>
+                        <InfoRow label="From" value={selected.pickup_address||selected.bookings?.address} />
+                        <InfoRow label="To" value={selected.dropoff_address} />
+                        <InfoRow label="Amount" value={`KSh ${(selected.amount||0).toLocaleString()}`} />
                       </div>
-                      <input className="form-control form-control-sm mb-3"
-                        placeholder="Search rider by name or phone…"
-                        value={riderSearch} onChange={e => setRiderSearch(e.target.value)}
-                        style={{ fontSize:12 }} />
-                      <div style={{ maxHeight:360, overflowY:'auto' }}>
+                      <label className="topbar-search" style={{ marginBottom:14 }}>
+                        <Search size={14} />
+                        <input placeholder="Search rider by name or phone…" value={riderSearch} onChange={e => setRiderSearch(e.target.value)} />
+                      </label>
+                      <div style={{ maxHeight:340, overflowY:'auto' }}>
                         {filteredRiders.length === 0
-                          ? <div className="text-xs text-gray-500 py-3">No approved riders found.</div>
+                          ? <div style={{ fontSize:12, color:'var(--muted)', padding:'10px 0' }}>No approved riders found.</div>
                           : filteredRiders.map(r => {
                             const activeLegCount = legs.filter(l => l.rider_id === r.id && !['delivered','cancelled'].includes(l.status)).length;
                             return (
-                              <div key={r.id} className="d-flex align-items-center py-2 border-bottom">
-                                <div className="flex-grow-1" style={{ minWidth:0 }}>
-                                  <div className="font-weight-bold text-xs text-gray-800">{r.full_name}</div>
-                                  <div className="text-xs text-gray-500">
-                                    🚲 {r.vehicle_type||'—'} · 📱 {r.phone||'—'}
-                                  </div>
-                                  <div className="text-xs" style={{ color: activeLegCount > 0 ? '#F6AD55' : '#48BB78' }}>
-                                    {activeLegCount > 0 ? `${activeLegCount} active leg${activeLegCount>1?'s':''}` : '✅ Free'}
+                              <div key={r.id} style={{ display:'flex', alignItems:'center', padding:'10px 0', borderBottom:'1px solid var(--line)', gap:8 }}>
+                                <div style={{ flex:1, minWidth:0 }}>
+                                  <div style={{ fontWeight:700, color:'var(--ink)', fontSize:12.5 }}>{r.full_name}</div>
+                                  <div style={{ fontSize:11, color:'var(--muted)', display:'flex', alignItems:'center', gap:5 }}><Bike size={11} /> {r.vehicle_type||'—'} · <Phone size={11} /> {r.phone||'—'}</div>
+                                  <div style={{ fontSize:11, color: activeLegCount > 0 ? 'var(--amber)' : 'var(--green)', marginTop:2 }}>
+                                    {activeLegCount > 0 ? `${activeLegCount} active leg${activeLegCount>1?'s':''}` : 'Free'}
                                   </div>
                                 </div>
-                                <span className="text-xs mr-2 font-weight-bold" style={{ color: r.status==='online'?'#1cc88a':'#aaa', whiteSpace:'nowrap' }}>
-                                  {r.status==='online'?'🟢 Online':'⚫ Offline'}
+                                <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:11, fontWeight:700, color: r.status==='online'?'var(--green)':'var(--muted)', whiteSpace:'nowrap' }}>
+                                  <Circle size={7} fill="currentColor" /> {r.status==='online'?'Online':'Offline'}
                                 </span>
                                 {r.can_receive_jobs === false && (
-                                  <span className="badge badge-danger text-xs mr-1" title={`Wallet KSh ${r.wallet_balance||0} — at or below KSh 500 minimum, jobs blocked`}>🔒 Blocked</span>
+                                  <span title={`Wallet KSh ${r.wallet_balance||0} — at or below KSh 500 minimum, jobs blocked`} style={{ display:'inline-flex', alignItems:'center', gap:3, fontSize:10, fontWeight:700, color:'var(--red)', background:'#FEE2E2', padding:'2px 7px', borderRadius:6 }}><Lock size={10} /> Blocked</span>
                                 )}
-                                <button className="btn btn-sm btn-warning" style={{ fontSize:11, fontWeight:800, color:'#0A0E1A', whiteSpace:'nowrap', opacity: r.can_receive_jobs === false ? 0.45 : 1 }}
-                                  disabled={assigning === selected.id}
-                                  onClick={() => assignRider(selected.id, r.id, r.full_name, r.can_receive_jobs === false)}>
+                                <button disabled={assigning === selected.id} onClick={() => assignRider(selected.id, r.id, r.full_name, r.can_receive_jobs === false)}
+                                  style={{ padding:'6px 13px', borderRadius:8, background:'var(--gold)', border:'none', color:'#fff', fontSize:11.5, fontWeight:700, whiteSpace:'nowrap', cursor:'pointer', opacity: r.can_receive_jobs === false ? 0.45 : 1 }}>
                                   {assigning === selected.id ? '…' : 'Assign'}
                                 </button>
                               </div>
@@ -3530,8 +3521,8 @@ function RiderOpsSection() {
                     </div>
                   </div>
                 ) : (
-                  <div className="admin-card" style={{ minHeight:300, display:'flex', alignItems:'center', justifyContent:'center', color:'#a0aec0' }}>
-                    <div className="text-center"><div style={{ fontSize:40, marginBottom:8 }}>👈</div><div>Select a leg to assign a rider</div></div>
+                  <div className="admin-card" style={{ minHeight:300, display:'flex', alignItems:'center', justifyContent:'center', color:'var(--muted)' }}>
+                    <div style={{ textAlign:'center' }}><ArrowLeft size={28} style={{ marginBottom:8 }} /><div style={{ fontSize:13 }}>Select a leg to assign a rider</div></div>
                   </div>
                 )}
               </div>
@@ -3541,7 +3532,7 @@ function RiderOpsSection() {
           {/* ── TAB: All Legs ── */}
           {tab === 'legs' && (
             <>
-              <div className="mb-3">
+              <div style={{ marginBottom:16 }}>
                 {['all','pending','rider_assigned','picked_up','at_station','out_for_delivery','delivered','cancelled'].map(s => (
                   <FilterPill key={s} active={statusF===s} onClick={() => setStatusF(s)}>
                     {s==='all' ? 'All' : (LEG_STATUS[s]?.label || s)}
@@ -3549,10 +3540,10 @@ function RiderOpsSection() {
                 ))}
               </div>
               {filtered.length === 0
-                ? <div className="text-center py-5"><div style={{fontSize:48}}>📭</div><p className="text-gray-500 mt-2">No legs found</p></div>
+                ? <div style={{ textAlign:'center', padding:'56px 0' }}><Package size={40} color="var(--muted)" style={{ marginBottom:10 }} /><p style={{ color:'var(--muted)', margin:0 }}>No legs found</p></div>
                 : (
                   <div className="admin-card">
-                    <div className="table-responsive">
+                    <div style={{ overflowX:'auto' }}>
                       <table className="admin-table">
                         <thead>
                           <tr><th>Service</th><th>Type</th><th>Rider</th><th>Pickup</th><th>Dropoff</th><th>Amount</th><th>Status</th><th>Action</th><th>Date</th></tr>
@@ -3560,28 +3551,22 @@ function RiderOpsSection() {
                         <tbody>
                           {filtered.map(leg => (
                             <tr key={leg.id}>
-                              <td className="font-weight-bold text-xs">{leg.bookings?.sub_service||'Delivery'}</td>
-                              <td className="text-xs">{leg.leg_type==='return'?'🔄 Return':'📦 Pickup'}</td>
-                              <td className="text-xs">{leg.rider?.full_name || <span className="text-gray-400">Unassigned</span>}</td>
-                              <td className="text-xs text-gray-600" style={{maxWidth:140,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{leg.pickup_address||leg.bookings?.address||'—'}</td>
-                              <td className="text-xs text-gray-600" style={{maxWidth:140,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{leg.dropoff_address||'—'}</td>
-                              <td className="text-xs font-weight-bold" style={{color:'#C9A020'}}>KSh {(leg.amount||0).toLocaleString()}</td>
+                              <td style={{ fontWeight:700, color:'var(--ink)' }}>{leg.bookings?.sub_service||'Delivery'}</td>
+                              <td style={{ color:'var(--ink-2)', display:'flex', alignItems:'center', gap:5 }}>{leg.leg_type==='return' ? <RotateCcw size={12} /> : <Package size={12} />} {leg.leg_type==='return'?'Return':'Pickup'}</td>
+                              <td style={{ color:'var(--ink-2)' }}>{leg.rider?.full_name || <span style={{ color:'var(--muted)' }}>Unassigned</span>}</td>
+                              <td style={{ color:'var(--muted)', maxWidth:140, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{leg.pickup_address||leg.bookings?.address||'—'}</td>
+                              <td style={{ color:'var(--muted)', maxWidth:140, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{leg.dropoff_address||'—'}</td>
+                              <td style={{ fontWeight:700, color:'var(--gold)' }}>KSh {(leg.amount||0).toLocaleString()}</td>
                               <td><LegStatusBadge status={leg.status} /></td>
                               <td>
                                 {leg.rider_id && !['delivered','cancelled'].includes(leg.status) && (
-                                  <button className="btn btn-xs btn-outline-danger" style={{ fontSize:10, fontWeight:700, padding:'2px 8px' }}
-                                    onClick={() => unassignRider(leg.id)}>
-                                    Unassign
-                                  </button>
+                                  <button onClick={() => unassignRider(leg.id)} style={{ fontSize:10.5, fontWeight:700, padding:'4px 9px', borderRadius:7, border:'1px solid rgba(239,68,68,.3)', background:'rgba(239,68,68,.06)', color:'var(--red)', cursor:'pointer' }}>Unassign</button>
                                 )}
                                 {!leg.rider_id && leg.status === 'pending' && (
-                                  <button className="btn btn-xs btn-outline-warning" style={{ fontSize:10, fontWeight:700, padding:'2px 8px' }}
-                                    onClick={() => { setTab('dispatch'); setSelected(leg); }}>
-                                    Assign
-                                  </button>
+                                  <button onClick={() => { setTab('dispatch'); setSelected(leg); }} style={{ fontSize:10.5, fontWeight:700, padding:'4px 9px', borderRadius:7, border:'1px solid rgba(245,158,11,.3)', background:'rgba(245,158,11,.06)', color:'var(--amber)', cursor:'pointer' }}>Assign</button>
                                 )}
                               </td>
-                              <td className="text-xs text-gray-500">{leg.created_at ? new Date(leg.created_at).toLocaleDateString('en-KE') : '—'}</td>
+                              <td style={{ color:'var(--muted)' }}>{leg.created_at ? new Date(leg.created_at).toLocaleDateString('en-KE') : '—'}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -3595,46 +3580,37 @@ function RiderOpsSection() {
 
           {/* ── TAB: Rider Queue ── */}
           {tab === 'queue' && (
-            <div className="row">
-              <div className="col-md-4">
-                <div className="font-weight-bold text-xs text-gray-600 mb-2 text-uppercase" style={{ letterSpacing:1 }}>
-                  Select a Rider
-                </div>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1.6fr', gap:18 }}>
+              <div>
+                <div style={{ fontSize:11, fontWeight:800, textTransform:'uppercase', letterSpacing:'.5px', color:'var(--muted)', marginBottom:10 }}>Select a Rider</div>
                 {riders.filter(r => r.verification_status === 'approved').map(r => {
                   const riderLegs   = legs.filter(l => l.rider_id === r.id);
                   const activeCount = riderLegs.filter(l => !['delivered','cancelled'].includes(l.status)).length;
+                  const isSel = queueRider?.id === r.id;
                   return (
-                    <div key={r.id} className="admin-card mb-2"
-                      onClick={() => setQueueRider(queueRider?.id === r.id ? null : r)}
-                      style={{ cursor:'pointer', borderLeft:`4px solid ${queueRider?.id===r.id?'#C9A020':'#e3e6f0'}`,
-                        background: queueRider?.id===r.id?'#fffbea':'#fff' }}>
-                      <div className="card-body py-2">
-                        <div className="d-flex align-items-center justify-content-between">
-                          <div>
-                            <div className="font-weight-bold text-xs text-gray-800">{r.full_name}</div>
-                            <div className="text-xs text-gray-500">🚲 {r.vehicle_type||'—'} · 📱 {r.phone||'—'}</div>
-                          </div>
-                          <div className="text-right">
-                            <div style={{ fontSize:11, fontWeight:800, color: r.status==='online'?'#1cc88a':'#aaa' }}>
-                              {r.status==='online'?'🟢 Online':'⚫ Offline'}
-                            </div>
-                            <div style={{ fontSize:11, fontWeight:700, color: activeCount>0?'#F6AD55':'#6c757d' }}>
-                              {activeCount} active
-                            </div>
-                          </div>
+                    <div key={r.id} className="admin-card" onClick={() => setQueueRider(isSel ? null : r)}
+                      style={{ cursor:'pointer', borderLeft:`4px solid ${isSel?'var(--gold)':'var(--line)'}`, background: isSel ? 'var(--gold-soft)' : 'var(--surface)' }}>
+                      <div style={{ padding:13, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+                        <div>
+                          <div style={{ fontWeight:700, color:'var(--ink)', fontSize:12.5 }}>{r.full_name}</div>
+                          <div style={{ fontSize:11, color:'var(--muted)', display:'flex', alignItems:'center', gap:5, marginTop:2 }}><Bike size={11} /> {r.vehicle_type||'—'} · <Phone size={11} /> {r.phone||'—'}</div>
+                        </div>
+                        <div style={{ textAlign:'right' }}>
+                          <div style={{ fontSize:11, fontWeight:800, color: r.status==='online'?'var(--green)':'var(--muted)', display:'flex', alignItems:'center', gap:4, justifyContent:'flex-end' }}><Circle size={7} fill="currentColor" /> {r.status==='online'?'Online':'Offline'}</div>
+                          <div style={{ fontSize:11, fontWeight:700, color: activeCount>0?'var(--amber)':'var(--muted)', marginTop:2 }}>{activeCount} active</div>
                         </div>
                       </div>
                     </div>
                   );
                 })}
                 {riders.filter(r=>r.verification_status==='approved').length === 0 &&
-                  <div className="text-xs text-gray-500">No approved riders yet.</div>}
+                  <div style={{ fontSize:12, color:'var(--muted)' }}>No approved riders yet.</div>}
               </div>
 
-              <div className="col-md-8">
+              <div>
                 {!queueRider ? (
-                  <div className="admin-card" style={{ minHeight:300, display:'flex', alignItems:'center', justifyContent:'center', color:'#a0aec0' }}>
-                    <div className="text-center"><div style={{ fontSize:40, marginBottom:8 }}>👈</div><div>Select a rider to view their queue</div></div>
+                  <div className="admin-card" style={{ minHeight:300, display:'flex', alignItems:'center', justifyContent:'center', color:'var(--muted)' }}>
+                    <div style={{ textAlign:'center' }}><ArrowLeft size={28} style={{ marginBottom:8 }} /><div style={{ fontSize:13 }}>Select a rider to view their queue</div></div>
                   </div>
                 ) : (() => {
                   const riderLegs   = legs.filter(l => l.rider_id === queueRider.id);
@@ -3643,29 +3619,25 @@ function RiderOpsSection() {
                   return (
                     <div>
                       {/* Rider summary card */}
-                      <div className="admin-card mb-3">
-                        <div className="card-body py-3">
-                          <div className="d-flex align-items-center gap-3 mb-3">
-                            <div style={{ width:48, height:48, borderRadius:24, background:'rgba(201,160,32,0.12)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22 }}>🚗</div>
-                            <div>
-                              <div className="font-weight-bold text-gray-800">{queueRider.full_name}</div>
-                              <div className="text-xs text-gray-500">🚲 {queueRider.vehicle_type||'—'} · 📱 {queueRider.phone||'—'}</div>
-                              <span style={{ fontSize:11, fontWeight:800, color: queueRider.status==='online'?'#1cc88a':'#aaa' }}>
-                                {queueRider.status==='online'?'🟢 Online':'⚫ Offline'}
-                              </span>
-                            </div>
-                            <div className="ml-auto d-flex" style={{ gap:12 }}>
-                              {[
-                                { label:'Active', val:activeLegs.length, color:'#F6AD55' },
-                                { label:'Done',   val:doneLegs.length,   color:'#48BB78' },
-                                { label:'Total',  val:riderLegs.length,  color:'#4e73df' },
-                              ].map(s => (
-                                <div key={s.label} className="text-center">
-                                  <div style={{ fontSize:20, fontWeight:900, color:s.color }}>{s.val}</div>
-                                  <div style={{ fontSize:10, color:'#6c757d', fontWeight:700 }}>{s.label}</div>
-                                </div>
-                              ))}
-                            </div>
+                      <div className="admin-card">
+                        <div style={{ padding:18, display:'flex', alignItems:'center', gap:14, flexWrap:'wrap' }}>
+                          <div style={{ width:48, height:48, borderRadius:14, background:'var(--gold-soft)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}><Bike size={22} color="var(--gold-2)" /></div>
+                          <div style={{ flex:1, minWidth:150 }}>
+                            <div style={{ fontWeight:800, color:'var(--ink)' }}>{queueRider.full_name}</div>
+                            <div style={{ fontSize:11.5, color:'var(--muted)', display:'flex', alignItems:'center', gap:5, marginTop:2 }}><Bike size={11} /> {queueRider.vehicle_type||'—'} · <Phone size={11} /> {queueRider.phone||'—'}</div>
+                            <span style={{ fontSize:11, fontWeight:800, color: queueRider.status==='online'?'var(--green)':'var(--muted)', display:'inline-flex', alignItems:'center', gap:4, marginTop:3 }}><Circle size={7} fill="currentColor" /> {queueRider.status==='online'?'Online':'Offline'}</span>
+                          </div>
+                          <div style={{ display:'flex', gap:16 }}>
+                            {[
+                              { label:'Active', val:activeLegs.length, color:'var(--amber)' },
+                              { label:'Done',   val:doneLegs.length,   color:'var(--green)' },
+                              { label:'Total',  val:riderLegs.length,  color:'var(--blue)' },
+                            ].map(s => (
+                              <div key={s.label} style={{ textAlign:'center' }}>
+                                <div style={{ fontSize:19, fontWeight:800, color:s.color }}>{s.val}</div>
+                                <div style={{ fontSize:10, color:'var(--muted)', fontWeight:700 }}>{s.label}</div>
+                              </div>
+                            ))}
                           </div>
                         </div>
                       </div>
@@ -3673,26 +3645,19 @@ function RiderOpsSection() {
                       {/* Active legs */}
                       {activeLegs.length > 0 && (
                         <>
-                          <div className="font-weight-bold text-xs text-gray-600 mb-2 text-uppercase" style={{ letterSpacing:1 }}>
-                            Active Legs ({activeLegs.length})
-                          </div>
+                          <div style={{ fontSize:11, fontWeight:800, textTransform:'uppercase', letterSpacing:'.5px', color:'var(--muted)', margin:'16px 0 10px' }}>Active Legs ({activeLegs.length})</div>
                           {activeLegs.map(leg => (
-                            <div key={leg.id} className="admin-card mb-2">
-                              <div className="card-body py-2">
-                                <div className="d-flex justify-content-between align-items-start mb-1">
-                                  <div className="font-weight-bold text-xs text-gray-800">
-                                    {leg.leg_type==='return'?'🔄 Return':'📦 Pickup'} · {leg.bookings?.sub_service||'Delivery'}
-                                  </div>
+                            <div key={leg.id} className="admin-card">
+                              <div style={{ padding:13 }}>
+                                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:5 }}>
+                                  <div style={{ fontWeight:700, color:'var(--ink)', fontSize:12.5, display:'flex', alignItems:'center', gap:5 }}>{leg.leg_type==='return' ? <RotateCcw size={12} /> : <Package size={12} />} {leg.leg_type==='return'?'Return':'Pickup'} · {leg.bookings?.sub_service||'Delivery'}</div>
                                   <LegStatusBadge status={leg.status} />
                                 </div>
-                                <div className="text-xs text-gray-500">📍 {leg.pickup_address||leg.bookings?.address||'—'}</div>
-                                <div className="text-xs text-gray-500">🏁 {leg.dropoff_address||'—'}</div>
-                                <div className="d-flex justify-content-between align-items-center mt-1">
-                                  <span className="text-xs font-weight-bold" style={{ color:'#C9A020' }}>KSh {(leg.amount||0).toLocaleString()}</span>
-                                  <button className="btn btn-xs btn-outline-danger" style={{ fontSize:10, fontWeight:700, padding:'2px 8px' }}
-                                    onClick={() => unassignRider(leg.id)}>
-                                    Unassign
-                                  </button>
+                                <div style={{ fontSize:11.5, color:'var(--muted)', display:'flex', alignItems:'center', gap:4 }}><MapPin size={11} /> {leg.pickup_address||leg.bookings?.address||'—'}</div>
+                                <div style={{ fontSize:11.5, color:'var(--muted)', display:'flex', alignItems:'center', gap:4, marginTop:2 }}><Flag size={11} /> {leg.dropoff_address||'—'}</div>
+                                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:7 }}>
+                                  <span style={{ fontSize:12, fontWeight:800, color:'var(--gold)' }}>KSh {(leg.amount||0).toLocaleString()}</span>
+                                  <button onClick={() => unassignRider(leg.id)} style={{ fontSize:10.5, fontWeight:700, padding:'4px 9px', borderRadius:7, border:'1px solid rgba(239,68,68,.3)', background:'rgba(239,68,68,.06)', color:'var(--red)', cursor:'pointer' }}>Unassign</button>
                                 </div>
                               </div>
                             </div>
@@ -3703,21 +3668,19 @@ function RiderOpsSection() {
                       {/* Past legs */}
                       {doneLegs.length > 0 && (
                         <>
-                          <div className="font-weight-bold text-xs text-gray-600 mt-3 mb-2 text-uppercase" style={{ letterSpacing:1 }}>
-                            Completed / Cancelled ({doneLegs.length})
-                          </div>
+                          <div style={{ fontSize:11, fontWeight:800, textTransform:'uppercase', letterSpacing:'.5px', color:'var(--muted)', margin:'16px 0 10px' }}>Completed / Cancelled ({doneLegs.length})</div>
                           <div className="admin-card">
-                            <div className="table-responsive">
+                            <div style={{ overflowX:'auto' }}>
                               <table className="admin-table">
                                 <thead><tr><th>Service</th><th>Type</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>
                                 <tbody>
                                   {doneLegs.map(leg => (
                                     <tr key={leg.id}>
-                                      <td className="text-xs font-weight-bold">{leg.bookings?.sub_service||'Delivery'}</td>
-                                      <td className="text-xs">{leg.leg_type==='return'?'🔄 Return':'📦 Pickup'}</td>
-                                      <td className="text-xs" style={{color:'#C9A020',fontWeight:700}}>KSh {(leg.amount||0).toLocaleString()}</td>
+                                      <td style={{ fontWeight:700, color:'var(--ink)' }}>{leg.bookings?.sub_service||'Delivery'}</td>
+                                      <td style={{ color:'var(--ink-2)' }}>{leg.leg_type==='return'?'Return':'Pickup'}</td>
+                                      <td style={{ color:'var(--gold)', fontWeight:700 }}>KSh {(leg.amount||0).toLocaleString()}</td>
                                       <td><LegStatusBadge status={leg.status} /></td>
-                                      <td className="text-xs text-gray-500">{new Date(leg.created_at).toLocaleDateString('en-KE')}</td>
+                                      <td style={{ color:'var(--muted)' }}>{new Date(leg.created_at).toLocaleDateString('en-KE')}</td>
                                     </tr>
                                   ))}
                                 </tbody>
@@ -3728,7 +3691,7 @@ function RiderOpsSection() {
                       )}
 
                       {riderLegs.length === 0 &&
-                        <div className="admin-card p-4 text-center text-gray-500 text-xs">No delivery legs assigned to this rider yet.</div>}
+                        <div className="admin-card" style={{ padding:24, textAlign:'center', color:'var(--muted)', fontSize:12.5 }}>No delivery legs assigned to this rider yet.</div>}
                     </div>
                   );
                 })()}
@@ -3739,7 +3702,7 @@ function RiderOpsSection() {
           {/* ── TAB: Riders ── */}
           {tab === 'riders' && (
             <div className="admin-card">
-              <div className="table-responsive">
+              <div style={{ overflowX:'auto' }}>
                 <table className="admin-table">
                   <thead><tr><th>Name</th><th>Vehicle</th><th>Status</th><th>Active Legs</th><th>Wallet</th><th>Verification</th><th>Joined</th></tr></thead>
                   <tbody>
@@ -3747,21 +3710,17 @@ function RiderOpsSection() {
                       const active = legs.filter(l => l.rider_id === r.id && !['delivered','cancelled'].includes(l.status)).length;
                       return (
                         <tr key={r.id}>
-                          <td className="font-weight-bold">{r.full_name||'—'}</td>
-                          <td className="text-xs text-gray-600">🚲 {r.vehicle_type||'—'}</td>
-                          <td className="text-xs font-weight-bold" style={{ color: r.status==='online'?'#1cc88a':'#aaa' }}>
-                            {r.status==='online'?'🟢 Online':'⚫ Offline'}
-                          </td>
-                          <td className="text-xs font-weight-bold" style={{ color: active>0?'#F6AD55':'#6c757d' }}>
-                            {active > 0 ? `${active} active` : '—'}
-                          </td>
-                          <td className="text-xs">KSh {(r.wallet_balance||0).toLocaleString()}</td>
+                          <td style={{ fontWeight:700, color:'var(--ink)' }}>{r.full_name||'—'}</td>
+                          <td style={{ color:'var(--ink-2)', display:'flex', alignItems:'center', gap:5 }}><Bike size={12} /> {r.vehicle_type||'—'}</td>
+                          <td style={{ fontWeight:700, color: r.status==='online'?'var(--green)':'var(--muted)', display:'flex', alignItems:'center', gap:4 }}><Circle size={7} fill="currentColor" /> {r.status==='online'?'Online':'Offline'}</td>
+                          <td style={{ fontWeight:700, color: active>0?'var(--amber)':'var(--muted)' }}>{active > 0 ? `${active} active` : '—'}</td>
+                          <td style={{ color:'var(--ink-2)' }}>KSh {(r.wallet_balance||0).toLocaleString()}</td>
                           <td><SBBadge status={r.verification_status||'pending'} /></td>
-                          <td className="text-xs text-gray-500">{r.created_at ? new Date(r.created_at).toLocaleDateString('en-KE') : '—'}</td>
+                          <td style={{ color:'var(--muted)' }}>{r.created_at ? new Date(r.created_at).toLocaleDateString('en-KE') : '—'}</td>
                         </tr>
                       );
                     })}
-                    {riders.length === 0 && <tr><td colSpan={7} className="text-xs text-gray-500 text-center py-3">No riders yet</td></tr>}
+                    {riders.length === 0 && <tr><td colSpan={7} style={{ color:'var(--muted)', textAlign:'center', padding:20 }}>No riders yet</td></tr>}
                   </tbody>
                 </table>
               </div>
