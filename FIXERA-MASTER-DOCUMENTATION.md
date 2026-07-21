@@ -1,6 +1,23 @@
 # 🏗️ FIXERA - MASTER DOCUMENTATION
 **Last Updated:** July 21, 2026  
-**Status:** Admin dashboard full redesign COMPLETE (all ~36 sections + gap-scan cleanup + Live Ops map light theme) ✅ · Data erasure + data export built (Kenya DPA 2019 rights, plan items 3.2/3.3) — **NEEDS `migrations/create_data_privacy.sql` run in Supabase before it works** ⚠️ · **Found + fixed a real bug: approving a refund never actually credited the customer** — now wired to `createRefund()`+`execute_refund()` ✅ · Refund + dispute SLA tracking built (plan items 3.7/3.8) — visible on each ticket/dispute card + surfaced in Alerts Feed ✅ · Fixed duplicate-logo bug on customer Sign Up page ✅ · Earlier: email system overhaul (Resend on both apps), fixera.co.ke → fixera.africa, Zoho inboxes fixed, subdomains live, Agent/Team management built · **PENDING:** run create_data_privacy.sql, migrate broadcast-announcement.js off Gmail, 8x8 phone layer, workflow automation, pg_cron auto-escalation (4.2)
+**Status:** Admin dashboard full redesign COMPLETE (all ~36 sections + gap-scan cleanup + Live Ops map light theme) ✅ · Data erasure + data export built (Kenya DPA 2019 rights, plan items 3.2/3.3) — **NEEDS `migrations/create_data_privacy.sql` run in Supabase before it works** ⚠️ · **Found + fixed a real bug: approving a refund never actually credited the customer** — now wired to `createRefund()`+`execute_refund()` ✅ · Refund + dispute SLA tracking built (plan items 3.7/3.8) — visible on each ticket/dispute card + surfaced in Alerts Feed ✅ · Fixed duplicate-logo bug on customer Sign Up page ✅ · Earlier: email system overhaul (Resend on both apps), fixera.co.ke → fixera.africa, Zoho inboxes fixed, subdomains live, Agent/Team management built · SLA auto-escalation cron built (4.2) ✅ · **PENDING:** run create_data_privacy.sql AND add_sla_auto_escalation_cron.sql (both need Supabase SQL Editor), migrate broadcast-announcement.js off Gmail, 8x8 phone layer, workflow automation
+
+---
+
+## 🆕 SESSION SUMMARY (July 21, 2026 — SLA auto-escalation cron — plan item 4.2)
+
+Built on top of the refund/dispute SLA tracking from the same day (3.7/3.8). New `migrations/add_sla_auto_escalation_cron.sql` — same pattern as the existing `auto_reassign_timed_out_jobs()` job (Phase 1): a `SECURITY DEFINER` plpgsql function scheduled via `pg_cron` every 15 minutes, no Vercel endpoint involved.
+
+`escalate_overdue_slas()`:
+- Finds refund-request/payment-failed tickets past the 5-day SLA that are still undecided and not yet escalated → bumps `priority` to `'urgent'` (which also pulls them into the existing "Urgent Tickets" alert bucket, not just the refund-specific one) and stamps a new `sla_escalated_at` column so it only fires once per ticket.
+- Finds disputes past the 7-day SLA still unresolved and not yet escalated → stamps the same `sla_escalated_at` column on the `disputes` table (no priority field there to bump).
+- Logs one `notification_log` row per escalation (`type='sla_escalation'`) for an audit trail — no email/push wiring added yet, this is a logged flag, not a page.
+
+UI: both `RefundManagementSection` and `DisputeCenterSection` list cards now show a bright red "ESCALATED" badge (distinct from the client-computed amber/red "due"/"overdue" badge) whenever `sla_escalated_at` is set — this is the visible signal that the cron actually fired on that item, vs. just being locally overdue.
+
+**PENDING — must run in Supabase before the cron is live:** `migrations/add_sla_auto_escalation_cron.sql`. Kept the 5-day/7-day windows hardcoded in SQL to match `REFUND_SLA_HOURS`/`DISPUTE_SLA_HOURS` in `AdminDashboard.jsx` — if either changes, both places need updating (noted in the migration's header comment).
+
+Execution plan (`fixera-execution-plan` memory) updated: 4.2 marked complete.
 
 ---
 

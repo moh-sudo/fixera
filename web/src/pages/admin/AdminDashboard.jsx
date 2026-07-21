@@ -5323,6 +5323,11 @@ function RefundManagementSection() {
                             <Clock size={11} /> {sla.overdue ? 'SLA overdue' : `Due ${sla.dueAt.toLocaleDateString('en-KE',{day:'numeric',month:'short'})}`}
                           </span>
                         )}
+                        {t.sla_escalated_at && (
+                          <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:10.5, fontWeight:800, padding:'2px 8px', borderRadius:999, background:'var(--red)', color:'#fff' }}>
+                            <Siren size={11} /> ESCALATED
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -6020,6 +6025,11 @@ function DisputeCenterSection() {
                         {showSla && (
                           <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:999, background: sla.overdue?'rgba(239,68,68,.12)':'rgba(245,158,11,.12)', color: sla.overdue?'var(--red)':'var(--amber)' }}>
                             <Clock size={10} /> {sla.overdue ? 'SLA overdue' : `Due ${sla.dueAt.toLocaleDateString('en-KE',{day:'numeric',month:'short'})}`}
+                          </span>
+                        )}
+                        {d.sla_escalated_at && (
+                          <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:10, fontWeight:800, padding:'2px 8px', borderRadius:999, background:'var(--red)', color:'#fff' }}>
+                            <Siren size={10} /> ESCALATED
                           </span>
                         )}
                       </div>
