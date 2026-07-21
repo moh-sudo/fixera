@@ -4517,9 +4517,9 @@ function WalletsSection() {
         if (!level) return;
 
         const meta = {
-          blocked:  { color: '#e74a3b', icon: '🔒', label: 'BLOCKED',   msg: `Wallet at KSh ${bal.toLocaleString()} — jobs blocked` },
-          critical: { color: '#f59e0b', icon: '🚨', label: 'CRITICAL',  msg: `Wallet at KSh ${bal.toLocaleString()} — almost at block limit` },
-          low:      { color: '#C9A020', icon: '⚠️', label: 'LOW',       msg: `Wallet at KSh ${bal.toLocaleString()} — running low` },
+          blocked:  { color: 'var(--red)',   Icon: Lock,        label: 'BLOCKED',  msg: `Wallet at KSh ${bal.toLocaleString()} — jobs blocked` },
+          critical: { color: 'var(--amber)', Icon: AlertCircle, label: 'CRITICAL', msg: `Wallet at KSh ${bal.toLocaleString()} — almost at block limit` },
+          low:      { color: 'var(--gold)',  Icon: AlertCircle, label: 'LOW',      msg: `Wallet at KSh ${bal.toLocaleString()} — running low` },
         }[level];
 
         setAlerts(prev => [{
@@ -4601,37 +4601,36 @@ function WalletsSection() {
 
   const blocked = stats.blockedPartners || 0;
 
+  const inputSt2 = { width:'100%', boxSizing:'border-box', fontSize:12.5, padding:'9px 12px', border:'1px solid var(--line-2)', borderRadius:9, outline:'none', fontFamily:'inherit', background:'var(--surface)', color:'var(--ink)', marginBottom:8 };
+
   return (
     <>
       <PageHeader title="Wallets & Deposits" sub="Monitor partner wallet balances and security deposits" />
-      {toast && <div className="alert alert-success py-2 mb-3">{toast}</div>}
+      {toast && <div style={{ display:'flex', alignItems:'center', gap:8, background:'rgba(22,163,74,.1)', color:'var(--green)', borderRadius:9, padding:'9px 14px', marginBottom:16, fontSize:12.5, fontWeight:700 }}><BadgeCheck size={15} /> {toast}</div>}
 
       {/* ── Live wallet alerts ── */}
       {alerts.length > 0 && (
-        <div className="mb-3">
-          <div className="d-flex justify-content-between align-items-center mb-2">
-            <div className="text-xs font-weight-bold text-gray-700">
-              🔔 Live Wallet Alerts <span className="badge badge-danger ml-1">{alerts.length}</span>
+        <div style={{ marginBottom:18 }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:9 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:7, fontSize:12.5, fontWeight:800, color:'var(--ink-2)' }}>
+              <Bell size={14} color="var(--red)" /> Live Wallet Alerts <span style={{ background:'var(--red)', color:'#fff', fontSize:10, fontWeight:800, padding:'1px 7px', borderRadius:999 }}>{alerts.length}</span>
             </div>
-            <button className="btn btn-xs btn-outline-secondary" style={{fontSize:10}}
-              onClick={() => setAlerts([])}>Dismiss all</button>
+            <button onClick={() => setAlerts([])} style={{ fontSize:11, fontWeight:700, color:'var(--muted)', background:'none', border:'1px solid var(--line-2)', borderRadius:8, padding:'4px 10px', cursor:'pointer' }}>Dismiss all</button>
           </div>
           {alerts.map(a => (
-            <div key={a.id} className="d-flex align-items-center justify-content-between mb-1 px-3 py-2"
-              style={{ background: `${a.color}12`, border: `1px solid ${a.color}44`, borderRadius: 8 }}>
-              <div className="d-flex align-items-center gap-2">
-                <span style={{fontSize:15}}>{a.icon}</span>
-                <div>
-                  <span className="text-xs font-weight-bold" style={{color: a.color}}>{a.label}</span>
-                  <span className="text-xs text-gray-700 ml-2">{a.name}</span>
-                  <span className="text-xs text-gray-500 ml-1">({a.role})</span>
-                  <span className="text-xs text-gray-500 ml-2">— {a.msg}</span>
+            <div key={a.id} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:6, padding:'9px 13px', background:`${a.color}12`, borderRadius:9 }}>
+              <div style={{ display:'flex', alignItems:'center', gap:9 }}>
+                <a.Icon size={15} color={a.color} />
+                <div style={{ fontSize:12 }}>
+                  <span style={{ fontWeight:800, color:a.color }}>{a.label}</span>
+                  <span style={{ color:'var(--ink-2)', marginLeft:8 }}>{a.name}</span>
+                  <span style={{ color:'var(--muted)', marginLeft:4 }}>({a.role})</span>
+                  <span style={{ color:'var(--muted)', marginLeft:8 }}>— {a.msg}</span>
                 </div>
               </div>
-              <div className="d-flex align-items-center gap-2">
-                <span className="text-xs text-gray-400">{a.time.toLocaleTimeString('en-KE', {hour:'2-digit',minute:'2-digit'})}</span>
-                <button className="btn btn-xs btn-outline-secondary" style={{fontSize:10, padding:'1px 6px'}}
-                  onClick={() => dismissAlert(a.id)}>✕</button>
+              <div style={{ display:'flex', alignItems:'center', gap:9 }}>
+                <span style={{ fontSize:11, color:'var(--muted)' }}>{a.time.toLocaleTimeString('en-KE', {hour:'2-digit',minute:'2-digit'})}</span>
+                <button onClick={() => dismissAlert(a.id)} style={{ background:'none', border:'none', color:'var(--muted)', cursor:'pointer', display:'flex' }}><X size={14} /></button>
               </div>
             </div>
           ))}
@@ -4639,71 +4638,62 @@ function WalletsSection() {
       )}
 
       {/* ── KPI strip ── */}
-      <div className="row mb-3">
-        <div className="col-6 col-md-3 mb-2">
-          <StatCard icon="🔒" label="Blocked Partners" value={blocked} color={blocked > 0 ? '#e74a3b' : '#1cc88a'} />
-        </div>
-        <div className="col-6 col-md-3 mb-2">
-          <StatCard icon="💰" label="Wallet Balance (total)" value={`KSh ${(stats.totalWalletBalance||0).toLocaleString()}`} color="#C9A020" />
-        </div>
-        <div className="col-6 col-md-3 mb-2">
-          <StatCard icon="🛡️" label="Deposits Held" value={`KSh ${(stats.totalDepositsHeld||0).toLocaleString()}`} color="#4e73df" />
-        </div>
-        <div className="col-6 col-md-3 mb-2">
-          <StatCard icon="⚠️" label="Deposits Not Paid" value={stats.depositNotPaid||0} color={stats.depositNotPaid > 0 ? '#f59e0b' : '#1cc88a'} />
-        </div>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', gap:14, marginBottom:20 }}>
+        <StatCard icon="🔒" label="Blocked Partners" value={blocked} color={blocked > 0 ? 'var(--red)' : 'var(--green)'} />
+        <StatCard icon="💰" label="Wallet Balance (total)" value={`KSh ${(stats.totalWalletBalance||0).toLocaleString()}`} color="var(--gold)" />
+        <StatCard icon="🛡️" label="Deposits Held" value={`KSh ${(stats.totalDepositsHeld||0).toLocaleString()}`} color="var(--blue)" />
+        <StatCard icon="⚠️" label="Deposits Not Paid" value={stats.depositNotPaid||0} color={stats.depositNotPaid > 0 ? 'var(--amber)' : 'var(--green)'} />
       </div>
 
       {/* ── Tabs ── */}
-      <ul className="nav nav-tabs mb-3">
-        <li className="nav-item">
-          <button className={`nav-link${tab==='wallets'?' active':''}`} onClick={()=>{ setTab('wallets'); setSelected(null); }}>
-            👛 Wallets — Workers & Riders
-            {(stats.walletBelowMin||0) > 0 && <span className="badge badge-danger ml-1">{stats.walletBelowMin}</span>}
-          </button>
-        </li>
-        <li className="nav-item">
-          <button className={`nav-link${tab==='deposits'?' active':''}`} onClick={()=>{ setTab('deposits'); setSelected(null); }}>
-            🛡️ Security Deposits
-            {(stats.depositNotPaid||0) > 0 && <span className="badge badge-warning ml-1">{stats.depositNotPaid}</span>}
-          </button>
-        </li>
-      </ul>
-
-      {/* ── Search ── */}
-      <div className="mb-3">
-        <input className="form-control form-control-sm" style={{maxWidth:300}}
-          placeholder="Search by name or email…"
-          value={search} onChange={e => { setSearch(e.target.value); setSelected(null); }} />
+      <div style={{ display:'flex', gap:6, marginBottom:16, borderBottom:'1px solid var(--line)' }}>
+        <button onClick={()=>{ setTab('wallets'); setSelected(null); }}
+          style={{ background:'none', border:'none', fontFamily:'inherit', cursor:'pointer', padding:'9px 14px', fontSize:13, fontWeight:700,
+            color:tab==='wallets'?'var(--gold-2)':'var(--muted)', display:'flex', alignItems:'center', gap:7,
+            borderBottom:tab==='wallets'?'2.5px solid var(--gold)':'2.5px solid transparent', marginBottom:-1 }}>
+          <Wallet size={14} /> Wallets — Workers & Riders
+          {(stats.walletBelowMin||0) > 0 && <span style={{ background:'var(--red)', color:'#fff', fontSize:10, fontWeight:800, padding:'1px 7px', borderRadius:999 }}>{stats.walletBelowMin}</span>}
+        </button>
+        <button onClick={()=>{ setTab('deposits'); setSelected(null); }}
+          style={{ background:'none', border:'none', fontFamily:'inherit', cursor:'pointer', padding:'9px 14px', fontSize:13, fontWeight:700,
+            color:tab==='deposits'?'var(--gold-2)':'var(--muted)', display:'flex', alignItems:'center', gap:7,
+            borderBottom:tab==='deposits'?'2.5px solid var(--gold)':'2.5px solid transparent', marginBottom:-1 }}>
+          <ShieldCheck size={14} /> Security Deposits
+          {(stats.depositNotPaid||0) > 0 && <span style={{ background:'var(--amber)', color:'#fff', fontSize:10, fontWeight:800, padding:'1px 7px', borderRadius:999 }}>{stats.depositNotPaid}</span>}
+        </button>
       </div>
 
-      <div className="row">
+      {/* ── Search ── */}
+      <label className="topbar-search" style={{ maxWidth:300, marginBottom:18 }}>
+        <Search size={15} />
+        <input placeholder="Search by name or email…" value={search} onChange={e => { setSearch(e.target.value); setSelected(null); }} />
+      </label>
+
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1.4fr', gap:18 }}>
         {/* ── LEFT: partner list ── */}
-        <div className="col-md-5" style={{maxHeight:640, overflowY:'auto'}}>
+        <div style={{ maxHeight:640, overflowY:'auto' }}>
           {loading ? <Spinner /> : tab === 'wallets' ? (
             filterList(walletPartners).length === 0
-              ? <p className="text-xs text-gray-500">No wallet partners found.</p>
+              ? <p style={{ fontSize:12, color:'var(--muted)' }}>No wallet partners found.</p>
               : filterList(walletPartners).map(p => {
                 const blocked = p.can_receive_jobs === false;
+                const isSel = selected?.id === p.id;
                 return (
-                  <div key={p.id} onClick={() => selectPartner(p)}
-                    className="admin-card mb-2"
-                    style={{ cursor:'pointer', borderLeft:`4px solid ${selected?.id===p.id ? '#C9A020' : blocked ? '#e74a3b' : 'transparent'}`, transition:'border 0.15s' }}>
-                    <div className="card-body py-2 d-flex justify-content-between align-items-center">
+                  <div key={p.id} onClick={() => selectPartner(p)} className="admin-card"
+                    style={{ cursor:'pointer', borderLeft:`4px solid ${isSel ? 'var(--gold)' : blocked ? 'var(--red)' : 'var(--line)'}` }}>
+                    <div style={{ padding:13, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                       <div>
-                        <div className="d-flex align-items-center gap-2">
-                          {blocked && <span className="badge badge-danger" style={{fontSize:10}}>🔒 BLOCKED</span>}
-                          <div className="text-sm font-weight-bold">{p.full_name||'—'}</div>
+                        <div style={{ display:'flex', alignItems:'center', gap:7 }}>
+                          {blocked && <span style={{ display:'inline-flex', alignItems:'center', gap:3, background:'var(--red)', color:'#fff', fontSize:9.5, fontWeight:800, padding:'2px 7px', borderRadius:6 }}><Lock size={9} /> BLOCKED</span>}
+                          <div style={{ fontSize:13, fontWeight:700, color:'var(--ink)' }}>{p.full_name||'—'}</div>
                         </div>
-                        <div className="text-xs text-gray-500 mt-1"><RoleBadge role={p.partner_role} /></div>
+                        <div style={{ marginTop:5 }}><RoleBadge role={p.partner_role} /></div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-sm font-weight-bold" style={{color: blocked ? '#e74a3b' : '#1cc88a'}}>
-                          KSh {(p.wallet_balance||0).toLocaleString()}
-                        </div>
+                      <div style={{ textAlign:'right' }}>
+                        <div style={{ fontSize:13, fontWeight:800, color: blocked ? 'var(--red)' : 'var(--green)' }}>KSh {(p.wallet_balance||0).toLocaleString()}</div>
                         {blocked
-                          ? <div className="text-xs text-danger">Top up needed</div>
-                          : <div className="text-xs text-gray-400">Min KSh 500</div>}
+                          ? <div style={{ fontSize:10.5, color:'var(--red)' }}>Top up needed</div>
+                          : <div style={{ fontSize:10.5, color:'var(--muted)' }}>Min KSh 500</div>}
                       </div>
                     </div>
                   </div>
@@ -4711,23 +4701,23 @@ function WalletsSection() {
               })
           ) : (
             filterList(depositPartners).length === 0
-              ? <p className="text-xs text-gray-500">No deposit partners found.</p>
+              ? <p style={{ fontSize:12, color:'var(--muted)' }}>No deposit partners found.</p>
               : filterList(depositPartners).map(p => {
                 const meta = DEPOSIT_STATUS_META[p.security_deposit_status||'not_paid'];
                 const blocked = p.can_receive_jobs === false;
+                const isSel = selected?.id === p.id;
                 return (
-                  <div key={p.id} onClick={() => selectPartner(p)}
-                    className="admin-card mb-2"
-                    style={{ cursor:'pointer', borderLeft:`4px solid ${selected?.id===p.id ? '#C9A020' : blocked ? '#e74a3b' : 'transparent'}`, transition:'border 0.15s' }}>
-                    <div className="card-body py-2 d-flex justify-content-between align-items-center">
+                  <div key={p.id} onClick={() => selectPartner(p)} className="admin-card"
+                    style={{ cursor:'pointer', borderLeft:`4px solid ${isSel ? 'var(--gold)' : blocked ? 'var(--red)' : 'var(--line)'}` }}>
+                    <div style={{ padding:13, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                       <div>
-                        <div className="text-sm font-weight-bold">{p.full_name||'—'}</div>
-                        <div className="text-xs text-gray-500 mt-1"><RoleBadge role={p.partner_role} /></div>
+                        <div style={{ fontSize:13, fontWeight:700, color:'var(--ink)' }}>{p.full_name||'—'}</div>
+                        <div style={{ marginTop:5 }}><RoleBadge role={p.partner_role} /></div>
                       </div>
-                      <div className="text-right">
-                        <span className="badge" style={{background:meta.bg, color:meta.color, fontSize:10}}>{meta.label}</span>
+                      <div style={{ textAlign:'right' }}>
+                        <span style={{ background:meta.bg, color:meta.color, fontSize:10, fontWeight:700, padding:'3px 9px', borderRadius:999 }}>{meta.label}</span>
                         {(p.security_deposit||0) > 0 && (
-                          <div className="text-xs text-gray-500 mt-1">KSh {(p.security_deposit||0).toLocaleString()} held</div>
+                          <div style={{ fontSize:10.5, color:'var(--muted)', marginTop:4 }}>KSh {(p.security_deposit||0).toLocaleString()} held</div>
                         )}
                       </div>
                     </div>
@@ -4738,91 +4728,75 @@ function WalletsSection() {
         </div>
 
         {/* ── RIGHT: detail panel ── */}
-        <div className="col-md-7">
+        <div>
           {!selected ? (
-            <div className="text-center py-5 text-gray-400 text-sm">← Select a partner to view details</div>
+            <div className="admin-card" style={{ minHeight:200, display:'flex', alignItems:'center', justifyContent:'center', color:'var(--muted)' }}>
+              <div style={{ textAlign:'center' }}><ArrowLeft size={26} style={{ marginBottom:8 }} /><div style={{ fontSize:13 }}>Select a partner to view details</div></div>
+            </div>
           ) : tab === 'wallets' ? (
             // ── Wallet detail ──
             <>
-              <div className="d-flex justify-content-between align-items-center mb-3">
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
                 <div>
-                  <h6 className="font-weight-bold mb-0">{selected.full_name}</h6>
-                  <div className="text-xs text-gray-500"><RoleBadge role={selected.partner_role} /></div>
+                  <div style={{ fontSize:15, fontWeight:800, color:'var(--ink)' }}>{selected.full_name}</div>
+                  <div style={{ marginTop:4 }}><RoleBadge role={selected.partner_role} /></div>
                 </div>
-                <button className="btn btn-sm btn-warning font-weight-bold"
-                  style={{background:'#C9A020',border:'none',color:'#0A0E1A'}}
-                  onClick={() => setAdjForm({ amount:'', reason:'' })}>
-                  💰 Adjust Wallet
+                <button onClick={() => setAdjForm({ amount:'', reason:'' })}
+                  style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'8px 14px', borderRadius:9, border:'none', background:'var(--gold)', color:'#fff', fontSize:12.5, fontWeight:700, cursor:'pointer' }}>
+                  <Wallet size={14} /> Adjust Wallet
                 </button>
               </div>
 
               {/* Balance card */}
-              <div className="admin-card mb-3" style={{borderLeft:`4px solid ${selected.can_receive_jobs===false?'#e74a3b':'#1cc88a'}`}}>
-                <div className="card-body py-3">
-                  <div className="row text-center">
-                    <div className="col-6">
-                      <div className="text-xs text-gray-500 font-weight-bold text-uppercase mb-1">Current Balance</div>
-                      <div className="font-weight-bold" style={{fontSize:22, color: selected.can_receive_jobs===false ? '#e74a3b' : '#1cc88a'}}>
-                        KSh {(selected.wallet_balance||0).toLocaleString()}
-                      </div>
+              <div className="admin-card" style={{ borderLeft:`4px solid ${selected.can_receive_jobs===false?'var(--red)':'var(--green)'}` }}>
+                <div style={{ padding:16, display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, textAlign:'center' }}>
+                  <div>
+                    <div style={{ fontSize:10.5, color:'var(--muted)', fontWeight:700, textTransform:'uppercase', letterSpacing:'.4px', marginBottom:5 }}>Current Balance</div>
+                    <div style={{ fontSize:22, fontWeight:800, color: selected.can_receive_jobs===false ? 'var(--red)' : 'var(--green)' }}>KSh {(selected.wallet_balance||0).toLocaleString()}</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize:10.5, color:'var(--muted)', fontWeight:700, textTransform:'uppercase', letterSpacing:'.4px', marginBottom:5 }}>Job Access</div>
+                    <div style={{ display:'inline-flex', alignItems:'center', gap:5, fontSize:13.5, fontWeight:800, color: selected.can_receive_jobs===false ? 'var(--red)' : 'var(--green)' }}>
+                      {selected.can_receive_jobs===false ? <><Lock size={13} /> Blocked</> : <><BadgeCheck size={13} /> Active</>}
                     </div>
-                    <div className="col-6">
-                      <div className="text-xs text-gray-500 font-weight-bold text-uppercase mb-1">Job Access</div>
-                      <div className="font-weight-bold" style={{fontSize:14, color: selected.can_receive_jobs===false ? '#e74a3b' : '#1cc88a'}}>
-                        {selected.can_receive_jobs===false ? '🔒 Blocked' : '✅ Active'}
-                      </div>
-                      {selected.can_receive_jobs===false && (
-                        <div className="text-xs text-danger mt-1">Must top up above KSh 500</div>
-                      )}
-                    </div>
+                    {selected.can_receive_jobs===false && (<div style={{ fontSize:10.5, color:'var(--red)', marginTop:4 }}>Must top up above KSh 500</div>)}
                   </div>
                 </div>
               </div>
 
               {/* Adjustment form */}
               {adjForm && (
-                <div className="admin-card mb-3" style={{borderLeft:'4px solid #C9A020'}}>
-                  <div className="card-body py-3">
-                    <div className="text-xs font-weight-bold text-gray-600 mb-2">
-                      Positive = top-up &nbsp;·&nbsp; Negative = deduction
+                <div className="admin-card" style={{ borderLeft:'4px solid var(--gold)' }}>
+                  <div style={{ padding:16 }}>
+                    <div style={{ fontSize:11.5, fontWeight:700, color:'var(--ink-2)', marginBottom:10 }}>Positive = top-up &nbsp;·&nbsp; Negative = deduction</div>
+                    <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:10 }}>
+                      <input type="number" style={{ ...inputSt2, marginBottom:0 }} placeholder="Amount (e.g. 1000 or -200)" value={adjForm.amount} onChange={e => setAdjForm(f => ({...f, amount: e.target.value}))} />
+                      <input style={{ ...inputSt2, marginBottom:0 }} placeholder="Reason (required)" value={adjForm.reason} onChange={e => setAdjForm(f => ({...f, reason: e.target.value}))} />
                     </div>
-                    <div className="row">
-                      <div className="col-6">
-                        <input type="number" className="form-control mb-2" placeholder="Amount (e.g. 1000 or -200)"
-                          value={adjForm.amount} onChange={e => setAdjForm(f => ({...f, amount: e.target.value}))} />
-                      </div>
-                      <div className="col-6">
-                        <input className="form-control mb-2" placeholder="Reason (required)"
-                          value={adjForm.reason} onChange={e => setAdjForm(f => ({...f, reason: e.target.value}))} />
-                      </div>
-                    </div>
-                    <div className="d-flex gap-2">
-                      <button className="btn btn-sm btn-warning font-weight-bold"
-                        style={{background:'#C9A020',border:'none',color:'#0A0E1A'}}
-                        disabled={saving} onClick={applyAdj}>{saving ? '…' : 'Apply'}</button>
-                      <button className="btn btn-sm btn-outline-secondary" onClick={() => setAdjForm(null)}>Cancel</button>
+                    <div style={{ display:'flex', gap:8 }}>
+                      <button disabled={saving} onClick={applyAdj} style={{ padding:'7px 15px', borderRadius:8, border:'none', background:'var(--gold)', color:'#fff', fontSize:12, fontWeight:700, cursor:'pointer' }}>{saving ? '…' : 'Apply'}</button>
+                      <button onClick={() => setAdjForm(null)} style={{ padding:'7px 15px', borderRadius:8, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--ink-2)', fontSize:12, fontWeight:700, cursor:'pointer' }}>Cancel</button>
                     </div>
                   </div>
                 </div>
               )}
 
               {/* Transaction history */}
-              <div className="text-xs font-weight-bold text-gray-700 mb-2">Transaction History</div>
-              {detail.txns.length === 0 ? <p className="text-xs text-gray-500">No transactions yet.</p> : (
-                <div style={{maxHeight:200, overflowY:'auto'}}>
+              <div style={{ fontSize:11.5, fontWeight:800, color:'var(--ink-2)', marginBottom:9 }}>Transaction History</div>
+              {detail.txns.length === 0 ? <p style={{ fontSize:12, color:'var(--muted)' }}>No transactions yet.</p> : (
+                <div className="admin-card" style={{ maxHeight:220, overflowY:'auto' }}>
                   <table className="admin-table">
                     <thead><tr><th>Type</th><th>Amount</th><th>Balance After</th><th>Note</th><th>Date</th></tr></thead>
                     <tbody>
                       {detail.txns.map(t => (
                         <tr key={t.id}>
                           <td><span className="sb-badge sb-badge-info">{t.type}</span></td>
-                          <td className="text-xs font-weight-bold"
-                            style={{color: ['commission','payout'].includes(t.type) ? '#e74a3b' : '#1cc88a'}}>
+                          <td style={{ fontWeight:700, color: ['commission','payout'].includes(t.type) ? 'var(--red)' : 'var(--green)' }}>
                             {['commission','payout'].includes(t.type) ? '−' : '+'}KSh {(t.amount||0).toLocaleString()}
                           </td>
-                          <td className="text-xs">KSh {(t.balance_after||0).toLocaleString()}</td>
-                          <td className="text-xs text-gray-500">{t.note||'—'}</td>
-                          <td className="text-xs text-gray-500">{new Date(t.created_at).toLocaleDateString('en-KE')}</td>
+                          <td style={{ color:'var(--ink-2)' }}>KSh {(t.balance_after||0).toLocaleString()}</td>
+                          <td style={{ color:'var(--muted)' }}>{t.note||'—'}</td>
+                          <td style={{ color:'var(--muted)' }}>{new Date(t.created_at).toLocaleDateString('en-KE')}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -4833,46 +4807,46 @@ function WalletsSection() {
               {/* Admin adjustments */}
               {detail.adjs.length > 0 && (
                 <>
-                  <div className="text-xs font-weight-bold text-gray-700 mt-3 mb-2">Admin Adjustments</div>
-                  <table className="admin-table">
-                    <thead><tr><th>Amount</th><th>Reason</th><th>Date</th></tr></thead>
-                    <tbody>
-                      {detail.adjs.map(a => (
-                        <tr key={a.id}>
-                          <td className="text-xs font-weight-bold" style={{color: a.amount>0?'#1cc88a':'#e74a3b'}}>
-                            KSh {a.amount>0?'+':''}{a.amount.toLocaleString()}
-                          </td>
-                          <td className="text-xs">{a.reason}</td>
-                          <td className="text-xs text-gray-500">{new Date(a.created_at).toLocaleDateString('en-KE')}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  <div style={{ fontSize:11.5, fontWeight:800, color:'var(--ink-2)', margin:'16px 0 9px' }}>Admin Adjustments</div>
+                  <div className="admin-card">
+                    <table className="admin-table">
+                      <thead><tr><th>Amount</th><th>Reason</th><th>Date</th></tr></thead>
+                      <tbody>
+                        {detail.adjs.map(a => (
+                          <tr key={a.id}>
+                            <td style={{ fontWeight:700, color: a.amount>0?'var(--green)':'var(--red)' }}>KSh {a.amount>0?'+':''}{a.amount.toLocaleString()}</td>
+                            <td style={{ color:'var(--ink-2)' }}>{a.reason}</td>
+                            <td style={{ color:'var(--muted)' }}>{new Date(a.created_at).toLocaleDateString('en-KE')}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </>
               )}
             </>
           ) : (
             // ── Deposit detail ──
             <>
-              <div className="d-flex justify-content-between align-items-center mb-3">
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14, flexWrap:'wrap', gap:10 }}>
                 <div>
-                  <h6 className="font-weight-bold mb-0">{selected.full_name}</h6>
-                  <div className="text-xs text-gray-500"><RoleBadge role={selected.partner_role} /></div>
+                  <div style={{ fontSize:15, fontWeight:800, color:'var(--ink)' }}>{selected.full_name}</div>
+                  <div style={{ marginTop:4 }}><RoleBadge role={selected.partner_role} /></div>
                 </div>
-                <div className="d-flex gap-2">
-                  <button className="btn btn-sm btn-success font-weight-bold"
-                    onClick={() => setDepForm({ action:'received', amount:'', ref:'', reason:'' })}>
-                    + Record Payment
+                <div style={{ display:'flex', gap:8 }}>
+                  <button onClick={() => setDepForm({ action:'received', amount:'', ref:'', reason:'' })}
+                    style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 13px', borderRadius:9, border:'none', background:'var(--green)', color:'#fff', fontSize:12, fontWeight:700, cursor:'pointer' }}>
+                    <Plus size={13} /> Record Payment
                   </button>
                   {selected.security_deposit_status === 'held' && (
                     <>
-                      <button className="btn btn-sm btn-info font-weight-bold"
-                        onClick={() => setDepForm({ action:'refund', amount: String(selected.security_deposit||''), ref:'', reason:'' })}>
-                        ↩ Refund
+                      <button onClick={() => setDepForm({ action:'refund', amount: String(selected.security_deposit||''), ref:'', reason:'' })}
+                        style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 13px', borderRadius:9, border:'none', background:'var(--blue)', color:'#fff', fontSize:12, fontWeight:700, cursor:'pointer' }}>
+                        <RotateCcw size={13} /> Refund
                       </button>
-                      <button className="btn btn-sm btn-danger font-weight-bold"
-                        onClick={() => setDepForm({ action:'forfeit', amount:'', ref:'', reason:'' })}>
-                        ✕ Forfeit
+                      <button onClick={() => setDepForm({ action:'forfeit', amount:'', ref:'', reason:'' })}
+                        style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'7px 13px', borderRadius:9, border:'none', background:'var(--red)', color:'#fff', fontSize:12, fontWeight:700, cursor:'pointer' }}>
+                        <X size={13} /> Forfeit
                       </button>
                     </>
                   )}
@@ -4883,28 +4857,26 @@ function WalletsSection() {
               {(() => {
                 const meta = DEPOSIT_STATUS_META[selected.security_deposit_status||'not_paid'];
                 return (
-                  <div className="admin-card mb-3" style={{borderLeft:`4px solid ${meta.color}`}}>
-                    <div className="card-body py-3">
-                      <div className="row text-center">
-                        <div className="col-4">
-                          <div className="text-xs text-gray-500 font-weight-bold text-uppercase mb-1">Status</div>
-                          <span className="badge" style={{background:meta.bg, color:meta.color, fontSize:12}}>{meta.label}</span>
+                  <div className="admin-card" style={{ borderLeft:`4px solid ${meta.color}` }}>
+                    <div style={{ padding:16 }}>
+                      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:10, textAlign:'center' }}>
+                        <div>
+                          <div style={{ fontSize:10.5, color:'var(--muted)', fontWeight:700, textTransform:'uppercase', letterSpacing:'.4px', marginBottom:5 }}>Status</div>
+                          <span style={{ background:meta.bg, color:meta.color, fontSize:11.5, fontWeight:700, padding:'3px 10px', borderRadius:999 }}>{meta.label}</span>
                         </div>
-                        <div className="col-4">
-                          <div className="text-xs text-gray-500 font-weight-bold text-uppercase mb-1">Amount Held</div>
-                          <div className="font-weight-bold" style={{fontSize:18, color:meta.color}}>
-                            KSh {(selected.security_deposit||0).toLocaleString()}
-                          </div>
+                        <div>
+                          <div style={{ fontSize:10.5, color:'var(--muted)', fontWeight:700, textTransform:'uppercase', letterSpacing:'.4px', marginBottom:5 }}>Amount Held</div>
+                          <div style={{ fontWeight:800, fontSize:17, color:meta.color }}>KSh {(selected.security_deposit||0).toLocaleString()}</div>
                         </div>
-                        <div className="col-4">
-                          <div className="text-xs text-gray-500 font-weight-bold text-uppercase mb-1">Job Access</div>
-                          <div className="font-weight-bold" style={{fontSize:13, color: selected.can_receive_jobs===false ? '#e74a3b' : '#1cc88a'}}>
-                            {selected.can_receive_jobs===false ? '🔒 Blocked' : '✅ Active'}
+                        <div>
+                          <div style={{ fontSize:10.5, color:'var(--muted)', fontWeight:700, textTransform:'uppercase', letterSpacing:'.4px', marginBottom:5 }}>Job Access</div>
+                          <div style={{ display:'inline-flex', alignItems:'center', gap:5, fontWeight:800, fontSize:12.5, color: selected.can_receive_jobs===false ? 'var(--red)' : 'var(--green)' }}>
+                            {selected.can_receive_jobs===false ? <><Lock size={12} /> Blocked</> : <><BadgeCheck size={12} /> Active</>}
                           </div>
                         </div>
                       </div>
                       {selected.security_deposit_paid_at && (
-                        <div className="text-xs text-gray-500 text-center mt-2">
+                        <div style={{ fontSize:11, color:'var(--muted)', textAlign:'center', marginTop:10 }}>
                           Paid on {new Date(selected.security_deposit_paid_at).toLocaleDateString('en-KE')}
                           {selected.security_deposit_ref && ` · Ref: ${selected.security_deposit_ref}`}
                         </div>
@@ -4916,58 +4888,49 @@ function WalletsSection() {
 
               {/* Deposit action form */}
               {depForm && (
-                <div className="admin-card mb-3" style={{borderLeft:`4px solid ${depForm.action==='received'?'#1cc88a':depForm.action==='refund'?'#17a2b8':'#e74a3b'}`}}>
-                  <div className="card-body py-3">
-                    <div className="text-xs font-weight-bold text-gray-600 mb-2">
-                      {depForm.action==='received' ? '💵 Record deposit payment received' : depForm.action==='refund' ? '↩ Refund deposit to partner' : '✕ Forfeit deposit (permanent)'}
+                <div className="admin-card" style={{ borderLeft:`4px solid ${depForm.action==='received'?'var(--green)':depForm.action==='refund'?'var(--blue)':'var(--red)'}` }}>
+                  <div style={{ padding:16 }}>
+                    <div style={{ fontSize:11.5, fontWeight:700, color:'var(--ink-2)', marginBottom:10 }}>
+                      {depForm.action==='received' ? 'Record deposit payment received' : depForm.action==='refund' ? 'Refund deposit to partner' : 'Forfeit deposit (permanent)'}
                     </div>
                     {depForm.action !== 'forfeit' && (
-                      <div className="row">
-                        <div className="col-4">
-                          <input type="number" className="form-control mb-2" placeholder="Amount (KSh)"
-                            value={depForm.amount} onChange={e => setDepForm(f => ({...f, amount: e.target.value}))} />
-                        </div>
-                        <div className="col-4">
-                          <input className="form-control mb-2" placeholder="M-Pesa ref (optional)"
-                            value={depForm.ref} onChange={e => setDepForm(f => ({...f, ref: e.target.value}))} />
-                        </div>
-                        <div className="col-4">
-                          <input className="form-control mb-2" placeholder="Note (optional)"
-                            value={depForm.reason} onChange={e => setDepForm(f => ({...f, reason: e.target.value}))} />
-                        </div>
+                      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:10, marginBottom:10 }}>
+                        <input type="number" style={{ ...inputSt2, marginBottom:0 }} placeholder="Amount (KSh)" value={depForm.amount} onChange={e => setDepForm(f => ({...f, amount: e.target.value}))} />
+                        <input style={{ ...inputSt2, marginBottom:0 }} placeholder="M-Pesa ref (optional)" value={depForm.ref} onChange={e => setDepForm(f => ({...f, ref: e.target.value}))} />
+                        <input style={{ ...inputSt2, marginBottom:0 }} placeholder="Note (optional)" value={depForm.reason} onChange={e => setDepForm(f => ({...f, reason: e.target.value}))} />
                       </div>
                     )}
                     {depForm.action === 'forfeit' && (
-                      <input className="form-control mb-2" placeholder="Reason for forfeiture (required)"
-                        value={depForm.reason} onChange={e => setDepForm(f => ({...f, reason: e.target.value}))} />
+                      <input style={inputSt2} placeholder="Reason for forfeiture (required)" value={depForm.reason} onChange={e => setDepForm(f => ({...f, reason: e.target.value}))} />
                     )}
-                    <div className="d-flex gap-2">
-                      <button className="btn btn-sm font-weight-bold"
-                        style={{background: depForm.action==='received'?'#1cc88a':depForm.action==='refund'?'#17a2b8':'#e74a3b', border:'none', color:'#fff'}}
-                        disabled={saving} onClick={applyDeposit}>{saving ? '…' : 'Confirm'}</button>
-                      <button className="btn btn-sm btn-outline-secondary" onClick={() => setDepForm(null)}>Cancel</button>
+                    <div style={{ display:'flex', gap:8 }}>
+                      <button disabled={saving} onClick={applyDeposit}
+                        style={{ padding:'7px 15px', borderRadius:8, border:'none', background: depForm.action==='received'?'var(--green)':depForm.action==='refund'?'var(--blue)':'var(--red)', color:'#fff', fontSize:12, fontWeight:700, cursor:'pointer' }}>
+                        {saving ? '…' : 'Confirm'}
+                      </button>
+                      <button onClick={() => setDepForm(null)} style={{ padding:'7px 15px', borderRadius:8, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--ink-2)', fontSize:12, fontWeight:700, cursor:'pointer' }}>Cancel</button>
                     </div>
                   </div>
                 </div>
               )}
 
               {/* Deposit transaction history */}
-              <div className="text-xs font-weight-bold text-gray-700 mb-2">Deposit History</div>
-              {detail.deposits.length === 0 ? <p className="text-xs text-gray-500">No deposit transactions yet.</p> : (
-                <div style={{maxHeight:260, overflowY:'auto'}}>
+              <div style={{ fontSize:11.5, fontWeight:800, color:'var(--ink-2)', marginBottom:9 }}>Deposit History</div>
+              {detail.deposits.length === 0 ? <p style={{ fontSize:12, color:'var(--muted)' }}>No deposit transactions yet.</p> : (
+                <div className="admin-card" style={{ maxHeight:260, overflowY:'auto' }}>
                   <table className="admin-table">
                     <thead><tr><th>Type</th><th>Amount</th><th>Method</th><th>Ref</th><th>Note</th><th>Date</th></tr></thead>
                     <tbody>
                       {detail.deposits.map(d => {
-                        const typeColor = { received:'#1cc88a', refund:'#17a2b8', forfeiture:'#e74a3b', adjustment:'#f59e0b' };
+                        const typeColor = { received:'var(--green)', refund:'var(--blue)', forfeiture:'var(--red)', adjustment:'var(--amber)' };
                         return (
                           <tr key={d.id}>
-                            <td><span className="sb-badge" style={{background:`${typeColor[d.type]}20`,color:typeColor[d.type]}}>{d.type}</span></td>
-                            <td className="text-xs font-weight-bold" style={{color:typeColor[d.type]}}>KSh {(d.amount||0).toLocaleString()}</td>
-                            <td className="text-xs">{d.method||'—'}</td>
-                            <td className="text-xs text-gray-500">{d.mpesa_ref||'—'}</td>
-                            <td className="text-xs text-gray-500">{d.note||'—'}</td>
-                            <td className="text-xs text-gray-500">{new Date(d.created_at).toLocaleDateString('en-KE')}</td>
+                            <td><span className="sb-badge" style={{ background:`${typeColor[d.type]}18`, color:typeColor[d.type] }}>{d.type}</span></td>
+                            <td style={{ fontWeight:700, color:typeColor[d.type] }}>KSh {(d.amount||0).toLocaleString()}</td>
+                            <td style={{ color:'var(--ink-2)' }}>{d.method||'—'}</td>
+                            <td style={{ color:'var(--muted)' }}>{d.mpesa_ref||'—'}</td>
+                            <td style={{ color:'var(--muted)' }}>{d.note||'—'}</td>
+                            <td style={{ color:'var(--muted)' }}>{new Date(d.created_at).toLocaleDateString('en-KE')}</td>
                           </tr>
                         );
                       })}
