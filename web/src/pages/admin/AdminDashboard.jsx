@@ -5827,11 +5827,11 @@ function FraudRiskSection() {
 
 // ── SECTION: Dispute Center ───────────────────────────────────────
 const RULING_OPTIONS = [
-  { value: 'customer_wins', label: '🏆 Customer Wins',  color: '#1cc88a' },
-  { value: 'partner_wins',  label: '🏆 Partner Wins',   color: '#4A90D9' },
-  { value: 'split',         label: '🤝 Split Decision', color: '#f6c23e' },
-  { value: 'dismissed',     label: '🚫 Dismissed',      color: '#6c757d' },
-  { value: 'no_fault',      label: '⚖️ No Fault Found', color: '#9F7AEA' },
+  { value: 'customer_wins', label: 'Customer Wins',  color: 'var(--green)' },
+  { value: 'partner_wins',  label: 'Partner Wins',   color: 'var(--blue)' },
+  { value: 'split',         label: 'Split Decision', color: 'var(--amber)' },
+  { value: 'dismissed',     label: 'Dismissed',      color: 'var(--muted)' },
+  { value: 'no_fault',      label: 'No Fault Found', color: 'var(--violet)' },
 ];
 const COMP_OPTIONS = [
   { value: 'full_refund',    label: 'Full Refund to Customer' },
@@ -5840,11 +5840,11 @@ const COMP_OPTIONS = [
   { value: 'none',           label: 'No Compensation' },
 ];
 const DISPUTE_STATUS_FLOW = {
-  pending:          { next: 'under_review',  btn: '▶ Start Review',       cls: 'btn-primary'   },
-  awaiting_customer:{ next: 'under_review',  btn: '▶ Mark Under Review',  cls: 'btn-warning'   },
-  awaiting_partner: { next: 'under_review',  btn: '▶ Mark Under Review',  cls: 'btn-warning'   },
-  under_review:     { next: null,            btn: null,                    cls: ''              },
-  resolved:         { next: 'under_review',  btn: '↩ Reopen',             cls: 'btn-secondary' },
+  pending:          { next: 'under_review',  btn: 'Start Review',       Icon: Navigation },
+  awaiting_customer:{ next: 'under_review',  btn: 'Mark Under Review',  Icon: Radio },
+  awaiting_partner: { next: 'under_review',  btn: 'Mark Under Review',  Icon: Radio },
+  under_review:     { next: null,            btn: null,                 Icon: null },
+  resolved:         { next: 'under_review',  btn: 'Reopen',             Icon: RotateCcw },
 };
 
 function DisputeCenterSection() {
@@ -5915,8 +5915,8 @@ function DisputeCenterSection() {
   };
 
   const STATUS_COLOR = {
-    pending:'#f6c23e', awaiting_customer:'#fd7e14', awaiting_partner:'#4A90D9',
-    under_review:'#9F7AEA', resolved:'#1cc88a',
+    pending:'var(--amber)', awaiting_customer:'var(--amber)', awaiting_partner:'var(--blue)',
+    under_review:'var(--violet)', resolved:'var(--green)',
   };
 
   const counts = {};
@@ -5927,66 +5927,65 @@ function DisputeCenterSection() {
       <PageHeader title="Dispute Center" sub="Two-sided dispute resolution — review both parties, issue a ruling" />
 
       {/* Stats */}
-      <div className="row mb-4">
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))', gap:12, marginBottom:20 }}>
         {[
-          { label:'Pending',       val: counts.pending||0,           color:'#f6c23e' },
-          { label:'Awaiting Party',val: (counts.awaiting_customer||0)+(counts.awaiting_partner||0), color:'#fd7e14' },
-          { label:'Under Review',  val: counts.under_review||0,      color:'#9F7AEA' },
-          { label:'Resolved',      val: counts.resolved||0,          color:'#1cc88a' },
+          { label:'Pending',       val: counts.pending||0,           color:'var(--amber)' },
+          { label:'Awaiting Party',val: (counts.awaiting_customer||0)+(counts.awaiting_partner||0), color:'var(--amber)' },
+          { label:'Under Review',  val: counts.under_review||0,      color:'var(--violet)' },
+          { label:'Resolved',      val: counts.resolved||0,          color:'var(--green)' },
         ].map(s => (
-          <div key={s.label} className="col-md-3 mb-2">
-            <StatCard icon="⚖️" label={s.label} value={s.val} color={s.color} />
-          </div>
+          <StatCard key={s.label} icon={<Scale size={22} color={s.color} />} label={s.label} value={s.val} color={s.color} />
         ))}
       </div>
 
-      <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-        <div>
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16, flexWrap:'wrap', gap:10 }}>
+        <div style={{ display:'flex', flexWrap:'wrap', gap:4 }}>
           {['all','pending','awaiting_customer','awaiting_partner','under_review','resolved'].map(f => (
             <FilterPill key={f} active={filter===f} onClick={() => setFilter(f)}>
               {f === 'all' ? 'All' : f.replace(/_/g,' ')}
             </FilterPill>
           ))}
         </div>
-        <button className="btn btn-primary btn-sm" style={{ fontWeight:700 }} onClick={() => setShowNew(true)}>
-          + New Dispute
+        <button onClick={() => setShowNew(true)}
+          style={{ display:'flex', alignItems:'center', gap:6, padding:'8px 14px', borderRadius:9, border:'none', background:'var(--navy)', color:'#fff', fontSize:12.5, fontWeight:700, cursor:'pointer' }}>
+          <Plus size={14} /> New Dispute
         </button>
       </div>
 
       {/* New dispute modal */}
       {showNew && (
-        <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center' }}>
-          <div className="admin-card" style={{ width:640, maxHeight:'90vh', overflowY:'auto', borderRadius:12 }}>
-            <div className="admin-card-header d-flex justify-content-between">
-              <span>⚖️ Open New Dispute</span>
-              <button onClick={() => setShowNew(false)} style={{ background:'none',border:'none',fontSize:18,cursor:'pointer',color:'#aaa' }}>×</button>
+        <div style={{ position:'fixed', inset:0, background:'rgba(15,27,45,0.5)', zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center' }}>
+          <div className="admin-card" style={{ width:640, maxHeight:'90vh', overflowY:'auto', borderRadius:16 }}>
+            <div className="admin-card-header">
+              <span style={{ display:'flex', alignItems:'center', gap:7 }}><Scale size={15} color="var(--gold)" /> Open New Dispute</span>
+              <button onClick={() => setShowNew(false)} style={{ background:'none',border:'none',cursor:'pointer',color:'var(--muted)', display:'flex' }}><X size={17} /></button>
             </div>
-            <div className="card-body">
-              <div className="row">
+            <div style={{ padding:'16px 20px 20px' }}>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14, marginBottom:14 }}>
                 {[['Booking Reference', 'booking_ref'],['Service', 'service'],['Customer Name','customer_name'],['Customer Email','customer_email'],['Partner Name','partner_name']].map(([lbl,key]) => (
-                  <div key={key} className="col-md-6 mb-3">
-                    <label className="text-xs font-weight-bold text-gray-600">{lbl}</label>
+                  <div key={key}>
+                    <label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', display:'block', marginBottom:4 }}>{lbl}</label>
                     <input className="form-control form-control-sm" value={newForm[key]} onChange={e => setNewForm(f=>({...f,[key]:e.target.value}))} />
                   </div>
                 ))}
-                <div className="col-md-6 mb-3">
-                  <label className="text-xs font-weight-bold text-gray-600">Partner Role</label>
+                <div>
+                  <label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', display:'block', marginBottom:4 }}>Partner Role</label>
                   <select className="form-control form-control-sm" value={newForm.partner_role} onChange={e => setNewForm(f=>({...f,partner_role:e.target.value}))}>
                     {['worker','vendor','rider','supplier','mover','water_carrier'].map(r=><option key={r} value={r}>{r}</option>)}
                   </select>
                 </div>
               </div>
-              <div className="mb-3">
-                <label className="text-xs font-weight-bold text-gray-600">Customer Statement</label>
+              <div style={{ marginBottom:14 }}>
+                <label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', display:'block', marginBottom:4 }}>Customer Statement</label>
                 <textarea className="form-control" rows={3} style={{ fontSize:12,resize:'none' }} value={newForm.customer_statement} onChange={e => setNewForm(f=>({...f,customer_statement:e.target.value}))} placeholder="Customer's version of events…" />
               </div>
-              <div className="mb-3">
-                <label className="text-xs font-weight-bold text-gray-600">Partner Statement</label>
+              <div style={{ marginBottom:14 }}>
+                <label style={{ fontSize:11, fontWeight:700, color:'var(--ink-2)', display:'block', marginBottom:4 }}>Partner Statement</label>
                 <textarea className="form-control" rows={3} style={{ fontSize:12,resize:'none' }} value={newForm.partner_statement} onChange={e => setNewForm(f=>({...f,partner_statement:e.target.value}))} placeholder="Partner's version of events…" />
               </div>
-              <div className="d-flex gap-2">
-                <button className="btn btn-primary btn-sm" style={{ fontWeight:700 }} onClick={createDispute}>Open Dispute</button>
-                <button className="btn btn-outline-secondary btn-sm" onClick={() => setShowNew(false)}>Cancel</button>
+              <div style={{ display:'flex', gap:8 }}>
+                <button onClick={createDispute} style={{ padding:'8px 16px', borderRadius:9, border:'none', background:'var(--navy)', color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer' }}>Open Dispute</button>
+                <button onClick={() => setShowNew(false)} style={{ padding:'8px 16px', borderRadius:9, border:'1px solid var(--line-2)', background:'none', color:'var(--ink-2)', fontSize:13, fontWeight:700, cursor:'pointer' }}>Cancel</button>
               </div>
             </div>
           </div>
@@ -5994,38 +5993,38 @@ function DisputeCenterSection() {
       )}
 
       {loading ? <Spinner /> : (
-        <div className="row">
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1.4fr', gap:18 }}>
           {/* List */}
-          <div className="col-md-5">
+          <div>
             {disputes.length === 0
-              ? <div className="text-center py-5 text-gray-500">No disputes in this view.</div>
+              ? <div style={{ textAlign:'center', padding:'48px 0', color:'var(--muted)' }}>No disputes in this view.</div>
               : disputes.map(d => (
-                <div key={d.id} className="admin-card mb-2" onClick={() => selectDispute(d)}
-                  style={{ borderLeft:`4px solid ${STATUS_COLOR[d.status]||'#aaa'}`, cursor:'pointer', background: selected?.id===d.id?'#f8f9fc':'#fff' }}>
-                  <div className="card-body py-2">
-                    <div className="d-flex justify-content-between align-items-start">
+                <div key={d.id} className="admin-card" onClick={() => selectDispute(d)}
+                  style={{ borderLeft:`4px solid ${STATUS_COLOR[d.status]||'var(--muted)'}`, cursor:'pointer', background: selected?.id===d.id?'var(--gold-soft)':'var(--surface)', marginBottom:10 }}>
+                  <div style={{ padding:'12px 16px' }}>
+                    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
                       <div>
-                        <div className="font-weight-bold text-gray-800 text-xs">{d.booking_ref || `Dispute #${d.id.slice(0,8)}`}</div>
-                        <div className="text-xs text-gray-500 mt-1">{d.service||'—'} · {d.customer_name||'—'} vs {d.partner_name||'—'}</div>
-                        <div className="text-xs text-gray-400 mt-1">{new Date(d.created_at).toLocaleDateString('en-KE')}</div>
+                        <div style={{ fontWeight:700, color:'var(--ink)', fontSize:12.5 }}>{d.booking_ref || `Dispute #${d.id.slice(0,8)}`}</div>
+                        <div style={{ fontSize:11.5, color:'var(--muted)', marginTop:4 }}>{d.service||'—'} · {d.customer_name||'—'} vs {d.partner_name||'—'}</div>
+                        <div style={{ fontSize:11, color:'var(--muted)', marginTop:4 }}>{new Date(d.created_at).toLocaleDateString('en-KE')}</div>
                       </div>
-                      <div className="d-flex flex-column align-items-end gap-1">
-                        <span className="sb-badge" style={{ background:`${STATUS_COLOR[d.status]}18`, color:STATUS_COLOR[d.status], border:`1px solid ${STATUS_COLOR[d.status]}40` }}>
+                      <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:5 }}>
+                        <span style={{ fontSize:10, fontWeight:700, background:`${STATUS_COLOR[d.status]}18`, color:STATUS_COLOR[d.status], border:`1px solid ${STATUS_COLOR[d.status]}40`, borderRadius:999, padding:'2px 8px' }}>
                           {d.status.replace(/_/g,' ')}
                         </span>
                         {d.ruling && (
-                          <span className="text-xs" style={{ color: RULING_OPTIONS.find(r=>r.value===d.ruling)?.color }}>
+                          <span style={{ fontSize:11, color: RULING_OPTIONS.find(r=>r.value===d.ruling)?.color }}>
                             {RULING_OPTIONS.find(r=>r.value===d.ruling)?.label}
                           </span>
                         )}
                       </div>
                     </div>
-                    <div className="d-flex gap-2 mt-2">
-                      <span className="text-xs" style={{ color: d.customer_submitted_at?'#1cc88a':'#e74a3b' }}>
-                        {d.customer_submitted_at?'✅':'⏳'} Customer
+                    <div style={{ display:'flex', gap:10, marginTop:8 }}>
+                      <span style={{ fontSize:11, display:'flex', alignItems:'center', gap:4, color: d.customer_submitted_at?'var(--green)':'var(--red)' }}>
+                        {d.customer_submitted_at ? <CheckCircle2 size={11} /> : <Clock size={11} />} Customer
                       </span>
-                      <span className="text-xs" style={{ color: d.partner_submitted_at?'#1cc88a':'#e74a3b' }}>
-                        {d.partner_submitted_at?'✅':'⏳'} Partner
+                      <span style={{ fontSize:11, display:'flex', alignItems:'center', gap:4, color: d.partner_submitted_at?'var(--green)':'var(--red)' }}>
+                        {d.partner_submitted_at ? <CheckCircle2 size={11} /> : <Clock size={11} />} Partner
                       </span>
                     </div>
                   </div>
@@ -6034,104 +6033,109 @@ function DisputeCenterSection() {
           </div>
 
           {/* Detail */}
-          <div className="col-md-7">
+          <div>
             {!selected ? (
-              <div className="admin-card" style={{ minHeight:400, display:'flex', alignItems:'center', justifyContent:'center', color:'#a0aec0' }}>
-                <div className="text-center"><div style={{ fontSize:48, marginBottom:8 }}>⚖️</div><div>Select a dispute to review both sides</div></div>
+              <div className="admin-card" style={{ minHeight:400, display:'flex', alignItems:'center', justifyContent:'center', color:'var(--muted)' }}>
+                <div style={{ textAlign:'center' }}><Scale size={40} color="var(--line-2)" style={{ marginBottom:8 }} /><div>Select a dispute to review both sides</div></div>
               </div>
             ) : (
               <div className="admin-card">
-                <div className="admin-card-header d-flex justify-content-between align-items-center">
-                  <span>⚖️ {selected.booking_ref || `Dispute #${selected.id.slice(0,8)}`}</span>
-                  <button onClick={() => setSelected(null)} style={{ background:'none',border:'none',fontSize:18,cursor:'pointer',color:'#aaa' }}>×</button>
+                <div className="admin-card-header">
+                  <span style={{ display:'flex', alignItems:'center', gap:7 }}><Scale size={15} color="var(--gold)" /> {selected.booking_ref || `Dispute #${selected.id.slice(0,8)}`}</span>
+                  <button onClick={() => setSelected(null)} style={{ background:'none',border:'none',cursor:'pointer',color:'var(--muted)', display:'flex' }}><X size={17} /></button>
                 </div>
-                <div className="card-body">
+                <div style={{ padding:'14px 20px 18px' }}>
                   {/* Meta */}
-                  <div className="row mb-3">
+                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:16 }}>
                     {[['Service',selected.service||'—'],['Customer',selected.customer_name||'—'],['Partner',`${selected.partner_name||'—'} (${selected.partner_role||'—'})`],['Status',selected.status.replace(/_/g,' ')]].map(([k,v])=>(
-                      <div key={k} className="col-6 mb-2">
-                        <div className="text-xs text-gray-500">{k}</div>
-                        <div className="text-xs font-weight-bold text-gray-800">{v}</div>
+                      <div key={k}>
+                        <div style={{ fontSize:10.5, color:'var(--muted)' }}>{k}</div>
+                        <div style={{ fontSize:12.5, fontWeight:700, color:'var(--ink)' }}>{v}</div>
                       </div>
                     ))}
                   </div>
 
                   {/* Two-sided statements */}
-                  <div className="row mb-3">
-                    <div className="col-md-6 mb-3">
-                      <div className="d-flex align-items-center gap-2 mb-2">
-                        <span style={{ width:8,height:8,borderRadius:'50%',background:'#1cc88a',display:'inline-block' }}/>
-                        <span className="text-xs font-weight-bold" style={{ color:'#1cc88a' }}>CUSTOMER — {selected.customer_name||'—'}</span>
+                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14, marginBottom:16 }}>
+                    <div>
+                      <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:8 }}>
+                        <span style={{ width:8,height:8,borderRadius:'50%',background:'var(--green)',display:'inline-block' }}/>
+                        <span style={{ fontSize:11, fontWeight:800, color:'var(--green)' }}>CUSTOMER — {selected.customer_name||'—'}</span>
                       </div>
-                      <div style={{ background:'rgba(28,200,138,0.05)', border:'1px solid rgba(28,200,138,0.2)', borderRadius:8, padding:'10px 12px', minHeight:100 }}>
+                      <div style={{ background:'rgba(22,163,74,0.05)', border:'1px solid rgba(22,163,74,0.2)', borderRadius:9, padding:'10px 12px', minHeight:100 }}>
                         {selected.customer_statement
-                          ? <div className="text-xs text-gray-700" style={{ whiteSpace:'pre-wrap' }}>{selected.customer_statement}</div>
-                          : <div className="text-xs text-gray-400 font-italic">No statement submitted yet.</div>}
+                          ? <div style={{ fontSize:12, color:'var(--ink-2)', whiteSpace:'pre-wrap' }}>{selected.customer_statement}</div>
+                          : <div style={{ fontSize:12, color:'var(--muted)', fontStyle:'italic' }}>No statement submitted yet.</div>}
                       </div>
-                      {selected.customer_submitted_at && <div className="text-xs text-gray-400 mt-1">Submitted {new Date(selected.customer_submitted_at).toLocaleString('en-KE')}</div>}
+                      {selected.customer_submitted_at && <div style={{ fontSize:11, color:'var(--muted)', marginTop:5 }}>Submitted {new Date(selected.customer_submitted_at).toLocaleString('en-KE')}</div>}
                     </div>
-                    <div className="col-md-6 mb-3">
-                      <div className="d-flex align-items-center gap-2 mb-2">
-                        <span style={{ width:8,height:8,borderRadius:'50%',background:'#4A90D9',display:'inline-block' }}/>
-                        <span className="text-xs font-weight-bold" style={{ color:'#4A90D9' }}>PARTNER — {selected.partner_name||'—'}</span>
+                    <div>
+                      <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:8 }}>
+                        <span style={{ width:8,height:8,borderRadius:'50%',background:'var(--blue)',display:'inline-block' }}/>
+                        <span style={{ fontSize:11, fontWeight:800, color:'var(--blue)' }}>PARTNER — {selected.partner_name||'—'}</span>
                       </div>
-                      <div style={{ background:'rgba(74,144,217,0.05)', border:'1px solid rgba(74,144,217,0.2)', borderRadius:8, padding:'10px 12px', minHeight:100 }}>
+                      <div style={{ background:'rgba(59,130,246,0.05)', border:'1px solid rgba(59,130,246,0.2)', borderRadius:9, padding:'10px 12px', minHeight:100 }}>
                         {selected.partner_statement
-                          ? <div className="text-xs text-gray-700" style={{ whiteSpace:'pre-wrap' }}>{selected.partner_statement}</div>
-                          : <div className="text-xs text-gray-400 font-italic">No statement submitted yet.</div>}
+                          ? <div style={{ fontSize:12, color:'var(--ink-2)', whiteSpace:'pre-wrap' }}>{selected.partner_statement}</div>
+                          : <div style={{ fontSize:12, color:'var(--muted)', fontStyle:'italic' }}>No statement submitted yet.</div>}
                       </div>
-                      {selected.partner_submitted_at && <div className="text-xs text-gray-400 mt-1">Submitted {new Date(selected.partner_submitted_at).toLocaleString('en-KE')}</div>}
+                      {selected.partner_submitted_at && <div style={{ fontSize:11, color:'var(--muted)', marginTop:5 }}>Submitted {new Date(selected.partner_submitted_at).toLocaleString('en-KE')}</div>}
                     </div>
                   </div>
 
                   {/* Advance status */}
                   {DISPUTE_STATUS_FLOW[selected.status]?.btn && selected.status !== 'under_review' && (
-                    <button className={`btn btn-sm ${DISPUTE_STATUS_FLOW[selected.status].cls} mb-3`}
-                      style={{ fontWeight:700 }} onClick={() => advanceStatus(selected)}>
+                    <button onClick={() => advanceStatus(selected)}
+                      style={{ display:'flex', alignItems:'center', gap:6, marginBottom:16, padding:'8px 14px', borderRadius:9, border:'none', background:'var(--blue)', color:'#fff', fontSize:12.5, fontWeight:700, cursor:'pointer' }}>
+                      {DISPUTE_STATUS_FLOW[selected.status].Icon && (() => { const FIcon = DISPUTE_STATUS_FLOW[selected.status].Icon; return <FIcon size={13} />; })()}
                       {DISPUTE_STATUS_FLOW[selected.status].btn}
                     </button>
                   )}
 
                   {/* Ruling panel */}
                   {selected.status !== 'resolved' && (
-                    <div style={{ background:'#f8f9fc', border:'1px solid #e3e6f0', borderRadius:8, padding:'14px' }}>
-                      <div className="font-weight-bold text-xs text-gray-800 mb-3">ISSUE RULING</div>
-                      <div className="mb-3">
-                        <label className="text-xs text-gray-500 mb-1 d-block">Decision</label>
-                        <div className="d-flex flex-wrap gap-2">
+                    <div style={{ background:'var(--canvas)', border:'1px solid var(--line)', borderRadius:10, padding:14 }}>
+                      <div style={{ fontSize:11, fontWeight:800, color:'var(--ink-2)', marginBottom:12 }}>ISSUE RULING</div>
+                      <div style={{ marginBottom:14 }}>
+                        <label style={{ fontSize:11, color:'var(--muted)', marginBottom:6, display:'block' }}>Decision</label>
+                        <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
                           {RULING_OPTIONS.map(r => (
                             <button key={r.value} onClick={() => setRuling(r.value)}
-                              className="btn btn-sm" style={{ fontSize:11, fontWeight:700, background: ruling===r.value?r.color:'transparent', color: ruling===r.value?'#fff':r.color, border:`1.5px solid ${r.color}` }}>
+                              style={{ fontSize:11, fontWeight:700, padding:'6px 12px', borderRadius:8, background: ruling===r.value?r.color:'transparent', color: ruling===r.value?'#fff':r.color, border:`1.5px solid ${r.color}`, cursor:'pointer' }}>
                               {r.label}
                             </button>
                           ))}
                         </div>
                       </div>
-                      <div className="mb-3">
-                        <label className="text-xs text-gray-500 mb-1 d-block">Compensation Action</label>
+                      <div style={{ marginBottom:14 }}>
+                        <label style={{ fontSize:11, color:'var(--muted)', marginBottom:6, display:'block' }}>Compensation Action</label>
                         <select className="form-control form-control-sm" value={comp} onChange={e => setComp(e.target.value)} style={{ fontSize:12 }}>
                           {COMP_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                         </select>
                       </div>
-                      <div className="mb-3">
-                        <label className="text-xs text-gray-500 mb-1 d-block">Admin Note (visible to both parties)</label>
+                      <div style={{ marginBottom:14 }}>
+                        <label style={{ fontSize:11, color:'var(--muted)', marginBottom:6, display:'block' }}>Admin Note (visible to both parties)</label>
                         <textarea className="form-control" rows={3} style={{ fontSize:12,resize:'none' }} value={note} onChange={e => setNote(e.target.value)} placeholder="Explain your ruling…" />
                       </div>
-                      <button className="btn btn-success btn-sm" style={{ fontWeight:700 }} disabled={!ruling || saving} onClick={resolve}>
-                        ⚖️ {saving ? 'Saving…' : 'Issue Ruling & Resolve'}
+                      <button disabled={!ruling || saving} onClick={resolve}
+                        style={{ display:'flex', alignItems:'center', gap:6, padding:'8px 16px', borderRadius:9, border:'none', background:'var(--green)', color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer', opacity: !ruling ? 0.5 : 1 }}>
+                        <Scale size={14} /> {saving ? 'Saving…' : 'Issue Ruling & Resolve'}
                       </button>
                     </div>
                   )}
 
                   {/* Show existing ruling */}
                   {selected.status === 'resolved' && selected.ruling && (
-                    <div style={{ background:'rgba(28,200,138,0.06)', border:'1px solid rgba(28,200,138,0.2)', borderRadius:8, padding:'14px' }}>
-                      <div className="font-weight-bold text-xs mb-2" style={{ color:'#1cc88a' }}>RULING ISSUED</div>
-                      <div className="text-xs font-weight-bold text-gray-800">{RULING_OPTIONS.find(r=>r.value===selected.ruling)?.label}</div>
-                      {selected.compensation_action && <div className="text-xs text-gray-600 mt-1">Action: {COMP_OPTIONS.find(o=>o.value===selected.compensation_action)?.label}</div>}
-                      {selected.admin_ruling_note && <div className="text-xs text-gray-600 mt-2">{selected.admin_ruling_note}</div>}
-                      <div className="text-xs text-gray-400 mt-2">Resolved {new Date(selected.resolved_at).toLocaleString('en-KE')}</div>
-                      <button className="btn btn-outline-secondary btn-sm mt-2" style={{ fontSize:11 }} onClick={() => advanceStatus(selected)}>↩ Reopen</button>
+                    <div style={{ background:'rgba(22,163,74,0.06)', border:'1px solid rgba(22,163,74,0.2)', borderRadius:10, padding:14 }}>
+                      <div style={{ fontSize:11, fontWeight:800, color:'var(--green)', marginBottom:8 }}>RULING ISSUED</div>
+                      <div style={{ fontSize:12.5, fontWeight:700, color:'var(--ink)' }}>{RULING_OPTIONS.find(r=>r.value===selected.ruling)?.label}</div>
+                      {selected.compensation_action && <div style={{ fontSize:12, color:'var(--ink-2)', marginTop:4 }}>Action: {COMP_OPTIONS.find(o=>o.value===selected.compensation_action)?.label}</div>}
+                      {selected.admin_ruling_note && <div style={{ fontSize:12, color:'var(--ink-2)', marginTop:8 }}>{selected.admin_ruling_note}</div>}
+                      <div style={{ fontSize:11, color:'var(--muted)', marginTop:8 }}>Resolved {new Date(selected.resolved_at).toLocaleString('en-KE')}</div>
+                      <button onClick={() => advanceStatus(selected)}
+                        style={{ display:'flex', alignItems:'center', gap:5, marginTop:10, padding:'6px 12px', borderRadius:8, border:'1px solid var(--line-2)', background:'none', color:'var(--ink-2)', fontSize:11, fontWeight:700, cursor:'pointer' }}>
+                        <RotateCcw size={12} /> Reopen
+                      </button>
                     </div>
                   )}
                 </div>
