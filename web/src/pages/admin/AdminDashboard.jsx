@@ -3741,12 +3741,12 @@ function WaterOpsSection() {
   const [statusF,  setStatusF]  = useState('all');
 
   const ORDER_STATUS = {
-    pending:    { label:'⏳ Pending',    color:'#6c757d' },
-    confirmed:  { label:'✅ Confirmed',  color:'#63B3ED' },
-    departed:   { label:'🚰 Departed',   color:'#F6AD55' },
-    arrived:    { label:'🏠 Arrived',    color:'#C9A020' },
-    delivered:  { label:'✅ Delivered',  color:'#48BB78' },
-    cancelled:  { label:'❌ Cancelled',  color:'#FC8181' },
+    pending:    { label:'Pending',    Icon: Clock,       color:'var(--muted)' },
+    confirmed:  { label:'Confirmed',  Icon: CheckCircle2,color:'var(--blue)' },
+    departed:   { label:'Departed',   Icon: Truck,       color:'var(--amber)' },
+    arrived:    { label:'Arrived',    Icon: MapPin,      color:'var(--gold)' },
+    delivered:  { label:'Delivered',  Icon: CheckCircle2,color:'var(--green)' },
+    cancelled:  { label:'Cancelled',  Icon: X,           color:'var(--red)' },
   };
 
   useEffect(() => {
@@ -3776,28 +3776,37 @@ function WaterOpsSection() {
 
   const filtered = statusF === 'all' ? orders : orders.filter(o => statusMap(o) === statusF);
 
+  const TABS = [
+    { id:'deliveries', label:'Water Orders', count: orders.length, Icon: Droplets },
+    { id:'carriers',   label:'Carriers',     count: carriers.length, Icon: Users },
+  ];
+
   return (
     <>
-      <PageHeader title="🚰 Water Carriers" sub="Water carrier profiles and delivery order monitoring" />
-      <div className="mb-3 d-flex" style={{ gap:8 }}>
-        {[{id:'deliveries',label:`🚰 Water Orders (${orders.length})`},{id:'carriers',label:`👥 Carriers (${carriers.length})`}].map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} className={`btn btn-sm ${tab===t.id?'btn-warning':'btn-outline-secondary'}`} style={tab===t.id?{background:'#C9A020',borderColor:'#C9A020',color:'#0A0E1A',fontWeight:800}:{fontWeight:700}}>{t.label}</button>
+      <PageHeader title="Water Carriers" sub="Water carrier profiles and delivery order monitoring" />
+      <div style={{ display:'flex', gap:8, marginBottom:18 }}>
+        {TABS.map(t => (
+          <button key={t.id} onClick={() => setTab(t.id)}
+            style={{ display:'inline-flex', alignItems:'center', gap:7, padding:'9px 15px', borderRadius:10, border: tab===t.id ? 'none' : '1px solid var(--line-2)',
+              background: tab===t.id ? 'var(--gold)' : 'var(--surface)', color: tab===t.id ? '#fff' : 'var(--ink-2)', fontSize:12.5, fontWeight:700, cursor:'pointer' }}>
+            <t.Icon size={14} /> {t.label} ({t.count})
+          </button>
         ))}
       </div>
 
       {loading ? <Spinner /> : tab === 'carriers' ? (
         <div className="admin-card">
-          <div className="table-responsive">
+          <div style={{ overflowX:'auto' }}>
             <table className="admin-table">
               <thead><tr><th>Name</th><th>Business</th><th>Status</th><th>Wallet</th><th>Joined</th></tr></thead>
               <tbody>
                 {carriers.map(c => (
                   <tr key={c.id}>
-                    <td className="font-weight-bold">{c.full_name||'—'}</td>
-                    <td className="text-xs text-gray-600">{c.business_name||c.company_name||'—'}</td>
+                    <td style={{ fontWeight:700, color:'var(--ink)' }}>{c.full_name||'—'}</td>
+                    <td style={{ color:'var(--ink-2)' }}>{c.business_name||c.company_name||'—'}</td>
                     <td><SBBadge status={c.verification_status||'pending'} /></td>
-                    <td className="text-xs">KSh {(c.wallet_balance||0).toLocaleString()}</td>
-                    <td className="text-xs text-gray-500">{c.created_at ? new Date(c.created_at).toLocaleDateString('en-KE') : '—'}</td>
+                    <td style={{ color:'var(--ink-2)' }}>KSh {(c.wallet_balance||0).toLocaleString()}</td>
+                    <td style={{ color:'var(--muted)' }}>{c.created_at ? new Date(c.created_at).toLocaleDateString('en-KE') : '—'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -3806,23 +3815,22 @@ function WaterOpsSection() {
         </div>
       ) : (
         <>
-          <div className="row mb-3">
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))', gap:14, marginBottom:18 }}>
             {[
-              {label:'Total Orders', val:orders.length, color:'#4A90D9'},
-              {label:'Pending',      val:orders.filter(o=>statusMap(o)==='pending').length, color:'#6c757d'},
-              {label:'In Transit',   val:orders.filter(o=>['confirmed','departed','arrived'].includes(statusMap(o))).length, color:'#F6AD55'},
-              {label:'Delivered',    val:orders.filter(o=>statusMap(o)==='delivered').length, color:'#48BB78'},
+              {label:'Total Orders', val:orders.length, color:'var(--blue)', Icon:Droplets},
+              {label:'Pending',      val:orders.filter(o=>statusMap(o)==='pending').length, color:'var(--muted)', Icon:Clock},
+              {label:'In Transit',   val:orders.filter(o=>['confirmed','departed','arrived'].includes(statusMap(o))).length, color:'var(--amber)', Icon:Truck},
+              {label:'Delivered',    val:orders.filter(o=>statusMap(o)==='delivered').length, color:'var(--green)', Icon:CheckCircle2},
             ].map(s => (
-              <div key={s.label} className="col-md-3 mb-2">
-                <div className="admin-card"><div className="card-body py-3 text-center">
-                  <div className="text-xs font-weight-bold text-gray-500 text-uppercase mb-1">{s.label}</div>
-                  <div style={{fontSize:26,fontWeight:900,color:s.color}}>{s.val}</div>
-                </div></div>
+              <div key={s.label} className="stat-card" style={{ textAlign:'center' }}>
+                <div className="stat-ico" style={{ background:`${s.color}18`, margin:'0 auto 10px' }}><s.Icon size={20} color={s.color} /></div>
+                <div style={{ fontSize:22, fontWeight:800, color:'var(--ink)' }}>{s.val}</div>
+                <div style={{ fontSize:11.5, color:'var(--muted)', marginTop:2 }}>{s.label}</div>
               </div>
             ))}
           </div>
 
-          <div className="mb-3">
+          <div style={{ marginBottom:16 }}>
             {['all','pending','confirmed','departed','arrived','delivered','cancelled'].map(s => (
               <FilterPill key={s} active={statusF===s} onClick={()=>setStatusF(s)}>
                 {s==='all' ? 'All' : (ORDER_STATUS[s]?.label || s)}
@@ -3831,10 +3839,10 @@ function WaterOpsSection() {
           </div>
 
           {filtered.length === 0 ? (
-            <div className="text-center py-5"><div style={{fontSize:48}}>🚰</div><p className="text-gray-500 mt-2">No water delivery orders found</p></div>
+            <div style={{ textAlign:'center', padding:'56px 0' }}><Droplets size={40} color="var(--muted)" style={{ marginBottom:10 }} /><p style={{ color:'var(--muted)', margin:0 }}>No water delivery orders found</p></div>
           ) : (
             <div className="admin-card">
-              <div className="table-responsive">
+              <div style={{ overflowX:'auto' }}>
                 <table className="admin-table">
                   <thead>
                     <tr><th>Date</th><th>Address</th><th>Carrier</th><th>Amount</th><th>Status</th><th>Delivered</th></tr>
@@ -3846,12 +3854,12 @@ function WaterOpsSection() {
                       const carrier = o.driver_snapshot;
                       return (
                         <tr key={o.id}>
-                          <td className="text-xs text-gray-600">{o.booking_date || new Date(o.created_at).toLocaleDateString('en-KE')}</td>
-                          <td className="text-xs" style={{maxWidth:200,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{o.address||'—'}</td>
-                          <td className="text-xs">{carrier?.name || (o.carrier_user_id ? 'Assigned' : <span className="text-gray-400">Unassigned</span>)}</td>
-                          <td className="text-xs font-weight-bold" style={{color:'#C9A020'}}>KSh {(o.amount||0).toLocaleString()}</td>
-                          <td><span style={{background:`${meta.color}18`,color:meta.color,border:`1px solid ${meta.color}40`,borderRadius:999,padding:'2px 10px',fontSize:11,fontWeight:800,whiteSpace:'nowrap'}}>{meta.label||st}</span></td>
-                          <td className="text-xs text-gray-500">{o.delivered_at ? new Date(o.delivered_at).toLocaleString('en-KE',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '—'}</td>
+                          <td style={{ color:'var(--ink-2)' }}>{o.booking_date || new Date(o.created_at).toLocaleDateString('en-KE')}</td>
+                          <td style={{ color:'var(--ink-2)', maxWidth:200, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{o.address||'—'}</td>
+                          <td style={{ color:'var(--ink-2)' }}>{carrier?.name || (o.carrier_user_id ? 'Assigned' : <span style={{ color:'var(--muted)' }}>Unassigned</span>)}</td>
+                          <td style={{ fontWeight:700, color:'var(--gold)' }}>KSh {(o.amount||0).toLocaleString()}</td>
+                          <td><span style={{ display:'inline-flex', alignItems:'center', gap:5, background:`${meta.color}18`, color:meta.color, borderRadius:999, padding:'3px 10px', fontSize:11, fontWeight:800, whiteSpace:'nowrap' }}>{meta.Icon && <meta.Icon size={11} />}{meta.label||st}</span></td>
+                          <td style={{ color:'var(--muted)' }}>{o.delivered_at ? new Date(o.delivered_at).toLocaleString('en-KE',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '—'}</td>
                         </tr>
                       );
                     })}
