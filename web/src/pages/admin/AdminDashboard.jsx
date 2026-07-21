@@ -1484,44 +1484,43 @@ function PaymentsSection() {
     return true;
   });
 
-  const STATUS_COLOR = { paid:'#1cc88a', pending:'#F6AD55', failed:'#e74a3b', refunded:'#9F7AEA' };
-  const METHOD_ICON  = { mpesa:'📱', cash:'💵', bank:'🏦', card:'💳' };
+  const STATUS_COLOR = { paid:'var(--green)', pending:'var(--amber)', failed:'var(--red)', refunded:'var(--violet)' };
+  const METHOD_ICON  = { mpesa: Smartphone, cash: Wallet, bank: Briefcase, card: CreditCard };
+  const inputSt = { fontSize:12, padding:'8px 11px', border:'1px solid var(--line-2)', borderRadius:9, outline:'none', fontFamily:'inherit', background:'var(--surface)', color:'var(--ink)' };
 
   return (
     <>
       <PageHeader title="Payments" sub="Full payment ledger — transactions, receipts, methods and status" />
 
       {/* KPI row */}
-      <div className="row mb-3">
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))', gap:12, marginBottom:20 }}>
         {[
-          { icon:'💰', label:'Total Revenue',   val:`KSh ${totalRev.toLocaleString()}`,           color:'#1cc88a' },
-          { icon:'✅', label:'Paid',             val:paid.length,                                  color:'#1cc88a' },
-          { icon:'⏳', label:'Pending',          val:`${pending.length} · KSh ${totalPending.toLocaleString()}`, color:'#F6AD55' },
-          { icon:'❌', label:'Failed',           val:failed.length,                                color:'#e74a3b' },
-          { icon:'📱', label:'M-Pesa',           val:payments.filter(p=>p.payment_method==='mpesa').length, color:'#48BB78' },
-          { icon:'📄', label:'Receipts Issued',  val:receipts.length,                              color:'#C9A020' },
+          { Icon:Wallet,     label:'Total Revenue',  val:`KSh ${totalRev.toLocaleString()}`, color:'var(--green)' },
+          { Icon:BadgeCheck, label:'Paid',            val:paid.length,                        color:'var(--green)' },
+          { Icon:Clock,      label:'Pending',         val:`${pending.length} · KSh ${totalPending.toLocaleString()}`, color:'var(--amber)' },
+          { Icon:X,          label:'Failed',          val:failed.length,                      color:'var(--red)' },
+          { Icon:Smartphone, label:'M-Pesa',          val:payments.filter(p=>p.payment_method==='mpesa').length, color:'var(--blue)' },
+          { Icon:FileText,   label:'Receipts Issued', val:receipts.length,                    color:'var(--gold)' },
         ].map(s => (
-          <div key={s.label} className="col-md-2 col-sm-4 mb-2">
-            <div className="admin-card"><div className="card-body py-2 text-center">
-              <div style={{ fontSize:16 }}>{s.icon}</div>
-              <div style={{ fontSize:18, fontWeight:900, color:s.color, lineHeight:1.2 }}>{s.val}</div>
-              <div className="text-xs text-gray-500">{s.label}</div>
-            </div></div>
+          <div key={s.label} className="stat-card" style={{ textAlign:'center', padding:14 }}>
+            <div className="stat-ico" style={{ width:36, height:36, background:`${s.color}18`, margin:'0 auto 8px' }}><s.Icon size={17} color={s.color} /></div>
+            <div style={{ fontSize:15, fontWeight:800, color:'var(--ink)', lineHeight:1.25 }}>{s.val}</div>
+            <div style={{ fontSize:10.5, color:'var(--muted)', marginTop:3 }}>{s.label}</div>
           </div>
         ))}
       </div>
 
       {/* Tabs */}
-      <div className="d-flex mb-3" style={{ gap:6, borderBottom:'2px solid #e3e6f0', paddingBottom:0 }}>
+      <div style={{ display:'flex', gap:6, marginBottom:18, borderBottom:'1px solid var(--line)' }}>
         {[
-          { id:'payments', label:`💳 Payments (${payments.length})` },
-          { id:'receipts', label:`📄 Receipts (${receipts.length})` },
+          { id:'payments', label:'Payments', count: payments.length, Icon: CreditCard },
+          { id:'receipts', label:'Receipts', count: receipts.length, Icon: FileText },
         ].map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
-            style={{ background:'none', border:'none', fontFamily:'inherit', cursor:'pointer', padding:'8px 14px',
-              fontSize:13, fontWeight:700, color:tab===t.id?'#C9A020':'#6c757d',
-              borderBottom:tab===t.id?'3px solid #C9A020':'3px solid transparent', marginBottom:-2 }}>
-            {t.label}
+            style={{ background:'none', border:'none', fontFamily:'inherit', cursor:'pointer', padding:'9px 14px',
+              fontSize:13, fontWeight:700, color:tab===t.id?'var(--gold-2)':'var(--muted)', display:'flex', alignItems:'center', gap:7,
+              borderBottom:tab===t.id?'2.5px solid var(--gold)':'2.5px solid transparent', marginBottom:-1 }}>
+            <t.Icon size={14} /> {t.label} ({t.count})
           </button>
         ))}
       </div>
@@ -1531,56 +1530,58 @@ function PaymentsSection() {
           {tab === 'payments' && (
             <>
               {/* Filters */}
-              <div className="d-flex flex-wrap mb-3" style={{ gap:8 }}>
-                <input className="form-control form-control-sm" placeholder="🔍 Search booking ID, M-Pesa ref, worker…"
-                  value={search} onChange={e => setSearch(e.target.value)} style={{ fontSize:12, maxWidth:260 }} />
-                <select className="form-control form-control-sm" value={statusF} onChange={e => setStatusF(e.target.value)} style={{ fontSize:12, width:'auto' }}>
+              <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:16, alignItems:'center' }}>
+                <label className="topbar-search" style={{ maxWidth:260 }}>
+                  <Search size={14} />
+                  <input placeholder="Search booking ID, M-Pesa ref, worker…" value={search} onChange={e => setSearch(e.target.value)} />
+                </label>
+                <select style={inputSt} value={statusF} onChange={e => setStatusF(e.target.value)}>
                   <option value="all">All Status</option>
                   {['paid','pending','failed','refunded'].map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
-                <select className="form-control form-control-sm" value={methodF} onChange={e => setMethodF(e.target.value)} style={{ fontSize:12, width:'auto' }}>
+                <select style={inputSt} value={methodF} onChange={e => setMethodF(e.target.value)}>
                   <option value="all">All Methods</option>
-                  {['mpesa','cash','bank','card'].map(m => <option key={m} value={m}>{METHOD_ICON[m]} {m}</option>)}
+                  {['mpesa','cash','bank','card'].map(m => <option key={m} value={m}>{m}</option>)}
                 </select>
-                <input type="date" className="form-control form-control-sm" value={dateFrom} onChange={e => setDateFrom(e.target.value)} style={{ fontSize:12, width:'auto' }} title="From date" />
-                <input type="date" className="form-control form-control-sm" value={dateTo}   onChange={e => setDateTo(e.target.value)}   style={{ fontSize:12, width:'auto' }} title="To date" />
+                <input type="date" style={inputSt} value={dateFrom} onChange={e => setDateFrom(e.target.value)} title="From date" />
+                <input type="date" style={inputSt} value={dateTo}   onChange={e => setDateTo(e.target.value)}   title="To date" />
                 {(search||statusF!=='all'||methodF!=='all'||dateFrom||dateTo) &&
-                  <button className="btn btn-sm btn-outline-secondary" style={{ fontSize:11 }}
-                    onClick={() => { setSearch(''); setStatusF('all'); setMethodF('all'); setDateFrom(''); setDateTo(''); }}>
-                    ✕ Clear
+                  <button onClick={() => { setSearch(''); setStatusF('all'); setMethodF('all'); setDateFrom(''); setDateTo(''); }}
+                    style={{ display:'inline-flex', alignItems:'center', gap:5, fontSize:11.5, fontWeight:700, padding:'8px 12px', borderRadius:9, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--ink-2)', cursor:'pointer' }}>
+                    <X size={12} /> Clear
                   </button>}
-                <span className="text-xs text-gray-500 align-self-center ml-auto">{filteredPays.length} of {payments.length}</span>
+                <span style={{ fontSize:11.5, color:'var(--muted)', marginLeft:'auto' }}>{filteredPays.length} of {payments.length}</span>
               </div>
 
               <div className="admin-card">
-                <div className="table-responsive">
+                <div style={{ overflowX:'auto' }}>
                   <table className="admin-table">
                     <thead>
                       <tr><th>Date</th><th>Booking ID</th><th>Worker</th><th>Method</th><th>M-Pesa Ref</th><th>Amount</th><th>Status</th></tr>
                     </thead>
                     <tbody>
                       {filteredPays.length === 0
-                        ? <tr><td colSpan={7} className="text-center text-gray-500 py-4">No payments match your filters</td></tr>
-                        : filteredPays.map(p => (
+                        ? <tr><td colSpan={7} style={{ textAlign:'center', color:'var(--muted)', padding:24 }}>No payments match your filters</td></tr>
+                        : filteredPays.map(p => {
+                          const MIcon = METHOD_ICON[p.payment_method];
+                          return (
                           <tr key={p.id}>
-                            <td className="text-xs text-gray-500">{new Date(p.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'})}</td>
-                            <td className="text-xs font-weight-bold" style={{ fontFamily:'monospace', color:'#4e73df' }}>
+                            <td style={{ color:'var(--muted)' }}>{new Date(p.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'})}</td>
+                            <td style={{ fontWeight:700, fontFamily:'ui-monospace,monospace', color:'var(--blue)' }}>
                               {p.booking_id ? p.booking_id.slice(0,8).toUpperCase() : '—'}
                             </td>
-                            <td className="text-xs text-gray-700">{p.worker_name || '—'}</td>
-                            <td className="text-xs">
-                              <span style={{ fontWeight:700 }}>{METHOD_ICON[p.payment_method] || '—'} {p.payment_method || '—'}</span>
-                            </td>
-                            <td className="text-xs" style={{ fontFamily:'monospace', color:'#48BB78' }}>{p.mpesa_ref || '—'}</td>
-                            <td className="text-xs font-weight-bold" style={{ color:'#C9A020' }}>KSh {(parseFloat(p.amount)||0).toLocaleString()}</td>
+                            <td style={{ color:'var(--ink-2)' }}>{p.worker_name || '—'}</td>
+                            <td style={{ fontWeight:700, color:'var(--ink-2)', display:'flex', alignItems:'center', gap:5 }}>{MIcon && <MIcon size={13} />} {p.payment_method || '—'}</td>
+                            <td style={{ fontFamily:'ui-monospace,monospace', color:'var(--green)' }}>{p.mpesa_ref || '—'}</td>
+                            <td style={{ fontWeight:700, color:'var(--gold)' }}>KSh {(parseFloat(p.amount)||0).toLocaleString()}</td>
                             <td>
-                              <span style={{ background:`${STATUS_COLOR[p.status]||'#aaa'}18`, color:STATUS_COLOR[p.status]||'#aaa',
-                                border:`1px solid ${STATUS_COLOR[p.status]||'#aaa'}40`, borderRadius:999, padding:'2px 10px', fontSize:11, fontWeight:800 }}>
+                              <span style={{ background:`${STATUS_COLOR[p.status]||'var(--muted)'}18`, color:STATUS_COLOR[p.status]||'var(--muted)',
+                                borderRadius:999, padding:'3px 10px', fontSize:11, fontWeight:800 }}>
                                 {p.status || '—'}
                               </span>
                             </td>
                           </tr>
-                        ))
+                        );})
                       }
                     </tbody>
                   </table>
@@ -1591,22 +1592,22 @@ function PaymentsSection() {
 
           {tab === 'receipts' && (
             <div className="admin-card">
-              <div className="table-responsive">
+              <div style={{ overflowX:'auto' }}>
                 <table className="admin-table">
                   <thead><tr><th>Receipt No</th><th>Service</th><th>Worker</th><th>Date</th><th>Amount</th><th>PDF</th></tr></thead>
                   <tbody>
                     {receipts.length === 0
-                      ? <tr><td colSpan={6} className="text-center text-gray-500 py-4">No receipts yet</td></tr>
+                      ? <tr><td colSpan={6} style={{ textAlign:'center', color:'var(--muted)', padding:24 }}>No receipts yet</td></tr>
                       : receipts.map(r => (
                         <tr key={r.id}>
-                          <td className="font-weight-bold" style={{ fontFamily:'monospace', color:'#C9A020' }}>{r.receipt_no}</td>
-                          <td className="text-xs text-gray-800">{r.sub_service || r.service || '—'}</td>
-                          <td className="text-xs text-gray-600">{r.worker_name || '—'}</td>
-                          <td className="text-xs text-gray-500">{new Date(r.generated_at).toLocaleDateString('en-KE')}</td>
-                          <td className="font-weight-bold text-xs" style={{ color:'#1cc88a' }}>KSh {(r.amount||0).toLocaleString()}</td>
+                          <td style={{ fontWeight:700, fontFamily:'ui-monospace,monospace', color:'var(--gold)' }}>{r.receipt_no}</td>
+                          <td style={{ color:'var(--ink)' }}>{r.sub_service || r.service || '—'}</td>
+                          <td style={{ color:'var(--ink-2)' }}>{r.worker_name || '—'}</td>
+                          <td style={{ color:'var(--muted)' }}>{new Date(r.generated_at).toLocaleDateString('en-KE')}</td>
+                          <td style={{ fontWeight:700, color:'var(--green)' }}>KSh {(r.amount||0).toLocaleString()}</td>
                           <td>{r.pdf_url
-                            ? <a href={r.pdf_url} target="_blank" rel="noreferrer" className="text-xs" style={{ color:'#C9A020', fontWeight:700 }}>📄 Download</a>
-                            : <span className="text-gray-500">—</span>}
+                            ? <a href={r.pdf_url} target="_blank" rel="noreferrer" style={{ display:'inline-flex', alignItems:'center', gap:5, color:'var(--gold-2)', fontWeight:700, fontSize:12, textDecoration:'none' }}><FileText size={13} /> Download</a>
+                            : <span style={{ color:'var(--muted)' }}>—</span>}
                           </td>
                         </tr>
                       ))
@@ -2405,65 +2406,58 @@ function PayoutsSection() {
     setSaving(null); load();
   };
 
-  const BORDER = { pending:'border-left-warning', approved:'border-left-info', paid:'border-left-success', rejected:'border-left-danger' };
+  const BORDER = { pending:'var(--amber)', approved:'var(--blue)', paid:'var(--green)', rejected:'var(--red)' };
+  const actBtn = (bg) => ({ display:'inline-flex', alignItems:'center', gap:6, padding:'8px 15px', borderRadius:9, border:'none', background:bg, color:'#fff', fontSize:12.5, fontWeight:700, cursor:'pointer', marginRight:8 });
 
   return (
     <>
       <PageHeader title="Payout Requests" sub="Worker withdrawal requests via M-Pesa" />
-      <div className="row mb-4">
-        <div className="col-md-3 mb-3"><StatCard icon="⏳" label="Pending"    value={stats.pending}  color="#f6c23e" /></div>
-        <div className="col-md-3 mb-3"><StatCard icon="✅" label="Approved"   value={stats.approved} color="#36b9cc" /></div>
-        <div className="col-md-3 mb-3"><StatCard icon="💚" label="Paid Out"   value={stats.paid}     color="#1cc88a" /></div>
-        <div className="col-md-3 mb-3"><StatCard icon="💰" label="Total Paid" value={`KSh ${(stats.total||0).toLocaleString()}`} color="#C9A020" /></div>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', gap:14, marginBottom:20 }}>
+        <StatCard icon="⏳" label="Pending"    value={stats.pending}  color="var(--amber)" />
+        <StatCard icon="✅" label="Approved"   value={stats.approved} color="var(--blue)" />
+        <StatCard icon="💚" label="Paid Out"   value={stats.paid}     color="var(--green)" />
+        <StatCard icon="💰" label="Total Paid" value={`KSh ${(stats.total||0).toLocaleString()}`} color="var(--gold)" />
       </div>
 
-      <div className="mb-3">
-        {[{k:'pending',label:'⏳ Pending'},{k:'approved',label:'✅ Approved'},{k:'paid',label:'💚 Paid'},{k:'rejected',label:'❌ Rejected'},{k:'all',label:'All'}]
+      <div style={{ marginBottom:18 }}>
+        {[{k:'pending',label:'Pending'},{k:'approved',label:'Approved'},{k:'paid',label:'Paid'},{k:'rejected',label:'Rejected'},{k:'all',label:'All'}]
           .map(f => <FilterPill key={f.k} active={filter===f.k} onClick={() => setFilter(f.k)}>{f.label}</FilterPill>)}
       </div>
 
       {loading ? <Spinner /> : payouts.length === 0 ? (
-        <div className="text-center py-5"><div style={{fontSize:48}}>💸</div><p className="text-gray-500 mt-2">No {filter !== 'all' ? filter : ''} payout requests</p></div>
+        <div style={{ textAlign:'center', padding:'56px 0' }}><Send size={40} color="var(--muted)" style={{ marginBottom:10 }} /><p style={{ color:'var(--muted)', margin:0 }}>No {filter !== 'all' ? filter : ''} payout requests</p></div>
       ) : payouts.map(p => (
-        <div key={p.id} className={`admin-card mb-3 ${BORDER[p.status] || 'border-left-warning'}`}>
-          <div className="card-body">
-            <div className="d-flex justify-content-between align-items-start mb-3">
+        <div key={p.id} className="admin-card" style={{ borderLeft:`4px solid ${BORDER[p.status] || 'var(--amber)'}` }}>
+          <div style={{ padding:18 }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:14 }}>
               <div>
-                <div className="h5 font-weight-bold text-gray-800 mb-1">KSh {(p.amount||0).toLocaleString()}</div>
-                <div className="text-xs text-gray-500">Requested {new Date(p.created_at).toLocaleString('en-KE',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+                <div style={{ fontSize:19, fontWeight:800, color:'var(--ink)', marginBottom:3 }}>KSh {(p.amount||0).toLocaleString()}</div>
+                <div style={{ fontSize:11.5, color:'var(--muted)' }}>Requested {new Date(p.created_at).toLocaleString('en-KE',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
               </div>
               <SBBadge status={p.status} />
             </div>
 
-            <div className="row mb-3">
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(130px,1fr))', gap:8, marginBottom:14 }}>
               {[['Worker ID',p.worker_id?.slice(0,8)+'...'],['M-Pesa Phone',p.phone||p.phone_number||'—'],['Method',p.method||'M-Pesa'],['Processed',p.processed_at?new Date(p.processed_at).toLocaleDateString('en-KE'):'—']]
                 .map(([l,v]) => (
-                <div key={l} className="col-md-3 col-6 mb-2">
-                  <div className="p-2 rounded" style={{ background:'#f8f9fc', border:'1px solid #e3e6f0' }}>
-                    <div className="text-xs text-gray-500 text-uppercase" style={{ letterSpacing:'0.05rem', fontSize:'0.65rem' }}>{l}</div>
-                    <div className="text-xs font-weight-bold text-gray-800 mt-1">{v}</div>
-                  </div>
+                <div key={l} style={{ padding:'8px 11px', borderRadius:9, background:'var(--canvas)', border:'1px solid var(--line)' }}>
+                  <div style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'.4px', color:'var(--muted)' }}>{l}</div>
+                  <div style={{ fontSize:12, fontWeight:700, color:'var(--ink)', marginTop:3 }}>{v}</div>
                 </div>
               ))}
             </div>
 
             {p.status === 'pending' && (
               <div>
-                <button disabled={saving===p.id} onClick={() => updateStatus(p.id,'approved')} className="btn btn-info btn-sm mr-2 font-weight-bold">
-                  {saving===p.id ? '...' : '✅ Approve'}
-                </button>
-                <button disabled={saving===p.id} onClick={() => updateStatus(p.id,'rejected')} className="btn btn-danger btn-sm font-weight-bold">
-                  {saving===p.id ? '...' : '❌ Reject'}
-                </button>
+                <button disabled={saving===p.id} onClick={() => updateStatus(p.id,'approved')} style={actBtn('var(--blue)')}><BadgeCheck size={14} /> {saving===p.id ? '…' : 'Approve'}</button>
+                <button disabled={saving===p.id} onClick={() => updateStatus(p.id,'rejected')} style={actBtn('var(--red)')}><X size={14} /> {saving===p.id ? '…' : 'Reject'}</button>
               </div>
             )}
             {p.status === 'approved' && (
-              <button disabled={saving===p.id} onClick={() => updateStatus(p.id,'paid')} className="btn btn-success btn-sm font-weight-bold">
-                {saving===p.id ? 'Processing...' : '💚 Mark as Paid (M-Pesa Sent)'}
-              </button>
+              <button disabled={saving===p.id} onClick={() => updateStatus(p.id,'paid')} style={actBtn('var(--green)')}><Wallet size={14} /> {saving===p.id ? 'Processing…' : 'Mark as Paid (M-Pesa Sent)'}</button>
             )}
             {p.status === 'rejected' && (
-              <button onClick={() => updateStatus(p.id,'pending')} className="btn btn-warning btn-sm font-weight-bold">↩️ Move Back to Pending</button>
+              <button onClick={() => updateStatus(p.id,'pending')} style={actBtn('var(--amber)')}><RotateCcw size={14} /> Move Back to Pending</button>
             )}
           </div>
         </div>
@@ -5409,12 +5403,12 @@ function RefundManagementSection() {
     load();
   };
 
-  const PRIORITY_COLOR = { urgent: '#e74a3b', high: '#fd7e14', normal: '#6c757d' };
+  const PRIORITY_COLOR = { urgent: 'var(--red)', high: 'var(--amber)', normal: 'var(--muted)' };
 
   return (
     <>
       <PageHeader title="Refund Management" sub="Review and action customer refund requests" />
-      <div className="mb-3">
+      <div style={{ marginBottom:18 }}>
         {['open','resolved','all'].map(f => (
           <FilterPill key={f} active={filter===f} onClick={() => setFilter(f)}>
             {f === 'open' ? 'Pending' : f.charAt(0).toUpperCase()+f.slice(1)}
@@ -5422,25 +5416,25 @@ function RefundManagementSection() {
         ))}
       </div>
       {loading ? <Spinner /> : (
-        <div className="row">
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1.4fr', gap:18 }}>
           {/* List */}
-          <div className="col-md-5">
+          <div>
             {tickets.length === 0
-              ? <div className="text-center py-5 text-gray-500">No refund requests in this queue.</div>
+              ? <div style={{ textAlign:'center', padding:'56px 0', color:'var(--muted)' }}>No refund requests in this queue.</div>
               : tickets.map(t => (
-                <div key={t.id} className="admin-card mb-2" onClick={() => setSelected(t)}
-                  style={{ borderLeft:`4px solid ${PRIORITY_COLOR[t.priority]||'#aaa'}`, cursor:'pointer', background: selected?.id===t.id?'#f8f9fc':'#fff' }}>
-                  <div className="card-body py-2">
-                    <div className="d-flex justify-content-between align-items-start">
+                <div key={t.id} className="admin-card" onClick={() => setSelected(t)}
+                  style={{ borderLeft:`4px solid ${PRIORITY_COLOR[t.priority]||'var(--muted)'}`, cursor:'pointer', background: selected?.id===t.id?'var(--canvas)':'var(--surface)' }}>
+                  <div style={{ padding:13 }}>
+                    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:10 }}>
                       <div>
-                        <div className="font-weight-bold text-gray-800 text-xs">{t.subject || 'Refund Request'}</div>
-                        <div className="text-xs text-gray-500 mt-1">{t.user_name || t.user_email} · {new Date(t.created_at).toLocaleDateString('en-KE')}</div>
+                        <div style={{ fontWeight:700, color:'var(--ink)', fontSize:12.5 }}>{t.subject || 'Refund Request'}</div>
+                        <div style={{ fontSize:11.5, color:'var(--muted)', marginTop:4 }}>{t.user_name || t.user_email} · {new Date(t.created_at).toLocaleDateString('en-KE')}</div>
                       </div>
-                      <div className="d-flex flex-column align-items-end gap-1">
+                      <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:5 }}>
                         <SBBadge status={t.status} />
                         {t.refund_decision && (
-                          <span className="sb-badge" style={{ background: t.refund_decision==='approved'?'rgba(28,200,138,0.12)':'rgba(231,74,59,0.12)', color: t.refund_decision==='approved'?'#1cc88a':'#e74a3b', border:`1px solid ${t.refund_decision==='approved'?'rgba(28,200,138,0.3)':'rgba(231,74,59,0.3)'}` }}>
-                            {t.refund_decision === 'approved' ? '✅ Approved' : '❌ Declined'}
+                          <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:10.5, fontWeight:700, padding:'2px 8px', borderRadius:999, background: t.refund_decision==='approved'?'rgba(22,163,74,.12)':'rgba(239,68,68,.12)', color: t.refund_decision==='approved'?'var(--green)':'var(--red)' }}>
+                            {t.refund_decision === 'approved' ? <BadgeCheck size={11} /> : <X size={11} />} {t.refund_decision === 'approved' ? 'Approved' : 'Declined'}
                           </span>
                         )}
                       </div>
@@ -5451,19 +5445,19 @@ function RefundManagementSection() {
           </div>
 
           {/* Detail */}
-          <div className="col-md-7">
+          <div>
             {!selected ? (
-              <div className="admin-card" style={{ minHeight:300,display:'flex',alignItems:'center',justifyContent:'center',color:'#a0aec0' }}>
-                <div className="text-center"><div style={{ fontSize:40,marginBottom:8 }}>👈</div><div>Select a request to review</div></div>
+              <div className="admin-card" style={{ minHeight:300, display:'flex', alignItems:'center', justifyContent:'center', color:'var(--muted)' }}>
+                <div style={{ textAlign:'center' }}><ArrowLeft size={28} style={{ marginBottom:8 }} /><div style={{ fontSize:13 }}>Select a request to review</div></div>
               </div>
             ) : (
               <div className="admin-card">
-                <div className="admin-card-header d-flex justify-content-between align-items-center">
-                  <span>💳 Refund Request #{selected.id?.slice(0,8)}</span>
-                  <button onClick={() => setSelected(null)} style={{ background:'none',border:'none',fontSize:18,cursor:'pointer',color:'#aaa' }}>×</button>
+                <div className="admin-card-header">
+                  <span style={{ display:'flex', alignItems:'center', gap:7 }}><RotateCcw size={15} color="var(--gold)" /> Refund Request #{selected.id?.slice(0,8)}</span>
+                  <button onClick={() => setSelected(null)} style={{ background:'none', border:'none', cursor:'pointer', color:'var(--muted)', display:'flex' }}><X size={17} /></button>
                 </div>
-                <div className="card-body">
-                  <div className="row mb-3">
+                <div style={{ padding:'14px 20px 18px' }}>
+                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:16 }}>
                     {[
                       ['Customer',  selected.user_name || '—'],
                       ['Email',     selected.user_email || '—'],
@@ -5472,49 +5466,42 @@ function RefundManagementSection() {
                       ['Submitted', new Date(selected.created_at).toLocaleString('en-KE')],
                       ['Status',    selected.status],
                     ].map(([k,v]) => (
-                      <div key={k} className="col-6 mb-2">
-                        <div className="text-xs text-gray-500">{k}</div>
-                        <div className="text-xs font-weight-bold text-gray-800">{v||'—'}</div>
+                      <div key={k}>
+                        <div style={{ fontSize:10.5, color:'var(--muted)', fontWeight:700, textTransform:'uppercase', letterSpacing:'.4px' }}>{k}</div>
+                        <div style={{ fontSize:12.5, fontWeight:700, color:'var(--ink)', marginTop:2 }}>{v||'—'}</div>
                       </div>
                     ))}
                   </div>
-                  <div className="mb-3">
-                    <div className="text-xs text-gray-500 mb-1">CUSTOMER MESSAGE</div>
-                    <div className="admin-card" style={{ background:'#f8f9fc',padding:'10px 14px' }}>
-                      <div className="text-xs text-gray-800">{selected.message || '—'}</div>
-                    </div>
+                  <div style={{ marginBottom:16 }}>
+                    <div style={{ fontSize:10.5, color:'var(--muted)', fontWeight:700, textTransform:'uppercase', letterSpacing:'.4px', marginBottom:6 }}>Customer Message</div>
+                    <div style={{ background:'var(--canvas)', border:'1px solid var(--line)', borderRadius:10, padding:'10px 13px', fontSize:12.5, color:'var(--ink-2)' }}>{selected.message || '—'}</div>
                   </div>
                   {selected.admin_note && (
-                    <div className="mb-3">
-                      <div className="text-xs text-gray-500 mb-1">PREVIOUS ADMIN NOTE</div>
-                      <div className="text-xs text-gray-600">{selected.admin_note}</div>
+                    <div style={{ marginBottom:16 }}>
+                      <div style={{ fontSize:10.5, color:'var(--muted)', fontWeight:700, textTransform:'uppercase', letterSpacing:'.4px', marginBottom:6 }}>Previous Admin Note</div>
+                      <div style={{ fontSize:12.5, color:'var(--ink-2)' }}>{selected.admin_note}</div>
                     </div>
                   )}
                   {!selected.refund_decision && (
                     <>
-                      <textarea
-                        className="form-control mb-3"
-                        rows={2}
-                        placeholder="Admin note (reason for approval or decline)…"
-                        style={{ fontSize:12,resize:'none' }}
-                        value={notes[selected.id]||''}
-                        onChange={e => setNotes(n => ({ ...n, [selected.id]: e.target.value }))}
-                      />
-                      <div className="d-flex gap-2">
-                        <button className="btn btn-success btn-sm" style={{ fontWeight:700 }}
-                          disabled={acting===selected.id} onClick={() => act(selected,'approved')}>
-                          ✅ Approve Refund
+                      <textarea rows={2} placeholder="Admin note (reason for approval or decline)…"
+                        style={{ width:'100%', boxSizing:'border-box', fontSize:12.5, padding:'10px 12px', borderRadius:9, border:'1px solid var(--line-2)', fontFamily:'inherit', resize:'none', marginBottom:12 }}
+                        value={notes[selected.id]||''} onChange={e => setNotes(n => ({ ...n, [selected.id]: e.target.value }))} />
+                      <div style={{ display:'flex', gap:9 }}>
+                        <button disabled={acting===selected.id} onClick={() => act(selected,'approved')}
+                          style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'8px 15px', borderRadius:9, border:'none', background:'var(--green)', color:'#fff', fontSize:12.5, fontWeight:700, cursor:'pointer' }}>
+                          <BadgeCheck size={14} /> Approve Refund
                         </button>
-                        <button className="btn btn-danger btn-sm" style={{ fontWeight:700 }}
-                          disabled={acting===selected.id} onClick={() => act(selected,'declined')}>
-                          ❌ Decline
+                        <button disabled={acting===selected.id} onClick={() => act(selected,'declined')}
+                          style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'8px 15px', borderRadius:9, border:'none', background:'var(--red)', color:'#fff', fontSize:12.5, fontWeight:700, cursor:'pointer' }}>
+                          <X size={14} /> Decline
                         </button>
                       </div>
                     </>
                   )}
                   {selected.refund_decision && (
-                    <div className="text-xs font-weight-bold" style={{ color: selected.refund_decision==='approved'?'#1cc88a':'#e74a3b' }}>
-                      {selected.refund_decision === 'approved' ? '✅ Refund was approved' : '❌ Refund was declined'}
+                    <div style={{ display:'inline-flex', alignItems:'center', gap:6, fontSize:12.5, fontWeight:700, color: selected.refund_decision==='approved'?'var(--green)':'var(--red)' }}>
+                      {selected.refund_decision === 'approved' ? <BadgeCheck size={15} /> : <X size={15} />} {selected.refund_decision === 'approved' ? 'Refund was approved' : 'Refund was declined'}
                     </div>
                   )}
                 </div>
@@ -5714,38 +5701,38 @@ function ReconciliationSection() {
   return (
     <>
       <PageHeader title="Financial Reconciliation" sub="30-day revenue vs payouts — daily breakdown" />
-      <div className="row mb-4">
-        <div className="col-md-3 mb-2"><StatCard icon="💰" label="Total Revenue"  value={fmt(summary.revenue)} color="#1cc88a" /></div>
-        <div className="col-md-3 mb-2"><StatCard icon="💸" label="Total Payouts"  value={fmt(summary.payouts)} color="#e74a3b" /></div>
-        <div className="col-md-3 mb-2"><StatCard icon="↩️" label="Refunds Approved" value={summary.refunds}   color="#f6c23e" /></div>
-        <div className="col-md-3 mb-2"><StatCard icon="🏦" label="Net Position"   value={fmt(summary.net)}    color={summary.net >= 0 ? '#4e73df' : '#e74a3b'} /></div>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', gap:14, marginBottom:20 }}>
+        <StatCard icon="💰" label="Total Revenue"    value={fmt(summary.revenue)} color="var(--green)" />
+        <StatCard icon="💸" label="Total Payouts"    value={fmt(summary.payouts)} color="var(--red)" />
+        <StatCard icon="↩️" label="Refunds Approved" value={summary.refunds}      color="var(--amber)" />
+        <StatCard icon="🏦" label="Net Position"     value={fmt(summary.net)}     color={summary.net >= 0 ? 'var(--blue)' : 'var(--red)'} />
       </div>
       {loading ? <Spinner /> : rows.length === 0 ? (
-        <div className="text-center py-5 text-gray-500">No payment data in the last 30 days.</div>
+        <div style={{ textAlign:'center', padding:'56px 0', color:'var(--muted)' }}>No payment data in the last 30 days.</div>
       ) : (
         <>
-          <div className="admin-card mb-4">
+          <div className="admin-card">
             <div className="admin-card-header">Revenue vs Payouts (last 30 days)</div>
-            <div className="card-body">
+            <div style={{ padding:'14px 16px 10px' }}>
               <ResponsiveContainer width="100%" height={280}>
                 <AreaChart data={rows} margin={{ top:10, right:10, left:0, bottom:0 }}>
                   <defs>
                     <linearGradient id="rev" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#1cc88a" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#1cc88a" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#16A34A" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#16A34A" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="pay" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#e74a3b" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#e74a3b" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#EF4444" stopOpacity={0.2} />
+                      <stop offset="95%" stopColor="#EF4444" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e3e6f0" />
-                  <XAxis dataKey="label" tick={{ fontSize:10 }} />
-                  <YAxis tick={{ fontSize:10 }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
-                  <Tooltip formatter={(v, n) => [fmt(v), n === 'revenue' ? 'Revenue' : 'Payouts']} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#EDF0F5" />
+                  <XAxis dataKey="label" tick={{ fontSize:11, fill:'#7A8699' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize:11, fill:'#7A8699' }} tickLine={false} axisLine={false} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
+                  <Tooltip contentStyle={{ borderRadius:12, border:'1px solid #EDF0F5', fontSize:13 }} formatter={(v, n) => [fmt(v), n === 'revenue' ? 'Revenue' : 'Payouts']} />
                   <Legend />
-                  <Area type="monotone" dataKey="revenue" stroke="#1cc88a" fill="url(#rev)" strokeWidth={2} name="Revenue" />
-                  <Area type="monotone" dataKey="payouts" stroke="#e74a3b" fill="url(#pay)" strokeWidth={2} name="Payouts" />
+                  <Area type="monotone" dataKey="revenue" stroke="#16A34A" fill="url(#rev)" strokeWidth={2.5} name="Revenue" />
+                  <Area type="monotone" dataKey="payouts" stroke="#EF4444" fill="url(#pay)" strokeWidth={2.5} name="Payouts" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -5757,10 +5744,10 @@ function ReconciliationSection() {
               <tbody>
                 {[...rows].reverse().map(r => (
                   <tr key={r.date}>
-                    <td className="text-xs text-gray-600">{r.label}</td>
-                    <td className="text-xs font-weight-bold" style={{ color:'#1cc88a' }}>{fmt(r.revenue)}</td>
-                    <td className="text-xs font-weight-bold" style={{ color:'#e74a3b' }}>{fmt(r.payouts)}</td>
-                    <td className="text-xs font-weight-bold" style={{ color: r.net >= 0 ? '#4e73df' : '#e74a3b' }}>{fmt(r.net)}</td>
+                    <td style={{ color:'var(--muted)' }}>{r.label}</td>
+                    <td style={{ fontWeight:700, color:'var(--green)' }}>{fmt(r.revenue)}</td>
+                    <td style={{ fontWeight:700, color:'var(--red)' }}>{fmt(r.payouts)}</td>
+                    <td style={{ fontWeight:700, color: r.net >= 0 ? 'var(--blue)' : 'var(--red)' }}>{fmt(r.net)}</td>
                   </tr>
                 ))}
               </tbody>
