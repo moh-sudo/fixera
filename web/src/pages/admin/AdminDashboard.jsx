@@ -6223,8 +6223,8 @@ function DispatchSection() {
     return scheduled < now && !['completed','cancelled'].includes(b.status);
   });
 
-  const ROLE_COLORS = { worker:'#4A90D9', vendor:'#F6AD55', rider:'#48BB78', supplier:'#FC8181', mover:'#9F7AEA', water_carrier:'#00B5D8' };
-  const ROLE_ICONS  = { worker:'🔧', vendor:'🏪', rider:'🚗', supplier:'📦', mover:'🚚', water_carrier:'🚰' };
+  const ROLE_COLORS = { worker:'var(--blue)', vendor:'var(--amber)', rider:'var(--green)', supplier:'var(--red)', mover:'var(--violet)', water_carrier:'#00B5D8' };
+  const ROLE_ICONS  = { worker:Wrench, vendor:Store, rider:Bike, supplier:Package, mover:Truck, water_carrier:Droplets };
 
   // workforce stats
   const online   = partners.filter(p => p.status === 'online').length;
@@ -6253,51 +6253,52 @@ function DispatchSection() {
 
   const PartnerPicker = ({ booking, onClose }) => (
     <div className="admin-card" style={{ position:'sticky', top:0 }}>
-      <div className="admin-card-header d-flex justify-content-between align-items-center">
-        <span>📡 {booking.worker_id ? 'Reassign' : 'Assign'} — {booking.service || booking.sub_service || 'Booking'}</span>
-        <button onClick={onClose} style={{ background:'none', border:'none', fontSize:18, cursor:'pointer', color:'#aaa' }}>×</button>
+      <div className="admin-card-header">
+        <span style={{ display:'flex', alignItems:'center', gap:7 }}><Radio size={15} color="var(--gold)" /> {booking.worker_id ? 'Reassign' : 'Assign'} — {booking.service || booking.sub_service || 'Booking'}</span>
+        <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', color:'var(--muted)', display:'flex' }}><X size={17} /></button>
       </div>
-      <div className="card-body">
-        <div className="mb-3 p-3" style={{ background:'#f8f9fc', borderRadius:8, fontSize:12 }}>
-          <div><strong>📍</strong> {booking.address || '—'}</div>
-          <div><strong>📅</strong> {booking.booking_date || '—'} {booking.booking_time ? `at ${booking.booking_time}` : ''}</div>
-          {booking.worker_name && <div className="mt-1"><strong>Current:</strong> {booking.worker_name}</div>}
-          {booking.notes && <div className="text-gray-500 mt-1">Note: {booking.notes}</div>}
+      <div style={{ padding:'14px 20px 18px' }}>
+        <div style={{ marginBottom:14, padding:12, background:'var(--canvas)', borderRadius:9, fontSize:12 }}>
+          <div style={{ display:'flex', alignItems:'center', gap:6 }}><MapPin size={12} color="var(--muted)" /> {booking.address || '—'}</div>
+          <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:4 }}><Clock size={12} color="var(--muted)" /> {booking.booking_date || '—'} {booking.booking_time ? `at ${booking.booking_time}` : ''}</div>
+          {booking.worker_name && <div style={{ marginTop:6 }}><strong>Current:</strong> {booking.worker_name}</div>}
+          {booking.notes && <div style={{ color:'var(--muted)', marginTop:6 }}>Note: {booking.notes}</div>}
         </div>
-        <div className="d-flex gap-2 mb-2">
-          <input className="form-control form-control-sm flex-grow-1" placeholder="Search name or city…"
-            value={search} onChange={e => setSearch(e.target.value)} style={{ fontSize:12 }} />
+        <div style={{ display:'flex', gap:8, marginBottom:10 }}>
+          <input className="form-control form-control-sm" style={{ fontSize:12, flex:1 }} placeholder="Search name or city…"
+            value={search} onChange={e => setSearch(e.target.value)} />
           <select className="form-control form-control-sm" style={{ fontSize:12, width:'auto' }}
             value={roleF} onChange={e => setRoleF(e.target.value)}>
             <option value="all">All roles</option>
-            {Object.entries(ROLE_ICONS).map(([r,i]) => <option key={r} value={r}>{i} {r}</option>)}
+            {Object.keys(ROLE_ICONS).map(r => <option key={r} value={r}>{r}</option>)}
           </select>
         </div>
         <div style={{ maxHeight:340, overflowY:'auto' }}>
           {filteredPartners.length === 0
-            ? <div className="text-xs text-gray-500 py-3">No partners match.</div>
-            : filteredPartners.map(p => (
-              <div key={p.id} className="d-flex align-items-center py-2 border-bottom">
-                <div style={{ width:8, height:8, borderRadius:'50%', background:ROLE_COLORS[p.partner_role]||'#aaa', marginRight:8, flexShrink:0 }} />
-                <div className="flex-grow-1" style={{ minWidth:0 }}>
-                  <div className="font-weight-bold text-xs text-gray-800">{p.full_name}</div>
-                  <div className="text-xs text-gray-500">
-                    {ROLE_ICONS[p.partner_role]} {p.city||'—'} · ⭐{p.rating||'—'} · {p.total_jobs||0} jobs
+            ? <div style={{ fontSize:12, color:'var(--muted)', padding:'12px 0' }}>No partners match.</div>
+            : filteredPartners.map(p => {
+              const RIcon = ROLE_ICONS[p.partner_role];
+              return (
+              <div key={p.id} style={{ display:'flex', alignItems:'center', padding:'10px 0', borderBottom:'1px solid var(--line)' }}>
+                <div style={{ width:8, height:8, borderRadius:'50%', background:ROLE_COLORS[p.partner_role]||'var(--muted)', marginRight:10, flexShrink:0 }} />
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ fontWeight:700, color:'var(--ink)', fontSize:12.5 }}>{p.full_name}</div>
+                  <div style={{ fontSize:11, color:'var(--muted)', display:'flex', alignItems:'center', gap:4 }}>
+                    {RIcon && <RIcon size={11} />} {p.city||'—'} · <Star size={10} fill="var(--gold)" color="var(--gold)" />{p.rating||'—'} · {p.total_jobs||0} jobs
                   </div>
                 </div>
-                <span className="text-xs mr-2 font-weight-bold" style={{ color: p.status==='online'?'#1cc88a': ['on_way','in_progress'].includes(p.status)?'#F6AD55':'#aaa', whiteSpace:'nowrap' }}>
-                  {p.status==='online'?'🟢 Free': ['on_way','in_progress'].includes(p.status)?'🟡 Busy':'⚫ Offline'}
+                <span style={{ fontSize:11, fontWeight:700, marginRight:8, whiteSpace:'nowrap', color: p.status==='online'?'var(--green)': ['on_way','in_progress'].includes(p.status)?'var(--amber)':'var(--muted)' }}>
+                  {p.status==='online'?'Free': ['on_way','in_progress'].includes(p.status)?'Busy':'Offline'}
                 </span>
                 {p.can_receive_jobs === false && (
-                  <span className="badge badge-danger text-xs mr-1" title="Wallet/deposit below minimum">🔒</span>
+                  <Lock size={12} color="var(--red)" style={{ marginRight:6 }} />
                 )}
-                <button className="btn btn-sm btn-primary" style={{ fontSize:11, fontWeight:700, whiteSpace:'nowrap', opacity: p.can_receive_jobs === false ? 0.45 : 1 }}
-                  disabled={assigning === booking.id}
-                  onClick={() => assignPartner(booking.id, p.id, p.full_name, p.can_receive_jobs === false)}>
+                <button disabled={assigning === booking.id} onClick={() => assignPartner(booking.id, p.id, p.full_name, p.can_receive_jobs === false)}
+                  style={{ fontSize:11, fontWeight:700, whiteSpace:'nowrap', opacity: p.can_receive_jobs === false ? 0.45 : 1, padding:'6px 12px', borderRadius:8, border:'none', background:'var(--navy)', color:'#fff', cursor:'pointer' }}>
                   {assigning === booking.id ? '…' : booking.worker_id ? 'Reassign' : 'Assign'}
                 </button>
               </div>
-            ))
+            );})
           }
         </div>
       </div>
@@ -6305,48 +6306,46 @@ function DispatchSection() {
   );
 
   const TABS = [
-    { id:'queue',     label:`📋 Queue`,          badge: bookings.length,         badgeColor:'#e74a3b' },
-    { id:'active',    label:`🔧 Active Jobs`,     badge: active.length,           badgeColor:'#1cc88a' },
-    { id:'delayed',   label:`⚠️ Delayed`,         badge: delayed.length,          badgeColor: delayed.length > 0 ? '#e74a3b' : '#6c757d' },
-    { id:'workforce', label:`👥 Workforce`,        badge: `${online} online`,      badgeColor:'#1cc88a', badgeText:true },
-    { id:'analytics', label:`📊 Analytics`,        badge: null },
+    { id:'queue',     Icon:ClipboardList, label:`Queue`,        badge: bookings.length,         badgeColor:'var(--red)' },
+    { id:'active',    Icon:Wrench,        label:`Active Jobs`,  badge: active.length,           badgeColor:'var(--green)' },
+    { id:'delayed',   Icon:AlertCircle,   label:`Delayed`,      badge: delayed.length,          badgeColor: delayed.length > 0 ? 'var(--red)' : 'var(--muted)' },
+    { id:'workforce', Icon:Users,         label:`Workforce`,    badge: `${online} online`,      badgeColor:'var(--green)', badgeText:true },
+    { id:'analytics', Icon:BarChart3,     label:`Analytics`,    badge: null },
   ];
 
   return (
     <>
-      <PageHeader title="📡 Dispatch & Tracking Center" sub="Real-time job assignment, workforce monitoring and dispatch analytics" />
+      <PageHeader title="Dispatch & Tracking Center" sub="Real-time job assignment, workforce monitoring and dispatch analytics" />
 
       {/* KPI bar */}
-      <div className="row mb-3">
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))', gap:12, marginBottom:20 }}>
         {[
-          { icon:'📋', label:'Queue',          val:bookings.length,  color:'#e74a3b' },
-          { icon:'🔧', label:'Active Jobs',    val:active.length,    color:'#1cc88a' },
-          { icon:'⚠️', label:'Delayed',        val:delayed.length,   color: delayed.length > 0 ? '#e74a3b' : '#6c757d' },
-          { icon:'🟢', label:'Online Partners',val:online,           color:'#1cc88a' },
-          { icon:'🟡', label:'Busy Partners',  val:busy,             color:'#F6AD55' },
-          { icon:'👥', label:'Total Partners', val:partners.length,  color:'#4e73df' },
+          { Icon:ClipboardList, label:'Queue',           val:bookings.length,  color:'var(--red)' },
+          { Icon:Wrench,        label:'Active Jobs',     val:active.length,    color:'var(--green)' },
+          { Icon:AlertCircle,   label:'Delayed',         val:delayed.length,   color: delayed.length > 0 ? 'var(--red)' : 'var(--muted)' },
+          { Icon:Circle,        label:'Online Partners', val:online,           color:'var(--green)' },
+          { Icon:Circle,        label:'Busy Partners',   val:busy,             color:'var(--amber)' },
+          { Icon:Users,         label:'Total Partners',  val:partners.length,  color:'var(--blue)' },
         ].map(s => (
-          <div key={s.label} className="col-md-2 col-sm-4 mb-2">
-            <div className="admin-card"><div className="card-body py-2 text-center">
-              <div style={{ fontSize:18 }}>{s.icon}</div>
-              <div style={{ fontSize:22, fontWeight:900, color:s.color }}>{s.val}</div>
-              <div className="text-xs text-gray-500">{s.label}</div>
-            </div></div>
+          <div key={s.label} className="stat-card" style={{ textAlign:'center', padding:14 }}>
+            <div className="stat-ico" style={{ width:34, height:34, background:`${s.color}18`, margin:'0 auto 7px' }}><s.Icon size={16} color={s.color} /></div>
+            <div style={{ fontSize:18, fontWeight:800, color:'var(--ink)' }}>{s.val}</div>
+            <div style={{ fontSize:10.5, color:'var(--muted)', marginTop:2 }}>{s.label}</div>
           </div>
         ))}
       </div>
 
       {/* Tab bar */}
-      <div className="d-flex mb-3 flex-wrap" style={{ gap:6, borderBottom:'2px solid #e3e6f0', paddingBottom:0 }}>
+      <div style={{ display:'flex', flexWrap:'wrap', alignItems:'center', gap:6, borderBottom:'2px solid var(--line)', marginBottom:18 }}>
         {TABS.map(t => (
           <button key={t.id} onClick={() => { setTab(t.id); setSelected(null); }}
             style={{
               background:'none', border:'none', fontFamily:'inherit', cursor:'pointer', padding:'8px 14px',
-              fontSize:13, fontWeight:700, color: tab===t.id?'#C9A020':'#6c757d',
-              borderBottom: tab===t.id?'3px solid #C9A020':'3px solid transparent',
+              fontSize:13, fontWeight:700, color: tab===t.id?'var(--gold)':'var(--muted)',
+              borderBottom: tab===t.id?'3px solid var(--gold)':'3px solid transparent',
               marginBottom:-2, display:'flex', alignItems:'center', gap:6,
             }}>
-            {t.label}
+            <t.Icon size={13} /> {t.label}
             {t.badge != null && (
               <span style={{ background:t.badgeColor+'20', color:t.badgeColor, border:`1px solid ${t.badgeColor}40`,
                 fontSize:10, fontWeight:800, padding:'1px 7px', borderRadius:999 }}>
@@ -6356,10 +6355,10 @@ function DispatchSection() {
           </button>
         ))}
         <button onClick={() => window.dispatchEvent(new CustomEvent('fixera-nav', { detail:'live_ops' }))}
-          style={{ marginLeft:'auto', background:'#0A0E1A', border:'1px solid rgba(255,255,255,0.15)',
+          style={{ marginLeft:'auto', background:'var(--navy)', border:'1px solid rgba(255,255,255,0.15)',
             color:'#48BB78', fontSize:12, fontWeight:700, padding:'6px 14px', borderRadius:8,
             cursor:'pointer', fontFamily:'inherit', display:'flex', alignItems:'center', gap:6 }}>
-          🗺️ Live Map
+          <MapIcon size={13} /> Live Map
         </button>
       </div>
 
@@ -6367,28 +6366,29 @@ function DispatchSection() {
         <>
           {/* ── TAB: Queue ── */}
           {tab === 'queue' && (
-            <div className="row">
-              <div className="col-md-5">
-                <div className="font-weight-bold text-xs text-gray-600 mb-2 text-uppercase" style={{ letterSpacing:1 }}>
+            <div style={{ display:'grid', gridTemplateColumns: selected ? '1fr 1.4fr' : '1fr', gap:18 }}>
+              <div>
+                <div style={{ fontSize:11, fontWeight:800, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, marginBottom:10 }}>
                   Unassigned Bookings ({bookings.length})
                 </div>
                 {bookings.length === 0
-                  ? <div className="admin-card p-4 text-center text-gray-500 text-xs">✅ All bookings are assigned!</div>
+                  ? <div className="admin-card" style={{ padding:20, textAlign:'center', color:'var(--muted)', fontSize:12.5 }}>All bookings are assigned!</div>
                   : bookings.map(b => {
                     const ageHrs = Math.round((now - new Date(b.created_at)) / 3600000);
+                    const isSel = selected?.id===b.id;
                     return (
-                      <div key={b.id} className="admin-card mb-2" onClick={() => setSelected(b)}
-                        style={{ borderLeft:`4px solid ${selected?.id===b.id?'#4e73df':ageHrs>4?'#e74a3b':'#e3e6f0'}`, cursor:'pointer', background:selected?.id===b.id?'#f0f4ff':'#fff' }}>
-                        <div className="card-body py-2">
-                          <div className="d-flex justify-content-between align-items-start mb-1">
-                            <div className="font-weight-bold text-gray-800 text-xs">{b.service || b.sub_service || 'Booking'}</div>
-                            {ageHrs > 4 && <span style={{ fontSize:9, fontWeight:800, background:'#ffe4e4', color:'#e74a3b', padding:'2px 6px', borderRadius:4 }}>⏰ {ageHrs}h old</span>}
+                      <div key={b.id} className="admin-card" onClick={() => setSelected(b)}
+                        style={{ borderLeft:`4px solid ${isSel?'var(--blue)':ageHrs>4?'var(--red)':'var(--line-2)'}`, cursor:'pointer', background:isSel?'var(--gold-soft)':'var(--surface)', marginBottom:10 }}>
+                        <div style={{ padding:'12px 16px' }}>
+                          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:6 }}>
+                            <div style={{ fontWeight:700, color:'var(--ink)', fontSize:12.5 }}>{b.service || b.sub_service || 'Booking'}</div>
+                            {ageHrs > 4 && <span style={{ fontSize:9, fontWeight:800, background:'rgba(239,68,68,0.1)', color:'var(--red)', padding:'2px 7px', borderRadius:4 }}>{ageHrs}h old</span>}
                           </div>
-                          <div className="text-xs text-gray-500">📍 {b.address || '—'}</div>
-                          <div className="text-xs text-gray-500">📅 {b.booking_date || '—'} {b.booking_time ? `at ${b.booking_time}` : ''}</div>
-                          <div className="d-flex justify-content-between align-items-center mt-1">
+                          <div style={{ fontSize:11.5, color:'var(--muted)', display:'flex', alignItems:'center', gap:5 }}><MapPin size={11} /> {b.address || '—'}</div>
+                          <div style={{ fontSize:11.5, color:'var(--muted)', display:'flex', alignItems:'center', gap:5, marginTop:2 }}><Clock size={11} /> {b.booking_date || '—'} {b.booking_time ? `at ${b.booking_time}` : ''}</div>
+                          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop:8 }}>
                             <SBBadge status={b.status} />
-                            <span className="text-xs" style={{ color:ageHrs>4?'#e74a3b':'#aaa' }}>
+                            <span style={{ fontSize:11, color:ageHrs>4?'var(--red)':'var(--muted)' }}>
                               {ageHrs < 1 ? 'Just now' : `${ageHrs}h ago`}
                             </span>
                           </div>
@@ -6397,26 +6397,25 @@ function DispatchSection() {
                     );
                   })}
               </div>
-              <div className="col-md-7">
-                {selected
-                  ? <PartnerPicker booking={selected} onClose={() => setSelected(null)} />
-                  : <div className="admin-card" style={{ minHeight:300, display:'flex', alignItems:'center', justifyContent:'center', color:'#a0aec0' }}>
-                      <div className="text-center"><div style={{ fontSize:40, marginBottom:8 }}>👈</div><div>Select a booking to assign a partner</div></div>
-                    </div>
-                }
-              </div>
+              {selected ? <PartnerPicker booking={selected} onClose={() => setSelected(null)} />
+                : bookings.length > 0 && (
+                  <div className="admin-card" style={{ minHeight:300, display:'flex', alignItems:'center', justifyContent:'center', color:'var(--muted)' }}>
+                    <div style={{ textAlign:'center' }}><ArrowLeft size={30} color="var(--line-2)" style={{ marginBottom:8 }} /><div>Select a booking to assign a partner</div></div>
+                  </div>
+                )
+              }
             </div>
           )}
 
           {/* ── TAB: Active Jobs ── */}
           {tab === 'active' && (
-            <div className="row">
-              <div className={selected ? 'col-md-6' : 'col-12'}>
+            <div style={{ display:'grid', gridTemplateColumns: selected ? '1.4fr 1fr' : '1fr', gap:18 }}>
+              <div>
                 {active.length === 0
-                  ? <div className="text-center py-5"><div style={{fontSize:48}}>✅</div><p className="text-gray-500 mt-2">No active jobs right now</p></div>
+                  ? <div style={{ textAlign:'center', padding:'48px 0' }}><CheckCircle2 size={40} color="var(--green)" /><p style={{ color:'var(--muted)', marginTop:10 }}>No active jobs right now</p></div>
                   : (
                     <div className="admin-card">
-                      <div className="table-responsive">
+                      <div style={{ overflowX:'auto' }}>
                         <table className="admin-table">
                           <thead>
                             <tr><th>Service</th><th>Address</th><th>Partner</th><th>Date</th><th>Status</th><th>Action</th></tr>
@@ -6424,21 +6423,22 @@ function DispatchSection() {
                           <tbody>
                             {active.map(b => {
                               const partner = partners.find(p => p.id === b.worker_id);
+                              const RIcon = partner && ROLE_ICONS[partner.partner_role];
                               return (
-                                <tr key={b.id} style={{ background: selected?.id===b.id ? '#f0f4ff' : undefined }}>
-                                  <td className="font-weight-bold text-xs">{b.service || b.sub_service || '—'}</td>
-                                  <td className="text-xs text-gray-600" style={{ maxWidth:160, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{b.address||'—'}</td>
-                                  <td className="text-xs">
+                                <tr key={b.id} style={{ background: selected?.id===b.id ? 'var(--gold-soft)' : undefined }}>
+                                  <td style={{ fontWeight:700, color:'var(--ink)' }}>{b.service || b.sub_service || '—'}</td>
+                                  <td style={{ color:'var(--muted)', maxWidth:160, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{b.address||'—'}</td>
+                                  <td>
                                     {partner
-                                      ? <span><span style={{ color:ROLE_COLORS[partner.partner_role]||'#aaa' }}>{ROLE_ICONS[partner.partner_role]}</span> {partner.full_name}</span>
-                                      : <span className="text-gray-400">{b.worker_name || '—'}</span>}
+                                      ? <span style={{ display:'inline-flex', alignItems:'center', gap:5 }}>{RIcon && <RIcon size={12} color={ROLE_COLORS[partner.partner_role]} />} {partner.full_name}</span>
+                                      : <span style={{ color:'var(--muted)' }}>{b.worker_name || '—'}</span>}
                                   </td>
-                                  <td className="text-xs text-gray-500">{b.booking_date||'—'}</td>
+                                  <td style={{ color:'var(--muted)' }}>{b.booking_date||'—'}</td>
                                   <td><SBBadge status={b.status} /></td>
                                   <td>
-                                    <button className="btn btn-xs btn-outline-warning" style={{ fontSize:10, fontWeight:700, padding:'2px 8px' }}
-                                      onClick={() => setSelected(selected?.id===b.id ? null : b)}>
-                                      {selected?.id===b.id ? 'Close' : '↔ Reassign'}
+                                    <button onClick={() => setSelected(selected?.id===b.id ? null : b)}
+                                      style={{ fontSize:10.5, fontWeight:700, padding:'4px 10px', borderRadius:7, border:'1px solid var(--amber)', background:'none', color:'var(--amber)', cursor:'pointer' }}>
+                                      {selected?.id===b.id ? 'Close' : 'Reassign'}
                                     </button>
                                   </td>
                                 </tr>
@@ -6451,33 +6451,29 @@ function DispatchSection() {
                   )
                 }
               </div>
-              {selected && (
-                <div className="col-md-6">
-                  <PartnerPicker booking={selected} onClose={() => setSelected(null)} />
-                </div>
-              )}
+              {selected && <PartnerPicker booking={selected} onClose={() => setSelected(null)} />}
             </div>
           )}
 
           {/* ── TAB: Delayed Jobs ── */}
           {tab === 'delayed' && (
-            <div className="row">
-              <div className={selected ? 'col-md-6' : 'col-12'}>
+            <div style={{ display:'grid', gridTemplateColumns: selected ? '1.4fr 1fr' : '1fr', gap:18 }}>
+              <div>
                 {delayed.length === 0 ? (
-                  <div className="text-center py-5">
-                    <div style={{ fontSize:48 }}>✅</div>
-                    <p className="text-gray-500 mt-2 font-weight-bold">No delayed jobs!</p>
-                    <p className="text-gray-400 text-xs">Jobs past their scheduled time appear here.</p>
+                  <div style={{ textAlign:'center', padding:'48px 0' }}>
+                    <CheckCircle2 size={40} color="var(--green)" />
+                    <p style={{ color:'var(--ink-2)', fontWeight:700, marginTop:10 }}>No delayed jobs!</p>
+                    <p style={{ color:'var(--muted)', fontSize:12 }}>Jobs past their scheduled time appear here.</p>
                   </div>
                 ) : (
                   <>
-                    <div className="mb-3 p-3" style={{ background:'#fff5f5', border:'1px solid #fed7d7', borderRadius:10 }}>
-                      <div className="font-weight-bold text-xs" style={{ color:'#e74a3b' }}>
-                        ⚠️ {delayed.length} job{delayed.length!==1?'s':''} past their scheduled time and still in progress.
+                    <div style={{ marginBottom:14, padding:12, background:'rgba(239,68,68,0.06)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:10 }}>
+                      <div style={{ fontSize:12, fontWeight:700, color:'var(--red)', display:'flex', alignItems:'center', gap:6 }}>
+                        <AlertCircle size={14} /> {delayed.length} job{delayed.length!==1?'s':''} past their scheduled time and still in progress.
                       </div>
                     </div>
                     <div className="admin-card">
-                      <div className="table-responsive">
+                      <div style={{ overflowX:'auto' }}>
                         <table className="admin-table">
                           <thead>
                             <tr><th>Service</th><th>Scheduled</th><th>Partner</th><th>Status</th><th>Overdue</th><th>Action</th></tr>
@@ -6488,20 +6484,20 @@ function DispatchSection() {
                               const hrsLate   = Math.round((now - scheduled) / 3600000);
                               const partner   = partners.find(p => p.id === b.worker_id);
                               return (
-                                <tr key={b.id} style={{ background: selected?.id===b.id ? '#fff0f0' : undefined }}>
-                                  <td className="font-weight-bold text-xs">{b.service || b.sub_service || '—'}</td>
-                                  <td className="text-xs text-gray-600">{b.booking_date} {b.booking_time||''}</td>
-                                  <td className="text-xs">{partner?.full_name || b.worker_name || <span className="text-gray-400">Unassigned</span>}</td>
+                                <tr key={b.id} style={{ background: selected?.id===b.id ? 'rgba(239,68,68,0.05)' : undefined }}>
+                                  <td style={{ fontWeight:700, color:'var(--ink)' }}>{b.service || b.sub_service || '—'}</td>
+                                  <td style={{ color:'var(--muted)' }}>{b.booking_date} {b.booking_time||''}</td>
+                                  <td>{partner?.full_name || b.worker_name || <span style={{ color:'var(--muted)' }}>Unassigned</span>}</td>
                                   <td><SBBadge status={b.status} /></td>
                                   <td>
-                                    <span style={{ background:'#ffe4e4', color:'#e74a3b', fontSize:10, fontWeight:800, padding:'2px 8px', borderRadius:999 }}>
+                                    <span style={{ background:'rgba(239,68,68,0.1)', color:'var(--red)', fontSize:10, fontWeight:800, padding:'2px 8px', borderRadius:999 }}>
                                       {hrsLate}h late
                                     </span>
                                   </td>
                                   <td>
-                                    <button className="btn btn-xs btn-outline-danger" style={{ fontSize:10, fontWeight:700, padding:'2px 8px' }}
-                                      onClick={() => setSelected(selected?.id===b.id ? null : b)}>
-                                      {selected?.id===b.id ? 'Close' : '↔ Reassign'}
+                                    <button onClick={() => setSelected(selected?.id===b.id ? null : b)}
+                                      style={{ fontSize:10.5, fontWeight:700, padding:'4px 10px', borderRadius:7, border:'1px solid var(--red)', background:'none', color:'var(--red)', cursor:'pointer' }}>
+                                      {selected?.id===b.id ? 'Close' : 'Reassign'}
                                     </button>
                                   </td>
                                 </tr>
@@ -6514,11 +6510,7 @@ function DispatchSection() {
                   </>
                 )}
               </div>
-              {selected && (
-                <div className="col-md-6">
-                  <PartnerPicker booking={selected} onClose={() => setSelected(null)} />
-                </div>
-              )}
+              {selected && <PartnerPicker booking={selected} onClose={() => setSelected(null)} />}
             </div>
           )}
 
@@ -6526,64 +6518,64 @@ function DispatchSection() {
           {tab === 'workforce' && (
             <>
               {/* Summary by role */}
-              <div className="row mb-4">
-                {byRole.map(r => (
-                  <div key={r.role} className="col-md-4 col-sm-6 mb-3">
-                    <div className="admin-card">
-                      <div className="card-body py-3">
-                        <div className="d-flex align-items-center mb-2">
-                          <span style={{ fontSize:22, marginRight:8 }}>{r.icon}</span>
-                          <div>
-                            <div className="font-weight-bold text-gray-800 text-sm">{ROLE_LABEL[r.role]||r.role}</div>
-                            <div className="text-xs text-gray-500">{r.total} total partners</div>
-                          </div>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:12, marginBottom:22 }}>
+                {byRole.map(r => {
+                  const RIcon = ROLE_ICONS[r.role];
+                  return (
+                  <div key={r.role} className="admin-card">
+                    <div style={{ padding:16 }}>
+                      <div style={{ display:'flex', alignItems:'center', marginBottom:10, gap:9 }}>
+                        {RIcon && <RIcon size={20} color={r.color} />}
+                        <div>
+                          <div style={{ fontWeight:700, color:'var(--ink)', fontSize:13 }}>{ROLE_LABEL[r.role]||r.role}</div>
+                          <div style={{ fontSize:11, color:'var(--muted)' }}>{r.total} total partners</div>
                         </div>
-                        <div className="d-flex" style={{ gap:8 }}>
-                          <div style={{ flex:1, textAlign:'center', padding:'8px 6px', background:'rgba(28,200,138,0.08)', borderRadius:8, border:'1px solid rgba(28,200,138,0.2)' }}>
-                            <div style={{ color:'#1cc88a', fontSize:20, fontWeight:900 }}>{r.online}</div>
-                            <div style={{ fontSize:9, color:'#6c757d', fontWeight:700 }}>ONLINE</div>
-                          </div>
-                          <div style={{ flex:1, textAlign:'center', padding:'8px 6px', background:'rgba(246,173,85,0.08)', borderRadius:8, border:'1px solid rgba(246,173,85,0.2)' }}>
-                            <div style={{ color:'#F6AD55', fontSize:20, fontWeight:900 }}>{r.busy}</div>
-                            <div style={{ fontSize:9, color:'#6c757d', fontWeight:700 }}>BUSY</div>
-                          </div>
-                          <div style={{ flex:1, textAlign:'center', padding:'8px 6px', background:'rgba(231,74,59,0.06)', borderRadius:8, border:'1px solid rgba(231,74,59,0.15)' }}>
-                            <div style={{ color:'#e74a3b', fontSize:20, fontWeight:900 }}>{r.jobs}</div>
-                            <div style={{ fontSize:9, color:'#6c757d', fontWeight:700 }}>JOBS</div>
-                          </div>
+                      </div>
+                      <div style={{ display:'flex', gap:8 }}>
+                        <div style={{ flex:1, textAlign:'center', padding:'8px 6px', background:'rgba(22,163,74,0.08)', borderRadius:8, border:'1px solid rgba(22,163,74,0.2)' }}>
+                          <div style={{ color:'var(--green)', fontSize:18, fontWeight:800 }}>{r.online}</div>
+                          <div style={{ fontSize:9, color:'var(--muted)', fontWeight:700 }}>ONLINE</div>
+                        </div>
+                        <div style={{ flex:1, textAlign:'center', padding:'8px 6px', background:'rgba(245,158,11,0.08)', borderRadius:8, border:'1px solid rgba(245,158,11,0.2)' }}>
+                          <div style={{ color:'var(--amber)', fontSize:18, fontWeight:800 }}>{r.busy}</div>
+                          <div style={{ fontSize:9, color:'var(--muted)', fontWeight:700 }}>BUSY</div>
+                        </div>
+                        <div style={{ flex:1, textAlign:'center', padding:'8px 6px', background:'rgba(239,68,68,0.06)', borderRadius:8, border:'1px solid rgba(239,68,68,0.15)' }}>
+                          <div style={{ color:'var(--red)', fontSize:18, fontWeight:800 }}>{r.jobs}</div>
+                          <div style={{ fontSize:9, color:'var(--muted)', fontWeight:700 }}>JOBS</div>
                         </div>
                       </div>
                     </div>
                   </div>
-                ))}
+                );})}
               </div>
 
               {/* Full partner grid */}
-              <div className="font-weight-bold text-xs text-gray-600 mb-2 text-uppercase" style={{ letterSpacing:1 }}>
+              <div style={{ fontSize:11, fontWeight:800, color:'var(--ink-2)', textTransform:'uppercase', letterSpacing:0.5, marginBottom:10 }}>
                 All Partners ({partners.length})
               </div>
               <div className="admin-card">
-                <div className="table-responsive">
+                <div style={{ overflowX:'auto' }}>
                   <table className="admin-table">
                     <thead>
                       <tr><th>Name</th><th>Role</th><th>Status</th><th>City</th><th>Rating</th><th>Jobs Done</th><th>GPS</th></tr>
                     </thead>
                     <tbody>
                       {partners.map(p => {
-                        const statusColor = p.status==='online'?'#1cc88a': ['on_way','in_progress','confirmed'].includes(p.status)?'#F6AD55':'#aaa';
-                        const statusLabel = p.status==='online'?'🟢 Free': p.status==='on_way'?'🚗 On Way': p.status==='in_progress'?'🔧 On Job': p.status==='confirmed'?'✅ Assigned':'⚫ Offline';
+                        const statusColor = p.status==='online'?'var(--green)': ['on_way','in_progress','confirmed'].includes(p.status)?'var(--amber)':'var(--muted)';
+                        const statusLabel = p.status==='online'?'Free': p.status==='on_way'?'On Way': p.status==='in_progress'?'On Job': p.status==='confirmed'?'Assigned':'Offline';
                         return (
                           <tr key={p.id}>
-                            <td className="font-weight-bold text-xs text-gray-800">{p.full_name||'—'}</td>
+                            <td style={{ fontWeight:700, color:'var(--ink)' }}>{p.full_name||'—'}</td>
                             <td><RoleBadge role={p.partner_role||'worker'} /></td>
                             <td><span style={{ fontSize:11, fontWeight:700, color:statusColor }}>{statusLabel}</span></td>
-                            <td className="text-xs text-gray-600">{p.city||'—'}</td>
-                            <td className="text-xs text-gray-600">⭐ {p.rating||'—'}</td>
-                            <td className="text-xs text-gray-600">{p.total_jobs||0}</td>
-                            <td className="text-xs">
+                            <td style={{ color:'var(--muted)' }}>{p.city||'—'}</td>
+                            <td style={{ color:'var(--muted)', display:'flex', alignItems:'center', gap:3 }}><Star size={10} fill="var(--gold)" color="var(--gold)" /> {p.rating||'—'}</td>
+                            <td style={{ color:'var(--muted)' }}>{p.total_jobs||0}</td>
+                            <td>
                               {p.current_lat
-                                ? <span style={{ color:'#1cc88a', fontWeight:700 }}>✅ Active</span>
-                                : <span style={{ color:'#aaa' }}>No GPS</span>}
+                                ? <span style={{ color:'var(--green)', fontWeight:700, display:'flex', alignItems:'center', gap:4 }}><CheckCircle2 size={11} /> Active</span>
+                                : <span style={{ color:'var(--muted)' }}>No GPS</span>}
                             </td>
                           </tr>
                         );
@@ -6611,98 +6603,94 @@ function DispatchSection() {
 
             return (
               <>
-                <div className="row mb-4">
+                <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))', gap:12, marginBottom:22 }}>
                   {[
-                    { icon:'📋', label:'In Queue',           val:bookings.length,  color:'#e74a3b', sub:'Awaiting assignment' },
-                    { icon:'🔧', label:'Active Right Now',   val:active.length,    color:'#1cc88a', sub:'Confirmed + in progress' },
-                    { icon:'⚠️', label:'Delayed',            val:delayed.length,   color:delayed.length>0?'#e74a3b':'#6c757d', sub:'Past scheduled time' },
-                    { icon:'⏱️', label:'Avg Queue Age',      val:`${avgAgeHrs}h`,  color:avgAgeHrs>2?'#e74a3b':'#4e73df', sub:'Time unassigned' },
-                    { icon:'🟢', label:'Partners Available', val:online,           color:'#1cc88a', sub:'Online & free' },
-                    { icon:'📊', label:'Workforce Capacity', val:`${partners.length>0?Math.round((online/partners.length)*100):0}%`, color:'#4e73df', sub:'Online / total' },
+                    { Icon:ClipboardList, label:'In Queue',           val:bookings.length,  color:'var(--red)', sub:'Awaiting assignment' },
+                    { Icon:Wrench,        label:'Active Right Now',   val:active.length,    color:'var(--green)', sub:'Confirmed + in progress' },
+                    { Icon:AlertCircle,   label:'Delayed',            val:delayed.length,   color:delayed.length>0?'var(--red)':'var(--muted)', sub:'Past scheduled time' },
+                    { Icon:Clock,         label:'Avg Queue Age',      val:`${avgAgeHrs}h`,  color:avgAgeHrs>2?'var(--red)':'var(--blue)', sub:'Time unassigned' },
+                    { Icon:Circle,        label:'Partners Available', val:online,           color:'var(--green)', sub:'Online & free' },
+                    { Icon:BarChart3,     label:'Workforce Capacity', val:`${partners.length>0?Math.round((online/partners.length)*100):0}%`, color:'var(--blue)', sub:'Online / total' },
                   ].map(s => (
-                    <div key={s.label} className="col-md-4 col-sm-6 mb-3">
-                      <div className="admin-card"><div className="card-body py-3">
-                        <div className="d-flex align-items-center mb-1">
-                          <span style={{ fontSize:20, marginRight:8 }}>{s.icon}</span>
-                          <div className="text-xs text-gray-500 text-uppercase font-weight-bold" style={{ letterSpacing:0.8 }}>{s.label}</div>
+                    <div key={s.label} className="admin-card">
+                      <div style={{ padding:16 }}>
+                        <div style={{ display:'flex', alignItems:'center', marginBottom:6, gap:8 }}>
+                          <s.Icon size={17} color={s.color} />
+                          <div style={{ fontSize:10.5, color:'var(--muted)', textTransform:'uppercase', fontWeight:700, letterSpacing:0.5 }}>{s.label}</div>
                         </div>
-                        <div style={{ fontSize:28, fontWeight:900, color:s.color }}>{s.val}</div>
-                        <div className="text-xs text-gray-400 mt-1">{s.sub}</div>
-                      </div></div>
+                        <div style={{ fontSize:24, fontWeight:800, color:s.color }}>{s.val}</div>
+                        <div style={{ fontSize:11, color:'var(--muted)', marginTop:4 }}>{s.sub}</div>
+                      </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="row">
+                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
                   {/* Job status breakdown */}
-                  <div className="col-md-6 mb-3">
-                    <div className="admin-card">
-                      <div className="admin-card-header">Jobs by Status</div>
-                      <div className="card-body">
-                        {statusCounts.filter(s=>s.count>0).map(s => {
-                          const total = statusCounts.reduce((a,c)=>a+c.count,0)||1;
-                          const pct   = Math.round((s.count/total)*100);
-                          const color = {pending:'#6c757d',confirmed:'#63B3ED',on_way:'#48BB78',in_progress:'#F6AD55',completed:'#1cc88a',cancelled:'#e74a3b'}[s.status]||'#aaa';
-                          return (
-                            <div key={s.status} className="mb-2">
-                              <div className="d-flex justify-content-between text-xs mb-1">
-                                <span className="font-weight-bold text-gray-700">{s.status.replace('_',' ')}</span>
-                                <span style={{ color }}>{s.count} ({pct}%)</span>
-                              </div>
-                              <div style={{ background:'#e9ecef', borderRadius:4, height:8 }}>
-                                <div style={{ background:color, width:`${pct}%`, height:8, borderRadius:4, transition:'width 0.4s' }} />
-                              </div>
+                  <div className="admin-card">
+                    <div className="admin-card-header">Jobs by Status</div>
+                    <div style={{ padding:16 }}>
+                      {statusCounts.filter(s=>s.count>0).map(s => {
+                        const total = statusCounts.reduce((a,c)=>a+c.count,0)||1;
+                        const pct   = Math.round((s.count/total)*100);
+                        const color = {pending:'var(--muted)',confirmed:'var(--blue)',on_way:'var(--green)',in_progress:'var(--amber)',completed:'var(--green)',cancelled:'var(--red)'}[s.status]||'var(--muted)';
+                        return (
+                          <div key={s.status} style={{ marginBottom:10 }}>
+                            <div style={{ display:'flex', justifyContent:'space-between', fontSize:11.5, marginBottom:4 }}>
+                              <span style={{ fontWeight:700, color:'var(--ink-2)' }}>{s.status.replace('_',' ')}</span>
+                              <span style={{ color }}>{s.count} ({pct}%)</span>
                             </div>
-                          );
-                        })}
-                        {statusCounts.every(s=>s.count===0) && <div className="text-xs text-gray-500">No job data</div>}
-                      </div>
+                            <div style={{ background:'var(--line)', borderRadius:4, height:8 }}>
+                              <div style={{ background:color, width:`${pct}%`, height:8, borderRadius:4, transition:'width 0.4s' }} />
+                            </div>
+                          </div>
+                        );
+                      })}
+                      {statusCounts.every(s=>s.count===0) && <div style={{ fontSize:12, color:'var(--muted)' }}>No job data</div>}
                     </div>
                   </div>
 
                   {/* Role coverage */}
-                  <div className="col-md-6 mb-3">
-                    <div className="admin-card">
-                      <div className="admin-card-header">Workforce by Role</div>
-                      <div className="card-body">
-                        {byRole.map(r => (
-                          <div key={r.role} className="d-flex align-items-center mb-2 py-1 border-bottom">
-                            <span style={{ width:24, fontSize:16 }}>{r.icon}</span>
-                            <div className="flex-grow-1 text-xs text-gray-700 font-weight-bold ml-2">{ROLE_LABEL[r.role]||r.role}</div>
-                            <span style={{ fontSize:10, fontWeight:700, color:'#1cc88a', background:'rgba(28,200,138,0.1)', padding:'2px 8px', borderRadius:4, marginRight:4 }}>{r.online} free</span>
-                            <span style={{ fontSize:10, fontWeight:700, color:'#F6AD55', background:'rgba(246,173,85,0.1)', padding:'2px 8px', borderRadius:4, marginRight:4 }}>{r.busy} busy</span>
-                            <span style={{ fontSize:10, fontWeight:700, color:'#6c757d' }}>{r.total} total</span>
-                          </div>
-                        ))}
-                      </div>
+                  <div className="admin-card">
+                    <div className="admin-card-header">Workforce by Role</div>
+                    <div style={{ padding:16 }}>
+                      {byRole.map(r => {
+                        const RIcon = ROLE_ICONS[r.role];
+                        return (
+                        <div key={r.role} style={{ display:'flex', alignItems:'center', marginBottom:8, paddingBottom:8, borderBottom:'1px solid var(--line)', gap:8 }}>
+                          {RIcon && <RIcon size={15} color={r.color} />}
+                          <div style={{ flex:1, fontSize:11.5, color:'var(--ink-2)', fontWeight:700 }}>{ROLE_LABEL[r.role]||r.role}</div>
+                          <span style={{ fontSize:10, fontWeight:700, color:'var(--green)', background:'rgba(22,163,74,0.1)', padding:'2px 8px', borderRadius:4 }}>{r.online} free</span>
+                          <span style={{ fontSize:10, fontWeight:700, color:'var(--amber)', background:'rgba(245,158,11,0.1)', padding:'2px 8px', borderRadius:4 }}>{r.busy} busy</span>
+                          <span style={{ fontSize:10, fontWeight:700, color:'var(--muted)' }}>{r.total} total</span>
+                        </div>
+                      );})}
                     </div>
                   </div>
 
                   {/* Top partners by jobs */}
-                  <div className="col-12">
-                    <div className="admin-card">
-                      <div className="admin-card-header">🏆 Top Partners by Jobs Completed</div>
-                      <div className="table-responsive">
-                        <table className="admin-table">
-                          <thead><tr><th>#</th><th>Name</th><th>Role</th><th>City</th><th>Jobs</th><th>Rating</th><th>Status</th></tr></thead>
-                          <tbody>
-                            {topPartners.map((p, i) => (
-                              <tr key={p.id}>
-                                <td className="text-xs font-weight-bold text-gray-400">#{i+1}</td>
-                                <td className="font-weight-bold text-xs text-gray-800">{p.full_name}</td>
-                                <td><RoleBadge role={p.partner_role} /></td>
-                                <td className="text-xs text-gray-600">{p.city||'—'}</td>
-                                <td className="font-weight-bold text-xs" style={{ color:'#4e73df' }}>{p.total_jobs}</td>
-                                <td className="text-xs">⭐ {p.rating||'—'}</td>
-                                <td className="text-xs font-weight-bold" style={{ color: p.status==='online'?'#1cc88a':'#aaa' }}>
-                                  {p.status==='online'?'🟢':p.status==='on_way'?'🚗':p.status==='in_progress'?'🔧':'⚫'}
-                                </td>
-                              </tr>
-                            ))}
-                            {topPartners.length===0 && <tr><td colSpan={7} className="text-xs text-gray-500 text-center py-3">No data yet</td></tr>}
-                          </tbody>
-                        </table>
-                      </div>
+                  <div className="admin-card" style={{ gridColumn:'1 / -1' }}>
+                    <div className="admin-card-header">Top Partners by Jobs Completed</div>
+                    <div style={{ overflowX:'auto' }}>
+                      <table className="admin-table">
+                        <thead><tr><th>#</th><th>Name</th><th>Role</th><th>City</th><th>Jobs</th><th>Rating</th><th>Status</th></tr></thead>
+                        <tbody>
+                          {topPartners.map((p, i) => (
+                            <tr key={p.id}>
+                              <td style={{ color:'var(--muted)', fontWeight:700 }}>#{i+1}</td>
+                              <td style={{ fontWeight:700, color:'var(--ink)' }}>{p.full_name}</td>
+                              <td><RoleBadge role={p.partner_role} /></td>
+                              <td style={{ color:'var(--muted)' }}>{p.city||'—'}</td>
+                              <td style={{ fontWeight:700, color:'var(--blue)' }}>{p.total_jobs}</td>
+                              <td style={{ display:'flex', alignItems:'center', gap:3 }}><Star size={10} fill="var(--gold)" color="var(--gold)" /> {p.rating||'—'}</td>
+                              <td style={{ fontWeight:700, color: p.status==='online'?'var(--green)':'var(--muted)' }}>
+                                <Circle size={9} fill={p.status==='online'?'var(--green)':'var(--muted)'} color={p.status==='online'?'var(--green)':'var(--muted)'} />
+                              </td>
+                            </tr>
+                          ))}
+                          {topPartners.length===0 && <tr><td colSpan={7} style={{ textAlign:'center', color:'var(--muted)', padding:16 }}>No data yet</td></tr>}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 </div>
