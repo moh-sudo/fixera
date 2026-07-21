@@ -4,6 +4,29 @@
 
 ---
 
+## 🆕 SESSION SUMMARY (July 21, 2026 — Fixy AI chat broken for everyone)
+
+### The bug
+User reported "AI Fixy is not working across all." Root cause: `web/src/services/aiService.js` (`askFixeraAI`) posted to `/api/ai-chat` with no `Authorization` header. That endpoint calls `requireAuth` (see `web/api/_auth.js`), which 401s immediately without a bearer token — so every Fixy request, for every user, on every page, failed before ever reaching Gemini. Every other authenticated API caller in the app (`emailService.js`, `paymentService.js`, `teamService.js`, `promoService.js`) already fetches `supabase.auth.getSession()` and attaches the token; `aiService.js` was the one place that never did.
+
+### Fix shipped
+`web/src/services/aiService.js` — `askFixeraAI` now fetches the current session and conditionally sends `Authorization: Bearer <token>`, matching the existing pattern. Verified in-browser: the outgoing fetch now includes the header when a session exists; no console/build errors. App-layer only, no migration needed.
+
+### Known follow-up (not fixed, flagging)
+`FixeraAI.jsx`'s floating widget is shown on public/pre-login pages (Welcome, Login) — only auto-hidden on `/profile`, `/receipt`, `/review`, `/payment`. A logged-out visitor can still open it and will get a 401 from `requireAuth` (by design — no guest path exists). Left as-is since it's a product decision (allow guest AI chat vs. hide the widget pre-login), not a bug — ask before changing.
+
+---
+
+## 🆕 SESSION SUMMARY (July 21, 2026 — Double-receipt-creation investigation)
+
+### The bug, confirmed
+Followed up on the scope note left in the 4.4 session below. Two code paths both insert into `receipts` for the same booking: the `trg_generate_receipt` DB trigger (fires when `payments.status` → `'paid'`, i.e. at payment time) and `ActiveJobPage.jsx` (fires separately when the partner marks the job complete). Since payment happens independently of job completion, both fire for the same `booking_id`, producing two rows. Confirmed real, visible impact: `web/src/pages/main/ReceiptPage.jsx` fetches the receipt with `.eq('booking_id', bookingId).maybeSingle()`, which errors when two rows match — silently losing the cached `pdf_url`/commission data and forcing PDF regeneration every time. Customer `HomePage.jsx` and partner `DashboardPage.jsx` (both list receipts by user) would also show duplicate entries for one booking. Separately, `ActiveJobPage.jsx`'s insert was writing a `user_id` key that doesn't match the table's actual (`NOT NULL`) `customer_id` column.
+
+### Fix shipped
+`worker/src/pages/main/ActiveJobPage.jsx` (job-completion handler): before inserting, now checks for an existing `receipts` row by `booking_id`. If the trigger already created one (payment happened first), it `UPDATE`s that row with the completion-time fields (worker, receipt number, PDF URL, etc.) instead of inserting a second row. Only inserts fresh if no row exists yet (e.g. pay-on-completion flow). Also fixed the `user_id` → `customer_id` field-name mismatch. No migration needed — this is app-layer only.
+
+---
+
 ## 🆕 SESSION SUMMARY (July 21, 2026 — Invoice PDF generation — plan item 4.4)
 
 ### Discovered the PDF infrastructure already existed — it just wasn't wired up

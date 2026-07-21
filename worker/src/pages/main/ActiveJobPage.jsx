@@ -136,7 +136,7 @@ export default function ActiveJobPage() {
       const receiptNo = `FIX-${job.id.slice(0, 8).toUpperCase()}`;
       const receiptData = {
         booking_id:   job.id,
-        user_id:      job.user_id,
+        customer_id:  job.user_id,
         worker_id:    user.id,
         receipt_no:   receiptNo,
         service:      job.service,
@@ -159,7 +159,17 @@ export default function ActiveJobPage() {
         if (customerEmail) receiptData.customer_email = customerEmail;
       }
 
-      await supabase.from('receipts').insert(receiptData);
+      // A DB trigger already inserts a receipts row keyed by booking_id
+      // when the payment for this booking turns 'paid' — update that
+      // row with completion details instead of inserting a second one.
+      const { data: existingReceipt } = await supabase
+        .from('receipts').select('id').eq('booking_id', job.id).maybeSingle();
+
+      if (existingReceipt) {
+        await supabase.from('receipts').update(receiptData).eq('id', existingReceipt.id);
+      } else {
+        await supabase.from('receipts').insert(receiptData);
+      }
 
       if (customerEmail) {
         supabase.functions.invoke('send-receipt', {
