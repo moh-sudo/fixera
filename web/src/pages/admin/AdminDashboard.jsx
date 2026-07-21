@@ -2543,68 +2543,35 @@ function AnnouncementsSection() {
 
   return (
     <>
-      <PageHeader title="Announcements" sub="Broadcast messages to customers and partners" />
+      <PageHeader title="Announcements" sub="Broadcast messages to customers and partners"
+        action={<button className="btn-navy" onClick={() => setForm({ ...BLANK })}><Plus size={15} /> New Announcement</button>} />
 
-      {toast && <div className="alert alert-success py-2">{toast}</div>}
-
-      <div className="mb-4 d-flex justify-content-end">
-        <button className="btn btn-warning font-weight-bold"
-          style={{ background:'#C9A020', border:'none', color:'#0A0E1A' }}
-          onClick={() => setForm({ ...BLANK })}>
-          + New Announcement
-        </button>
-      </div>
+      {toast && <div style={{ display:'flex', alignItems:'center', gap:8, background:'rgba(22,163,74,.1)', color:'var(--green)', borderRadius:9, padding:'9px 14px', marginBottom:16, fontSize:12.5, fontWeight:700 }}><BadgeCheck size={15} /> {toast}</div>}
 
       {/* ── Form ── */}
       {form && (
-        <div className="admin-card mb-4" style={{ borderLeft:'4px solid #C9A020' }}>
-          <div className="card-body">
-            <h6 className="font-weight-bold text-gray-700 mb-3">{form.id ? 'Edit Announcement' : 'New Announcement'}</h6>
+        <div className="admin-card" style={{ borderLeft:'4px solid var(--gold)' }}>
+          <div style={{ padding:18 }}>
+            <div style={{ fontSize:14.5, fontWeight:800, color:'var(--ink)', marginBottom:14 }}>{form.id ? 'Edit Announcement' : 'New Announcement'}</div>
             <div className="row">
-              <div className="col-12 mb-3">
-                <label className="text-xs font-weight-bold text-gray-600 text-uppercase" style={{ letterSpacing:'0.05rem' }}>Title *</label>
-                <input className="form-control" value={form.title} onChange={e => set('title', e.target.value)} placeholder="Short, clear headline" />
-              </div>
-              <div className="col-12 mb-3">
-                <label className="text-xs font-weight-bold text-gray-600 text-uppercase" style={{ letterSpacing:'0.05rem' }}>Message *</label>
-                <textarea className="form-control" rows={3} value={form.body} onChange={e => set('body', e.target.value)} placeholder="Full announcement text…" />
-              </div>
-              <div className="col-md-4 mb-3">
-                <label className="text-xs font-weight-bold text-gray-600 text-uppercase" style={{ letterSpacing:'0.05rem' }}>Type</label>
-                <select className="form-control" value={form.type} onChange={e => set('type', e.target.value)}>
-                  {Object.entries(TYPE_META).map(([k, v]) => <option key={k} value={k}>{v.icon} {v.label}</option>)}
-                </select>
-              </div>
-              <div className="col-md-4 mb-3">
-                <label className="text-xs font-weight-bold text-gray-600 text-uppercase" style={{ letterSpacing:'0.05rem' }}>Audience</label>
-                <select className="form-control" value={form.target} onChange={e => set('target', e.target.value)}>
-                  {Object.entries(TARGET_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
-                </select>
-              </div>
+              <div className="col-12 mb-3"><label className="text-xs font-weight-bold text-gray-600 text-uppercase" style={{ letterSpacing:'0.05rem' }}>Title *</label><input className="form-control" value={form.title} onChange={e => set('title', e.target.value)} placeholder="Short, clear headline" /></div>
+              <div className="col-12 mb-3"><label className="text-xs font-weight-bold text-gray-600 text-uppercase" style={{ letterSpacing:'0.05rem' }}>Message *</label><textarea className="form-control" rows={3} value={form.body} onChange={e => set('body', e.target.value)} placeholder="Full announcement text…" /></div>
+              <div className="col-md-4 mb-3"><label className="text-xs font-weight-bold text-gray-600 text-uppercase" style={{ letterSpacing:'0.05rem' }}>Type</label><select className="form-control" value={form.type} onChange={e => set('type', e.target.value)}>{Object.entries(TYPE_META).map(([k, v]) => <option key={k} value={k}>{v.icon} {v.label}</option>)}</select></div>
+              <div className="col-md-4 mb-3"><label className="text-xs font-weight-bold text-gray-600 text-uppercase" style={{ letterSpacing:'0.05rem' }}>Audience</label><select className="form-control" value={form.target} onChange={e => set('target', e.target.value)}>{Object.entries(TARGET_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></div>
               <div className="col-md-4 mb-3 d-flex align-items-end">
-                <div className="form-check mb-2">
-                  <input className="form-check-input" type="checkbox" id="pin-check" checked={form.is_pinned} onChange={e => set('is_pinned', e.target.checked)} />
-                  <label className="form-check-label text-sm font-weight-bold" htmlFor="pin-check">📌 Pin to top</label>
-                </div>
+                <div className="form-check mb-2"><input className="form-check-input" type="checkbox" id="pin-check" checked={form.is_pinned} onChange={e => set('is_pinned', e.target.checked)} /><label className="form-check-label text-sm font-weight-bold" htmlFor="pin-check" style={{ display:'inline-flex', alignItems:'center', gap:5 }}><Star size={12} /> Pin to top</label></div>
               </div>
-              <div className="col-md-6 mb-3">
-                <label className="text-xs font-weight-bold text-gray-600 text-uppercase" style={{ letterSpacing:'0.05rem' }}>Publish Date (leave blank = now)</label>
-                <input type="datetime-local" className="form-control" value={form.publish_at ? form.publish_at.slice(0,16) : ''} onChange={e => set('publish_at', e.target.value ? new Date(e.target.value).toISOString() : '')} />
-              </div>
-              <div className="col-md-6 mb-3">
-                <label className="text-xs font-weight-bold text-gray-600 text-uppercase" style={{ letterSpacing:'0.05rem' }}>Expiry Date (leave blank = never)</label>
-                <input type="datetime-local" className="form-control" value={form.expires_at ? form.expires_at.slice(0,16) : ''} onChange={e => set('expires_at', e.target.value ? new Date(e.target.value).toISOString() : '')} />
-              </div>
-              <div className="col-12 d-flex gap-2">
-                <button className="btn btn-warning font-weight-bold" style={{ background:'#C9A020', border:'none', color:'#0A0E1A' }}
-                  disabled={saving} onClick={save}>{saving ? 'Saving…' : form.id ? 'Update' : '📢 Publish'}</button>
-                <button className="btn btn-outline-secondary" onClick={() => setForm(null)}>Cancel</button>
+              <div className="col-md-6 mb-3"><label className="text-xs font-weight-bold text-gray-600 text-uppercase" style={{ letterSpacing:'0.05rem' }}>Publish Date (leave blank = now)</label><input type="datetime-local" className="form-control" value={form.publish_at ? form.publish_at.slice(0,16) : ''} onChange={e => set('publish_at', e.target.value ? new Date(e.target.value).toISOString() : '')} /></div>
+              <div className="col-md-6 mb-3"><label className="text-xs font-weight-bold text-gray-600 text-uppercase" style={{ letterSpacing:'0.05rem' }}>Expiry Date (leave blank = never)</label><input type="datetime-local" className="form-control" value={form.expires_at ? form.expires_at.slice(0,16) : ''} onChange={e => set('expires_at', e.target.value ? new Date(e.target.value).toISOString() : '')} /></div>
+              <div className="col-12" style={{ display:'flex', gap:8 }}>
+                <button disabled={saving} onClick={save} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'9px 18px', borderRadius:9, border:'none', background:'var(--gold)', color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer' }}><Megaphone size={14} /> {saving ? 'Saving…' : form.id ? 'Update' : 'Publish'}</button>
+                <button onClick={() => setForm(null)} style={{ padding:'9px 18px', borderRadius:9, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--ink-2)', fontSize:13, fontWeight:700, cursor:'pointer' }}>Cancel</button>
               </div>
             </div>
 
             {/* Live preview */}
-            <div className="mt-4">
-              <div className="text-xs font-weight-bold text-gray-500 text-uppercase mb-2" style={{ letterSpacing:'0.05rem' }}>Preview</div>
+            <div style={{ marginTop:18 }}>
+              <div style={{ fontSize:10.5, fontWeight:700, textTransform:'uppercase', letterSpacing:'.4px', color:'var(--muted)', marginBottom:8 }}>Preview</div>
               <AnnouncementCard item={{ ...form, publish_at: form.publish_at || now }} preview />
             </div>
           </div>
@@ -2613,9 +2580,9 @@ function AnnouncementsSection() {
 
       {/* ── List ── */}
       {loading ? <Spinner /> : list.length === 0 ? (
-        <div className="text-center py-5">
-          <div style={{ fontSize:48 }}>📢</div>
-          <p className="text-gray-500 mt-2">No announcements yet. Create your first one.</p>
+        <div style={{ textAlign:'center', padding:'56px 0' }}>
+          <Megaphone size={40} color="var(--muted)" style={{ marginBottom:10 }} />
+          <p style={{ color:'var(--muted)', margin:0 }}>No announcements yet. Create your first one.</p>
         </div>
       ) : (
         <div>
@@ -2624,40 +2591,32 @@ function AnnouncementsSection() {
             const expired   = isExpired(item);
             const scheduled = isScheduled(item);
             return (
-              <div key={item.id} className="admin-card mb-3" style={{ borderLeft: `4px solid ${TYPE_META[item.type]?.color || '#4A90D9'}`, opacity: expired ? 0.6 : 1 }}>
-                <div className="card-body">
-                  <div className="d-flex justify-content-between align-items-start">
+              <div key={item.id} className="admin-card" style={{ borderLeft: `4px solid ${TYPE_META[item.type]?.color || '#4A90D9'}`, opacity: expired ? 0.6 : 1 }}>
+                <div style={{ padding:16 }}>
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12 }}>
                     <div style={{ flex:1 }}>
-                      <div className="d-flex align-items-center gap-2 mb-1" style={{ gap:8, flexWrap:'wrap' }}>
-                        <span style={{ fontSize:18 }}>{TYPE_META[item.type]?.icon}</span>
-                        <span className="font-weight-bold text-gray-800" style={{ fontSize:15 }}>{item.title}</span>
-                        {item.is_pinned && <span className="sb-badge sb-badge-warning">📌 Pinned</span>}
-                        {live      && <span className="sb-badge sb-badge-success">🟢 Live</span>}
-                        {scheduled && <span className="sb-badge sb-badge-info">🕐 Scheduled</span>}
-                        {expired   && <span className="sb-badge sb-badge-secondary">⏹ Expired</span>}
+                      <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:7, flexWrap:'wrap' }}>
+                        <span style={{ fontSize:17 }}>{TYPE_META[item.type]?.icon}</span>
+                        <span style={{ fontWeight:800, color:'var(--ink)', fontSize:14.5 }}>{item.title}</span>
+                        {item.is_pinned && <span className="sb-badge sb-badge-warning" style={{ display:'inline-flex', alignItems:'center', gap:3 }}><Star size={10} /> Pinned</span>}
+                        {live      && <span className="sb-badge sb-badge-success">Live</span>}
+                        {scheduled && <span className="sb-badge sb-badge-info">Scheduled</span>}
+                        {expired   && <span className="sb-badge sb-badge-secondary">Expired</span>}
                       </div>
-                      <p className="text-sm text-gray-600 mb-2" style={{ maxWidth:600 }}>{item.body}</p>
-                      <div className="d-flex gap-3 text-xs text-gray-500" style={{ gap:12, flexWrap:'wrap' }}>
-                        <span>🎯 {TARGET_LABELS[item.target] || item.target}</span>
-                        <span>📅 {new Date(item.publish_at).toLocaleString('en-KE', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })}</span>
-                        {item.expires_at && <span>⏰ Expires {new Date(item.expires_at).toLocaleString('en-KE', { day:'numeric', month:'short', year:'numeric' })}</span>}
+                      <p style={{ fontSize:13, color:'var(--ink-2)', marginBottom:8, maxWidth:600 }}>{item.body}</p>
+                      <div style={{ display:'flex', gap:12, fontSize:11.5, color:'var(--muted)', flexWrap:'wrap' }}>
+                        <span>{TARGET_LABELS[item.target] || item.target}</span>
+                        <span>{new Date(item.publish_at).toLocaleString('en-KE', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' })}</span>
+                        {item.expires_at && <span>Expires {new Date(item.expires_at).toLocaleString('en-KE', { day:'numeric', month:'short', year:'numeric' })}</span>}
                       </div>
                     </div>
-                    <div className="d-flex gap-2 ml-3" style={{ gap:6, flexShrink:0, flexWrap:'wrap', justifyContent:'flex-end' }}>
-                      <button className="btn btn-sm btn-outline-secondary" onClick={() => togglePin(item)} title={item.is_pinned ? 'Unpin' : 'Pin to top'}>
-                        {item.is_pinned ? '📌' : '📍'}
-                      </button>
-                      <button className="btn btn-sm btn-outline-info" onClick={() => emailBroadcast(item)} disabled={saving} title="Send email to target audience">
-                        📧 Email
-                      </button>
-                      <button className="btn btn-sm btn-outline-success" disabled={saving} title="SMS broadcast — coming soon" onClick={() => alert('📱 SMS broadcast\n\nThis will send an SMS to all matching users via Africa\'s Talking or Twilio.\n\nIntegration coming soon — wire AFRICASTALKING_KEY in your .env to enable.')}>
-                        📱 SMS
-                      </button>
-                      <button className="btn btn-sm btn-outline-secondary" disabled={saving} title="Push notification — coming soon" onClick={() => alert('🔔 Push Notifications\n\nThis will send a push notification via FCM to all users with the Fixera app installed.\n\nIntegration coming soon — wire FIREBASE_SERVER_KEY in your .env to enable.')}>
-                        🔔 Push
-                      </button>
-                      <button className="btn btn-sm btn-outline-warning" onClick={() => setForm({ ...item })}>✏️ Edit</button>
-                      <button className="btn btn-sm btn-outline-danger" onClick={() => del(item.id)}>🗑️</button>
+                    <div style={{ display:'flex', gap:6, flexShrink:0, flexWrap:'wrap', justifyContent:'flex-end' }}>
+                      <button onClick={() => togglePin(item)} title={item.is_pinned ? 'Unpin' : 'Pin to top'} style={{ padding:'6px 9px', borderRadius:8, border:'1px solid var(--line-2)', background:'var(--surface)', color: item.is_pinned ? 'var(--gold)' : 'var(--ink-2)', cursor:'pointer', display:'flex' }}><Star size={13} fill={item.is_pinned ? 'var(--gold)' : 'none'} /></button>
+                      <button onClick={() => emailBroadcast(item)} disabled={saving} title="Send email to target audience" style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'6px 11px', borderRadius:8, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--blue)', fontSize:11.5, fontWeight:700, cursor:'pointer' }}><Mail size={12} /> Email</button>
+                      <button disabled={saving} title="SMS broadcast — coming soon" onClick={() => alert('SMS broadcast\n\nThis will send an SMS to all matching users via Africa\'s Talking or Twilio.\n\nIntegration coming soon — wire AFRICASTALKING_KEY in your .env to enable.')} style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'6px 11px', borderRadius:8, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--green)', fontSize:11.5, fontWeight:700, cursor:'pointer' }}><Smartphone size={12} /> SMS</button>
+                      <button disabled={saving} title="Push notification — coming soon" onClick={() => alert('Push Notifications\n\nThis will send a push notification via FCM to all users with the Fixera app installed.\n\nIntegration coming soon — wire FIREBASE_SERVER_KEY in your .env to enable.')} style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'6px 11px', borderRadius:8, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--ink-2)', fontSize:11.5, fontWeight:700, cursor:'pointer' }}><Bell size={12} /> Push</button>
+                      <button onClick={() => setForm({ ...item })} style={{ padding:'6px 9px', borderRadius:8, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--ink-2)', cursor:'pointer', display:'flex' }}><FileText size={13} /></button>
+                      <button onClick={() => del(item.id)} style={{ padding:'6px 9px', borderRadius:8, border:'1px solid rgba(239,68,68,.3)', background:'rgba(239,68,68,.06)', color:'var(--red)', cursor:'pointer', display:'flex' }}><X size={13} /></button>
                     </div>
                   </div>
                 </div>
@@ -2674,14 +2633,14 @@ function AnnouncementCard({ item, preview }) {
   const meta = TYPE_META[item?.type] || TYPE_META.info;
   if (!item?.title) return null;
   return (
-    <div style={{ background: meta.bg, border: `1px solid ${meta.color}40`, borderLeft: `4px solid ${meta.color}`, borderRadius: 10, padding: '12px 16px', display:'flex', gap:12, alignItems:'flex-start' }}>
+    <div style={{ background: meta.bg, borderLeft: `4px solid ${meta.color}`, borderRadius: 10, padding: '12px 16px', display:'flex', gap:12, alignItems:'flex-start' }}>
       <span style={{ fontSize:22, flexShrink:0 }}>{meta.icon}</span>
       <div style={{ flex:1 }}>
-        <div style={{ fontWeight:800, color: meta.color, fontSize:14, marginBottom:2 }}>
-          {item.is_pinned && '📌 '}{item.title}
+        <div style={{ fontWeight:800, color: meta.color, fontSize:14, marginBottom:2, display:'flex', alignItems:'center', gap:6 }}>
+          {item.is_pinned && <Star size={13} fill={meta.color} />}{item.title}
         </div>
-        <div style={{ fontSize:13, color:'#4a5568', lineHeight:1.5 }}>{item.body}</div>
-        {!preview && <div style={{ fontSize:11, color:'#718096', marginTop:6 }}>{TARGET_LABELS[item.target] || item.target}</div>}
+        <div style={{ fontSize:13, color:'var(--ink-2)', lineHeight:1.5 }}>{item.body}</div>
+        {!preview && <div style={{ fontSize:11, color:'var(--muted)', marginTop:6 }}>{TARGET_LABELS[item.target] || item.target}</div>}
       </div>
     </div>
   );
