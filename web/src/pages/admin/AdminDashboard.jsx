@@ -731,21 +731,21 @@ function OverviewSection() {
         style={{ display:'grid', gridTemplateColumns:'1.4fr 1fr 1fr', gap:18 }}>
         {/* Live map preview */}
         <button onClick={() => goToSection('live_ops')} className="admin-card" style={{ marginBottom:0, padding:0, cursor:'pointer', textAlign:'left', border:'1px solid var(--line)', overflow:'hidden', position:'relative', minHeight:180 }}>
-          <div style={{ position:'absolute', inset:0, background:'linear-gradient(135deg,#0F1B2D,#1E3355)', opacity:1 }} />
-          <div style={{ position:'absolute', inset:0, backgroundImage:'radial-gradient(circle at 30% 40%, rgba(201,160,32,.25), transparent 40%), radial-gradient(circle at 70% 70%, rgba(59,130,246,.2), transparent 40%)' }} />
-          <svg viewBox="0 0 400 200" style={{ position:'absolute', inset:0, width:'100%', height:'100%', opacity:.18 }}><path d="M0 120 Q100 60 200 110 T400 90" stroke="#fff" strokeWidth="2" fill="none"/><path d="M0 160 Q120 120 240 150 T400 140" stroke="#fff" strokeWidth="1.5" fill="none"/></svg>
-          <div style={{ position:'relative', padding:'20px 22px', color:'#fff', height:'100%', display:'flex', flexDirection:'column', justifyContent:'space-between', minHeight:180 }}>
+          <div style={{ position:'absolute', inset:0, background:'linear-gradient(135deg,#F5F7FB,#EDF0F5)' }} />
+          <div style={{ position:'absolute', inset:0, backgroundImage:'radial-gradient(circle at 30% 40%, rgba(201,160,32,.10), transparent 40%), radial-gradient(circle at 70% 70%, rgba(59,130,246,.08), transparent 40%)' }} />
+          <svg viewBox="0 0 400 200" style={{ position:'absolute', inset:0, width:'100%', height:'100%', opacity:.35 }}><path d="M0 120 Q100 60 200 110 T400 90" stroke="#C9A020" strokeWidth="2" fill="none"/><path d="M0 160 Q120 120 240 150 T400 140" stroke="#3B82F6" strokeWidth="1.5" fill="none"/></svg>
+          <div style={{ position:'relative', padding:'20px 22px', color:'var(--ink)', height:'100%', display:'flex', flexDirection:'column', justifyContent:'space-between', minHeight:180 }}>
             <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
               <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                <span className="live-dot" style={{ width:9, height:9, borderRadius:'50%', background:'#48BB78', display:'inline-block' }} />
-                <span style={{ fontSize:11, fontWeight:800, letterSpacing:1, color:'#9FE8B8' }}>LIVE OPERATIONS</span>
+                <span className="live-dot" style={{ width:9, height:9, borderRadius:'50%', background:'var(--green)', display:'inline-block' }} />
+                <span style={{ fontSize:11, fontWeight:800, letterSpacing:1, color:'var(--green)' }}>LIVE OPERATIONS</span>
               </div>
-              <MapPin size={20} color="#C9A020" />
+              <MapPin size={20} color="var(--gold)" />
             </div>
             <div>
               <div style={{ fontSize:30, fontWeight:800 }}>{stats.activeJobs}</div>
-              <div style={{ fontSize:12.5, color:'rgba(255,255,255,.7)' }}>jobs in progress on the map right now</div>
-              <div style={{ marginTop:12, display:'inline-flex', alignItems:'center', gap:7, fontSize:12.5, fontWeight:700, color:'#C9A020' }}>Open Live Map <ChevronDown size={15} style={{ transform:'rotate(-90deg)' }} /></div>
+              <div style={{ fontSize:12.5, color:'var(--muted)' }}>jobs in progress on the map right now</div>
+              <div style={{ marginTop:12, display:'inline-flex', alignItems:'center', gap:7, fontSize:12.5, fontWeight:700, color:'var(--gold)' }}>Open Live Map <ChevronDown size={15} style={{ transform:'rotate(-90deg)' }} /></div>
             </div>
           </div>
         </button>
