@@ -10,6 +10,7 @@ import {
   Briefcase, Star, TrendingUp, CheckCircle,
   BarChart2, RefreshCw, Truck, Clock,
   Award, Pencil, LogOut, X, Save, Camera,
+  Download, Trash2, AlertTriangle,
 } from 'lucide-react';
 
 const fadeUp = {
@@ -60,6 +61,58 @@ const STATS_BY_ROLE = {
     { Icon: BarChart2,   label: 'Avg Rating',     val: p => `${p?.product_rating || 4.4}★`,              color: CL.gold  },
   ],
 };
+
+function DeleteAccountModal({ onClose, onDeleted }) {
+  const [confirmText, setConfirmText] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleDelete = async () => {
+    setError(''); setLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/api/delete-account', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Could not delete account.');
+      await onDeleted();
+    } catch (e) {
+      setError(e.message || 'Something went wrong. Please try again.');
+    } finally { setLoading(false); }
+  };
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(10,22,40,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={onClose}>
+      <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} onClick={e => e.stopPropagation()}
+        style={{ width: '100%', maxWidth: 420, background: CL.bg, borderRadius: 20, padding: 26 }}>
+        <div style={{ width: 48, height: 48, borderRadius: 14, background: CL.redSoft, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+          <AlertTriangle size={24} color={CL.red} />
+        </div>
+        <div style={{ color: CL.text, fontSize: 18, fontWeight: 800, marginBottom: 8 }}>Delete your account?</div>
+        <p style={{ color: CL.muted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>
+          This permanently removes your personal details (name, phone, email, photo) and signs you out everywhere. You can't undo this.
+          Job and payout records are kept in anonymized form as required by law.
+          {' '}Any active jobs, wallet balance, or held security deposit must be cleared first.
+        </p>
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ color: CL.muted, fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 8 }}>Type DELETE to confirm</div>
+          <input value={confirmText} onChange={e => setConfirmText(e.target.value)} placeholder="DELETE"
+            style={{ width: '100%', padding: '13px 14px', borderRadius: 11, border: `1px solid ${CL.border}`, background: CL.surface, color: CL.text, fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+        </div>
+        {error && <div style={{ background: CL.redSoft, border: `1px solid ${CL.red}40`, borderRadius: 11, padding: '11px 14px', color: CL.red, fontSize: 13, marginBottom: 16, fontWeight: 600 }}>{error}</div>}
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button onClick={onClose} style={{ flex: 1, padding: '13px', borderRadius: 12, border: `1px solid ${CL.border}`, background: CL.surface, color: CL.text, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Cancel</button>
+          <button onClick={handleDelete} disabled={confirmText !== 'DELETE' || loading}
+            style={{ flex: 1, padding: '13px', borderRadius: 12, border: 'none', background: CL.red, color: '#fff', fontSize: 14, fontWeight: 700, cursor: confirmText !== 'DELETE' || loading ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: confirmText !== 'DELETE' || loading ? 0.5 : 1 }}>
+            {loading ? 'Deleting…' : 'Delete account'}
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
 
 function EditModal({ profile, role, onClose, onSave }) {
   const [form, setForm] = useState({
@@ -117,6 +170,8 @@ export default function ProfilePage() {
   const navigate = useNavigate();
   const { user, profile, logout, refreshProfile } = useAuth();
   const [showEdit,        setShowEdit]        = useState(false);
+  const [showDelete,      setShowDelete]      = useState(false);
+  const [exporting,       setExporting]       = useState(false);
   const [reviews,         setReviews]         = useState([]);
   const [revLoading,      setRevLoading]      = useState(false);
   const [avatarUrl,       setAvatarUrl]       = useState(null);
@@ -146,6 +201,32 @@ export default function ProfilePage() {
     : 'recently';
 
   const handleLogout = async () => { await logout(); navigate('/login'); };
+
+  const handleExport = async () => {
+    if (!user) return;
+    setExporting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/api/export-data', { headers: { Authorization: `Bearer ${session?.access_token}` } });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Could not export your data.');
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `fixera-partner-data-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      alert(e.message || 'Something went wrong exporting your data.');
+    } finally { setExporting(false); }
+  };
+
+  const handleAccountDeleted = async () => {
+    setShowDelete(false);
+    await logout();
+    navigate('/login');
+  };
+
   const handleSave   = async (form) => {
     await supabase.from('workers').update(form).eq('id', user.id);
     await refreshProfile();
@@ -325,6 +406,26 @@ export default function ProfilePage() {
         </div>
       </motion.div>
 
+      {/* Privacy */}
+      <motion.div custom={6.5} variants={fadeUp} initial="hidden" animate="show" style={{ marginBottom: 16 }}>
+        <div style={{ color: '#9BAAB8', fontSize: 11, fontWeight: 700, letterSpacing: 1.2, textTransform: 'uppercase', marginBottom: 10, paddingLeft: 4 }}>Privacy</div>
+        <div style={{ background: CL.surface, border: `1px solid ${CL.border}`, borderRadius: 16, overflow: 'hidden' }}>
+          <div onClick={handleExport} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', cursor: 'pointer' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 10, color: CL.text, fontSize: 14, fontWeight: 600 }}>
+              <Download size={16} color={CL.muted} /> {exporting ? 'Preparing export…' : 'Export my data'}
+            </span>
+            <span style={{ color: '#9BAAB8', fontSize: 13 }}>›</span>
+          </div>
+          <div style={{ height: 1, background: CL.border, marginLeft: 16 }} />
+          <div onClick={() => setShowDelete(true)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', cursor: 'pointer' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 10, color: CL.red, fontSize: 14, fontWeight: 600 }}>
+              <Trash2 size={16} color={CL.red} /> Delete my account
+            </span>
+            <span style={{ color: '#9BAAB8', fontSize: 13 }}>›</span>
+          </div>
+        </div>
+      </motion.div>
+
       {/* Logout */}
       <motion.button custom={7} variants={fadeUp} initial="hidden" animate="show" onClick={handleLogout} style={{
         width: '100%', padding: '15px', borderRadius: 14,
@@ -340,6 +441,7 @@ export default function ProfilePage() {
       </div>
 
       {showEdit && <EditModal profile={profile} role={role} onClose={() => setShowEdit(false)} onSave={handleSave} />}
+      {showDelete && <DeleteAccountModal onClose={() => setShowDelete(false)} onDeleted={handleAccountDeleted} />}
     </div>
   );
 }

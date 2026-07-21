@@ -1,11 +1,65 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Pencil, CalendarClock, FolderOpen, Search, Headphones, HelpCircle, FileText, ShieldCheck, Info, LogOut, ChevronRight, X, User } from 'lucide-react';
+import { Pencil, CalendarClock, FolderOpen, Search, Headphones, HelpCircle, FileText, ShieldCheck, Info, LogOut, ChevronRight, X, User, Download, Trash2, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { supabase } from '../../supabase';
 
 import { useCL } from '../../hooks/useCL';
+
+// ── Delete Account Modal ──
+function DeleteAccountModal({ onClose, onDeleted }) {
+  const CL = useCL();
+  const [confirmText, setConfirmText] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleDelete = async () => {
+    setError(''); setLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/api/delete-account', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Could not delete account.');
+      await onDeleted();
+    } catch (e) {
+      setError(e.message || 'Something went wrong. Please try again.');
+    } finally { setLoading(false); }
+  };
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(10,22,40,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={onClose}>
+      <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} onClick={e => e.stopPropagation()}
+        style={{ width: '100%', maxWidth: 420, background: CL.bg, borderRadius: 20, padding: 26 }}>
+        <div style={{ width: 48, height: 48, borderRadius: 14, background: CL.errorBg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+          <AlertTriangle size={24} color={CL.error} />
+        </div>
+        <div style={{ color: CL.text, fontSize: 18, fontWeight: 800, marginBottom: 8 }}>Delete your account?</div>
+        <p style={{ color: CL.muted, fontSize: 13, lineHeight: 1.6, marginBottom: 16 }}>
+          This permanently removes your personal details (name, phone, email, photo) and signs you out everywhere. You can't undo this.
+          Booking and payment records are kept in anonymized form as required by law.
+          {' '}Any active bookings must be completed or cancelled first.
+        </p>
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ color: CL.muted, fontSize: 11, fontWeight: 700, letterSpacing: 0.6, textTransform: 'uppercase', marginBottom: 8 }}>Type DELETE to confirm</div>
+          <input value={confirmText} onChange={e => setConfirmText(e.target.value)} placeholder="DELETE"
+            style={{ width: '100%', padding: '13px 14px', borderRadius: 11, border: `1px solid ${CL.border}`, background: CL.surface, color: CL.text, fontSize: 14, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box' }} />
+        </div>
+        {error && <div style={{ background: CL.errorBg, border: `1px solid ${CL.error}40`, borderRadius: 11, padding: '11px 14px', color: CL.error, fontSize: 13, marginBottom: 16, fontWeight: 600 }}>{error}</div>}
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button onClick={onClose} style={{ flex: 1, padding: '13px', borderRadius: 12, border: `1px solid ${CL.border}`, background: CL.surface, color: CL.text, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>Cancel</button>
+          <button onClick={handleDelete} disabled={confirmText !== 'DELETE' || loading}
+            style={{ flex: 1, padding: '13px', borderRadius: 12, border: 'none', background: CL.error, color: '#fff', fontSize: 14, fontWeight: 700, cursor: confirmText !== 'DELETE' || loading ? 'not-allowed' : 'pointer', fontFamily: 'inherit', opacity: confirmText !== 'DELETE' || loading ? 0.5 : 1 }}>
+            {loading ? 'Deleting…' : 'Delete account'}
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
 
 // ── Edit Profile Drawer ──
 function EditProfileDrawer({ profile, onClose, onSave }) {
@@ -75,6 +129,8 @@ export default function ProfilePage() {
   const navigate = useNavigate();
   const { profile, user, logout, updateProfile } = useAuth();
   const [showEdit, setShowEdit] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [stats, setStats] = useState({ total: 0, completed: 0 });
   const [statsLoad, setStatsLoad] = useState(true);
 
@@ -95,6 +151,31 @@ export default function ProfilePage() {
 
   const handleLogout = async () => { await logout(); navigate('/'); };
 
+  const handleExport = async () => {
+    if (!user) return;
+    setExporting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/api/export-data', { headers: { Authorization: `Bearer ${session?.access_token}` } });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Could not export your data.');
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `fixera-my-data-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      alert(e.message || 'Something went wrong exporting your data.');
+    } finally { setExporting(false); }
+  };
+
+  const handleAccountDeleted = async () => {
+    setShowDelete(false);
+    await logout();
+    navigate('/');
+  };
+
   const MENU_SECTIONS = [
     { title: 'Account', items: [
       { Icon: Pencil, label: 'Edit profile', onClick: () => setShowEdit(true) },
@@ -111,6 +192,10 @@ export default function ProfilePage() {
       { Icon: FileText,   label: 'Terms of service', onClick: () => navigate('/terms') },
       { Icon: ShieldCheck, label: 'Privacy policy',  onClick: () => navigate('/privacy') },
       { Icon: Info,       label: 'AI policy',        onClick: () => navigate('/ai-policy') },
+    ]},
+    { title: 'Privacy', items: [
+      { Icon: Download, label: exporting ? 'Preparing export…' : 'Export my data', onClick: handleExport },
+      { Icon: Trash2,   label: 'Delete my account', onClick: () => setShowDelete(true), danger: true },
     ]},
   ];
 
@@ -166,10 +251,10 @@ export default function ProfilePage() {
                   <div onClick={item.onClick} className="prof-row"
                     style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', cursor: 'pointer', transition: 'background 0.15s' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                      <div style={{ width: 38, height: 38, borderRadius: 11, background: CL.goldSoft, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                        <item.Icon size={18} color={CL.gold} strokeWidth={2} />
+                      <div style={{ width: 38, height: 38, borderRadius: 11, background: item.danger ? CL.errorBg : CL.goldSoft, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                        <item.Icon size={18} color={item.danger ? CL.error : CL.gold} strokeWidth={2} />
                       </div>
-                      <span style={{ color: CL.text, fontSize: 14, fontWeight: 600 }}>{item.label}</span>
+                      <span style={{ color: item.danger ? CL.error : CL.text, fontSize: 14, fontWeight: 600 }}>{item.label}</span>
                     </div>
                     <ChevronRight size={18} color={CL.light} />
                   </div>
@@ -192,6 +277,7 @@ export default function ProfilePage() {
       <style>{`.prof-row:hover{ background:#FAFBFC; }`}</style>
 
       {showEdit && <EditProfileDrawer profile={profile} onClose={() => setShowEdit(false)} onSave={updateProfile} />}
+      {showDelete && <DeleteAccountModal onClose={() => setShowDelete(false)} onDeleted={handleAccountDeleted} />}
     </div>
   );
 }

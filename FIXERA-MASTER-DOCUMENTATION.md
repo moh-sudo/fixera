@@ -1,6 +1,31 @@
 # 🏗️ FIXERA - MASTER DOCUMENTATION
-**Last Updated:** July 3, 2026  
-**Status:** EMAIL SYSTEM OVERHAULED — all transactional email was silently broken (serverless fns missing `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY`); now fixed & proven on BOTH apps via Resend from noreply@fixera.africa ✅ · `fixera.co.ke` → `fixera.africa` everywhere (~24 refs) ✅ · Zoho inboxes support@/partner@/info@/finance@/legal@ created + owner added as member (black hole fixed) ✅ · Partner ticket email alerts + confirmation added ✅ · Partner support UI de-emojified → Lucide ✅ · app.fixera.africa + partners.fixera.africa subdomains LIVE ✅ · Marketing site: Vercel + Google Analytics, real favicon/logo, emoji→Lucide, DNS live ✅ · Supabase Auth SMTP → Resend DONE (signup/reset/magic-link now send from noreply@fixera.africa via smtp.resend.com; verified — reset email arrived branded "Fixera") ✅ · Project now backed up to private GitHub `github.com/moh-sudo/fixera` (auto commit+push established alongside doc updates) ✅ · SPF + DKIM live for fixera.africa (Zoho outbound now authenticated; Resend already was) ✅ · Support/ops contact-center blueprint saved to memory · Agent/Team management system BUILT (admin Team screen, create/list/update/revoke staff via /api/admin-team, Verification/HR + Trust&Safety roles, ticket-assign dropdown) — needs `migrations/extend_admin_roles.sql` run in Supabase ✅ · **PENDING:** run extend_admin_roles.sql, migrate broadcast-announcement.js off Gmail, 8x8 phone layer, workflow automation
+**Last Updated:** July 21, 2026  
+**Status:** Admin dashboard full redesign COMPLETE (all ~36 sections + gap-scan cleanup + Live Ops map light theme) ✅ · Data erasure + data export built (Kenya DPA 2019 rights, plan items 3.2/3.3) — **NEEDS `migrations/create_data_privacy.sql` run in Supabase before it works** ⚠️ · Fixed duplicate-logo bug on customer Sign Up page ✅ · Earlier: email system overhaul (Resend on both apps), fixera.co.ke → fixera.africa, Zoho inboxes fixed, subdomains live, Agent/Team management built · **PENDING:** run create_data_privacy.sql, migrate broadcast-announcement.js off Gmail, 8x8 phone layer, workflow automation, Phase 3 items 3.7/3.8 (SLA enforcement, both now unblocked)
+
+---
+
+## 🆕 SESSION SUMMARY (July 21, 2026 — Data Erasure & Export, Kenya DPA 2019 compliance — plan items 3.2/3.3)
+
+### Built the right to erasure + right to data portability
+Picked up from the execution-plan checklist (Phase 3, legal/compliance track): items 3.2 (data erasure) and 3.3 (data export). Both are now built and deployed on **both apps**.
+
+**Key design decision — never delete the `auth.users` row.** Checked FK constraints across the schema first: `receipts.customer_id`, `reviews.reviewer_id/reviewee_id`, and `wallet_transactions.worker_id` all `REFERENCES auth.users(id) ON DELETE CASCADE`. Calling `supabase.auth.admin.deleteUser()` would have cascade-deleted a user's receipts, reviews, and wallet transaction history — destroying the *other* party's records too (a partner's review thread, a customer's paid receipt) and blowing away exactly the financial records Kenyan tax law requires retaining. Erasure instead: anonymizes PII columns on `profiles`/`workers` (name → "Deleted User", email → `deleted-{id}@erased.fixera.africa`, phone/city/avatar/national ID → null), sets a new `deleted_at` timestamp, and disables login via `auth.admin.updateUserById()` (random password + placeholder email) — the auth row and all FK-linked financial/review records stay intact, just no longer traceable to a real identity.
+
+**Blockers before erasure is allowed:**
+- Customer (`web/api/delete-account.js`): any booking not `completed`/`cancelled` blocks the request.
+- Partner (`worker/api/delete-account.js`): any active job, a positive `wallet_balance`, or a `security_deposit_status = 'held'` all block the request (must withdraw / resolve deposit first).
+
+Both endpoints also scrub the PII snapshot (`user_name`/`user_email`) left on past `support_tickets` rows, and log every completed erasure to a new `data_erasure_log` audit table (for compliance evidence — who, when, which role).
+
+**Data export** (`web/api/export-data.js`, `worker/api/export-data.js`): bundles profile + bookings/jobs + receipts/wallet transactions + reviews + support tickets scoped to `auth.uid()` into one JSON payload; the client wraps it in a Blob and triggers a browser download — no server-side file storage involved.
+
+**UI:** added a new "Privacy" section to both apps' `ProfilePage.jsx` (customer: after Legal, before Logout) with "Export my data" and "Delete my account" (red). Delete opens a confirmation modal requiring the user to type `DELETE` before the button enables, explains what's kept vs. anonymized, and on success logs the user out and redirects home.
+
+**⚠️ PENDING — must run before this works in production:** `migrations/create_data_privacy.sql` (adds `profiles.deleted_at`, `workers.deleted_at`, creates `data_erasure_log`) has NOT yet been run in Supabase. The endpoints will 500 on the `deleted_at` column / `data_erasure_log` insert until it's run.
+
+**Scope note for future review:** this is a first pass. `bookings.address` and other job-level PII snapshots are intentionally left untouched (treated as transaction records, not identity data) — a stricter reading of DPA 2019 might want those redacted too, but that would touch a lot more of the schema; flagged here rather than done silently. Also: erasure doesn't retroactively scrub a deleted user's name out of admin-facing displays that join live (e.g., `bookings.worker_name` snapshots) — those are point-in-time text snapshots by design, not violated by this change, but worth knowing.
+
+Execution plan (`fixera-execution-plan` memory) updated: 3.2 and 3.3 marked complete. While in there, also corrected 3 stale items that were marked pending but already built in earlier work (4.1 admin live map, 4.9 revenue forecast) or partially built (4.10 tax report — real data yes, P9 forms still missing), and noted 3.7/3.8 (refund/dispute SLA enforcement) are now unblocked since their dependencies (1.11, 2.7) are both done.
 
 ---
 
