@@ -7378,63 +7378,49 @@ function RevenueForecastSection() {
   }, []);
 
   const fmt = v => `KES ${Number(v||0).toLocaleString('en-KE',{maximumFractionDigits:0})}`;
-  const momColor = stats.momGrowth === null ? '#aaa' : parseFloat(stats.momGrowth) >= 0 ? '#1cc88a' : '#e74a3b';
+  const momColor = stats.momGrowth === null ? 'var(--muted)' : parseFloat(stats.momGrowth) >= 0 ? 'var(--green)' : 'var(--red)';
 
   return (
     <>
       <PageHeader title="Revenue Forecast" sub="Weekly actuals, 10% growth target, and 4-week linear forecast" />
-      <div className="row mb-4">
-        <div className="col-md-3 mb-2">
-          <StatCard icon="📅" label="This Month"    value={fmt(stats.thisMonth)}  color="#4e73df" />
-        </div>
-        <div className="col-md-3 mb-2">
-          <StatCard icon="📆" label="Last Month"    value={fmt(stats.lastMonth)}  color="#36b9cc" />
-        </div>
-        <div className="col-md-3 mb-2">
-          <StatCard icon="📈" label="MoM Growth"
-            value={stats.momGrowth !== null ? `${parseFloat(stats.momGrowth) >= 0 ? '+' : ''}${stats.momGrowth}%` : '—'}
-            color={momColor}
-            sub={parseFloat(stats.momGrowth) >= 0 ? 'Growing' : 'Declining'}
-          />
-        </div>
-        <div className="col-md-3 mb-2">
-          <StatCard icon="📊" label="Weekly Avg"   value={fmt(stats.weeklyAvg)}  color="#C9A020" />
-        </div>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', gap:12, marginBottom:22 }}>
+        <StatCard icon={<Clock size={22} color="var(--blue)" />} label="This Month" value={fmt(stats.thisMonth)} color="var(--blue)" />
+        <StatCard icon={<Clock size={22} color="#36b9cc" />} label="Last Month" value={fmt(stats.lastMonth)} color="#36b9cc" />
+        <StatCard icon={<TrendingUp size={22} color={momColor} />} label="MoM Growth"
+          value={stats.momGrowth !== null ? `${parseFloat(stats.momGrowth) >= 0 ? '+' : ''}${stats.momGrowth}%` : '—'}
+          color={momColor}
+          sub={parseFloat(stats.momGrowth) >= 0 ? 'Growing' : 'Declining'}
+        />
+        <StatCard icon={<BarChart3 size={22} color="var(--gold)" />} label="Weekly Avg" value={fmt(stats.weeklyAvg)} color="var(--gold)" />
       </div>
 
       {loading ? <Spinner /> : weekly.length === 0 ? (
-        <div className="text-center py-5 text-gray-500">No payment data found for the last 16 weeks.</div>
+        <div style={{ textAlign:'center', padding:'48px 0', color:'var(--muted)' }}>No payment data found for the last 16 weeks.</div>
       ) : (
         <>
           {/* Main chart */}
-          <div className="admin-card mb-4">
-            <div className="admin-card-header d-flex justify-content-between align-items-center">
+          <div className="admin-card" style={{ marginBottom:20 }}>
+            <div className="admin-card-header">
               <span>Weekly Revenue — Actual vs Target vs Forecast</span>
               <div style={{ display:'flex', gap:16, fontSize:11 }}>
-                <span style={{ color:'#4e73df' }}>■ Actual</span>
-                <span style={{ color:'#f6c23e' }}>— Target (+10%)</span>
-                <span style={{ color:'#FC8181' }}>--- Forecast</span>
+                <span style={{ color:'var(--blue)' }}>■ Actual</span>
+                <span style={{ color:'var(--amber)' }}>— Target (+10%)</span>
+                <span style={{ color:'var(--red)' }}>--- Forecast</span>
               </div>
             </div>
-            <div className="card-body">
+            <div style={{ padding:16 }}>
               <ResponsiveContainer width="100%" height={320}>
                 <LineChart data={weekly} margin={{ top:10, right:20, left:0, bottom:0 }}>
-                  <defs>
-                    <linearGradient id="actualGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%"  stopColor="#4e73df" stopOpacity={0.2} />
-                      <stop offset="95%" stopColor="#4e73df" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e3e6f0" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--line)" />
                   <XAxis dataKey="label" tick={{ fontSize:10 }} interval={1} />
                   <YAxis tick={{ fontSize:10 }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
                   <Tooltip
                     formatter={(v, name) => [v ? fmt(v) : '—', name]}
                     labelStyle={{ fontWeight:700 }}
                   />
-                  <Line type="monotone" dataKey="actual"   stroke="#4e73df" strokeWidth={2.5} dot={{ r:3 }}   connectNulls={false} name="Actual" />
-                  <Line type="monotone" dataKey="target"   stroke="#f6c23e" strokeWidth={1.5} strokeDasharray="6 3" dot={false} name="Target" connectNulls />
-                  <Line type="monotone" dataKey="forecast" stroke="#FC8181" strokeWidth={2}   strokeDasharray="8 4" dot={{ r:3, fill:'#FC8181' }} connectNulls={false} name="Forecast" />
+                  <Line type="monotone" dataKey="actual"   stroke="var(--blue)" strokeWidth={2.5} dot={{ r:3 }}   connectNulls={false} name="Actual" />
+                  <Line type="monotone" dataKey="target"   stroke="var(--amber)" strokeWidth={1.5} strokeDasharray="6 3" dot={false} name="Target" connectNulls />
+                  <Line type="monotone" dataKey="forecast" stroke="var(--red)" strokeWidth={2}   strokeDasharray="8 4" dot={{ r:3, fill:'var(--red)' }} connectNulls={false} name="Forecast" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -7452,16 +7438,16 @@ function RevenueForecastSection() {
                   const diff = w.actual && w.target ? w.actual - w.target : null;
                   return (
                     <tr key={i} style={{ opacity: w.actual === null ? 0.55 : 1 }}>
-                      <td className="text-xs text-gray-600">
+                      <td style={{ color:'var(--ink-2)' }}>
                         {w.label}
-                        {w.actual === null && <span className="sb-badge sb-badge-secondary ml-2" style={{ fontSize:9 }}>FORECAST</span>}
+                        {w.actual === null && <span style={{ fontSize:9, fontWeight:700, background:'var(--canvas)', color:'var(--muted)', padding:'2px 6px', borderRadius:999, marginLeft:8 }}>FORECAST</span>}
                       </td>
-                      <td className="text-xs font-weight-bold" style={{ color: w.actual ? '#4e73df' : '#aaa' }}>
+                      <td style={{ fontWeight:700, color: w.actual ? 'var(--blue)' : 'var(--muted)' }}>
                         {w.actual ? fmt(w.actual) : '—'}
                       </td>
-                      <td className="text-xs text-gray-600">{w.target ? fmt(w.target) : '—'}</td>
-                      <td className="text-xs" style={{ color:'#FC8181' }}>{w.forecast ? fmt(w.forecast) : '—'}</td>
-                      <td className="text-xs font-weight-bold" style={{ color: diff === null ? '#aaa' : diff >= 0 ? '#1cc88a' : '#e74a3b' }}>
+                      <td style={{ color:'var(--ink-2)' }}>{w.target ? fmt(w.target) : '—'}</td>
+                      <td style={{ color:'var(--red)' }}>{w.forecast ? fmt(w.forecast) : '—'}</td>
+                      <td style={{ fontWeight:700, color: diff === null ? 'var(--muted)' : diff >= 0 ? 'var(--green)' : 'var(--red)' }}>
                         {diff === null ? '—' : `${diff >= 0 ? '+' : ''}${fmt(Math.abs(diff))}`}
                       </td>
                     </tr>
@@ -7506,12 +7492,12 @@ function PartnerAvailabilitySection() {
   }, [load]);
 
   const ROLES = [
-    { key:'worker',        icon:'🔧', label:'Workers',        color:'#C9A020' },
-    { key:'rider',         icon:'🚗', label:'Riders',         color:'#48BB78' },
-    { key:'vendor',        icon:'🏪', label:'Vendors',        color:'#fd7e14' },
-    { key:'mover',         icon:'🚚', label:'Movers',         color:'#9F7AEA' },
-    { key:'water_carrier', icon:'🚰', label:'Water Carriers', color:'#00B5D8' },
-    { key:'supplier',      icon:'📦', label:'Suppliers',      color:'#FC8181' },
+    { key:'worker',        Icon:Wrench,   label:'Workers',        color:'var(--gold)' },
+    { key:'rider',         Icon:Bike,     label:'Riders',         color:'var(--green)' },
+    { key:'vendor',        Icon:Store,    label:'Vendors',        color:'var(--amber)' },
+    { key:'mover',         Icon:Truck,    label:'Movers',         color:'var(--violet)' },
+    { key:'water_carrier', Icon:Droplets, label:'Water Carriers', color:'#00B5D8' },
+    { key:'supplier',      Icon:Package,  label:'Suppliers',      color:'var(--red)' },
   ];
 
   const byRole = {};
@@ -7531,52 +7517,42 @@ function PartnerAvailabilitySection() {
   const totalOnline  = partners.filter(p => p.status === 'online').length;
   const totalAll     = partners.length;
   const coveragePct  = totalAll > 0 ? Math.round((totalOnline / totalAll) * 100) : 0;
-  const coverageColor = coveragePct >= 50 ? '#1cc88a' : coveragePct >= 25 ? '#f6c23e' : '#e74a3b';
+  const coverageColor = coveragePct >= 50 ? 'var(--green)' : coveragePct >= 25 ? 'var(--amber)' : 'var(--red)';
 
   return (
     <>
       <PageHeader title="Partner Availability" sub="Live online/offline status across all approved partners — refreshes every 30 seconds" />
 
       {/* Summary bar */}
-      <div className="row mb-4">
-        <div className="col-md-3 mb-2">
-          <StatCard icon="🟢" label="Online Now"  value={totalOnline}            color="#1cc88a" sub="Active partners" />
-        </div>
-        <div className="col-md-3 mb-2">
-          <StatCard icon="⚫" label="Offline"     value={totalAll - totalOnline} color="#6c757d" sub="Not taking jobs" />
-        </div>
-        <div className="col-md-3 mb-2">
-          <StatCard icon="📊" label="Coverage"    value={`${coveragePct}%`}      color={coverageColor} sub="Of approved partners" />
-        </div>
-        <div className="col-md-3 mb-2">
-          <StatCard icon="🕐" label="Last Refresh"
-            value={lastRefresh ? lastRefresh.toLocaleTimeString('en-KE', { hour:'2-digit', minute:'2-digit', second:'2-digit' }) : '—'}
-            color="#36b9cc" sub="Auto-refreshes 30s"
-          />
-        </div>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', gap:12, marginBottom:22 }}>
+        <StatCard icon={<Circle size={22} fill="var(--green)" color="var(--green)" />} label="Online Now" value={totalOnline} color="var(--green)" sub="Active partners" />
+        <StatCard icon={<Circle size={22} color="var(--muted)" />} label="Offline" value={totalAll - totalOnline} color="var(--muted)" sub="Not taking jobs" />
+        <StatCard icon={<BarChart3 size={22} color={coverageColor} />} label="Coverage" value={`${coveragePct}%`} color={coverageColor} sub="Of approved partners" />
+        <StatCard icon={<Clock size={22} color="#36b9cc" />} label="Last Refresh"
+          value={lastRefresh ? lastRefresh.toLocaleTimeString('en-KE', { hour:'2-digit', minute:'2-digit', second:'2-digit' }) : '—'}
+          color="#36b9cc" sub="Auto-refreshes 30s"
+        />
       </div>
 
       {loading ? <Spinner /> : (
         <>
           {/* Role cards grid */}
-          <div className="row mb-4">
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))', gap:12, marginBottom:22 }}>
             {ROLES.map(role => {
               const d = byRole[role.key];
               const pct = d.total > 0 ? Math.round((d.online / d.total) * 100) : 0;
-              const statusColor = pct >= 50 ? '#1cc88a' : pct >= 20 ? '#f6c23e' : '#e74a3b';
+              const statusColor = pct >= 50 ? 'var(--green)' : pct >= 20 ? 'var(--amber)' : 'var(--red)';
               return (
-                <div key={role.key} className="col-md-4 col-lg-2 mb-3">
-                  <div className="admin-card h-100" style={{ borderTop: `3px solid ${role.color}` }}>
-                    <div className="card-body p-3">
-                      <div style={{ fontSize:24, marginBottom:6 }}>{role.icon}</div>
-                      <div className="text-xs font-weight-bold text-gray-800 mb-1">{role.label}</div>
-                      <div style={{ fontSize:22, fontWeight:900, color: role.color }}>{d.online}</div>
-                      <div className="text-xs text-gray-500">/ {d.total} total</div>
-                      <div style={{ marginTop:8, height:5, background:'#e3e6f0', borderRadius:3, overflow:'hidden' }}>
-                        <div style={{ width:`${pct}%`, height:'100%', background:statusColor, borderRadius:3 }} />
-                      </div>
-                      <div className="text-xs mt-1 font-weight-bold" style={{ color: statusColor }}>{pct}% online</div>
+                <div key={role.key} className="admin-card" style={{ borderTop: `3px solid ${role.color}` }}>
+                  <div style={{ padding:14 }}>
+                    <div className="stat-ico" style={{ width:32, height:32, background:`${role.color}18`, marginBottom:8 }}><role.Icon size={16} color={role.color} /></div>
+                    <div style={{ fontSize:11.5, fontWeight:700, color:'var(--ink)', marginBottom:4 }}>{role.label}</div>
+                    <div style={{ fontSize:20, fontWeight:800, color: role.color }}>{d.online}</div>
+                    <div style={{ fontSize:11, color:'var(--muted)' }}>/ {d.total} total</div>
+                    <div style={{ marginTop:8, height:5, background:'var(--line)', borderRadius:3, overflow:'hidden' }}>
+                      <div style={{ width:`${pct}%`, height:'100%', background:statusColor, borderRadius:3 }} />
                     </div>
+                    <div style={{ fontSize:11, marginTop:4, fontWeight:700, color: statusColor }}>{pct}% online</div>
                   </div>
                 </div>
               );
@@ -7586,12 +7562,12 @@ function PartnerAvailabilitySection() {
           {/* Area breakdown */}
           <div className="admin-card">
             <div className="admin-card-header">Coverage by Area</div>
-            <div className="card-body p-0">
+            <div style={{ padding:0 }}>
               <table className="admin-table">
                 <thead>
                   <tr>
                     <th>Area</th>
-                    {ROLES.map(r => <th key={r.key}>{r.icon} {r.label.split(' ')[0]}</th>)}
+                    {ROLES.map(r => <th key={r.key}>{r.label.split(' ')[0]}</th>)}
                     <th>Total Online</th>
                   </tr>
                 </thead>
@@ -7605,23 +7581,23 @@ function PartnerAvailabilitySection() {
                       const rowTotal  = ROLES.reduce((s, r) => s + (byRole[r.key].cities[area]?.total  || 0), 0);
                       return (
                         <tr key={area}>
-                          <td className="font-weight-bold text-gray-800 text-xs">{area}</td>
+                          <td style={{ fontWeight:700, color:'var(--ink)' }}>{area}</td>
                           {ROLES.map(role => {
                             const city = byRole[role.key].cities[area];
-                            if (!city) return <td key={role.key} className="text-xs text-gray-300">—</td>;
-                            const c = city.online === 0 ? '#e74a3b' : city.online < city.total / 2 ? '#f6c23e' : '#1cc88a';
+                            if (!city) return <td key={role.key} style={{ color:'var(--line-2)' }}>—</td>;
+                            const c = city.online === 0 ? 'var(--red)' : city.online < city.total / 2 ? 'var(--amber)' : 'var(--green)';
                             return (
                               <td key={role.key}>
-                                <span className="font-weight-bold text-xs" style={{ color: c }}>{city.online}</span>
-                                <span className="text-xs text-gray-400">/{city.total}</span>
+                                <span style={{ fontWeight:700, color: c }}>{city.online}</span>
+                                <span style={{ color:'var(--muted)' }}>/{city.total}</span>
                               </td>
                             );
                           })}
                           <td>
-                            <span className="font-weight-bold text-xs" style={{ color: rowOnline === 0 ? '#e74a3b' : '#1cc88a' }}>
+                            <span style={{ fontWeight:700, color: rowOnline === 0 ? 'var(--red)' : 'var(--green)' }}>
                               {rowOnline}
                             </span>
-                            <span className="text-xs text-gray-400">/{rowTotal}</span>
+                            <span style={{ color:'var(--muted)' }}>/{rowTotal}</span>
                           </td>
                         </tr>
                       );
