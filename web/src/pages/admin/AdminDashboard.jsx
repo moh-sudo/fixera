@@ -1685,147 +1685,135 @@ function AnalyticsSection() {
 
   if (loading) return <Spinner />;
 
-  const PIE_COLORS = ['#C9A020','#17a2b8','#1cc88a','#fd7e14','#4e73df','#e74a3b'];
+  const PIE_COLORS = ['#C9A020','#3B82F6','#16A34A','#F59E0B','#7C6CF0','#EF4444'];
 
   return (
     <>
       <PageHeader title="Analytics" sub="Platform performance and insights — all charts are live data" />
 
-      {/* Row 1: Revenue + Customer Growth */}
-      <div className="row mb-4">
-        <div className="col-lg-8 mb-4">
-          <div className="admin-card h-100">
-            <div className="admin-card-header">💰 Monthly Revenue Overview (KSh)</div>
-            <div className="card-body">
-              {data.revenueData.length === 0 ? (
-                <div className="text-center py-5 text-gray-500">No revenue data yet</div>
-              ) : (
-                <ResponsiveContainer width="100%" height={260}>
-                  <AreaChart data={data.revenueData} margin={{ top:10, right:20, left:10, bottom:5 }}>
-                    <defs>
-                      <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%"  stopColor="#1cc88a" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#1cc88a" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="month" tick={{ fontSize:11 }} />
-                    <YAxis tick={{ fontSize:11 }} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
-                    <Tooltip formatter={v => [`KSh ${v.toLocaleString()}`, 'Revenue']} />
-                    <Area type="monotone" dataKey="revenue" stroke="#1cc88a" strokeWidth={2.5} fill="url(#areaGrad)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              )}
-            </div>
+      {/* Row 1: Revenue + Partners by Role */}
+      <div style={{ display:'grid', gridTemplateColumns:'1.6fr 1fr', gap:18, marginBottom:20 }}>
+        <div className="admin-card" style={{ marginBottom:0 }}>
+          <div className="admin-card-header">Monthly Revenue Overview (KSh)</div>
+          <div style={{ padding:'14px 12px 10px' }}>
+            {data.revenueData.length === 0 ? (
+              <div style={{ textAlign:'center', padding:'40px 0', color:'var(--muted)' }}>No revenue data yet</div>
+            ) : (
+              <ResponsiveContainer width="100%" height={260}>
+                <AreaChart data={data.revenueData} margin={{ top:10, right:20, left:10, bottom:5 }}>
+                  <defs>
+                    <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%"  stopColor="#16A34A" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#16A34A" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#EDF0F5" />
+                  <XAxis dataKey="month" tick={{ fontSize:11, fill:'#7A8699' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize:11, fill:'#7A8699' }} tickLine={false} axisLine={false} tickFormatter={v => `${(v/1000).toFixed(0)}k`} />
+                  <Tooltip contentStyle={{ borderRadius:12, border:'1px solid #EDF0F5', fontSize:13 }} formatter={v => [`KSh ${v.toLocaleString()}`, 'Revenue']} />
+                  <Area type="monotone" dataKey="revenue" stroke="#16A34A" strokeWidth={2.5} fill="url(#areaGrad)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
 
-        <div className="col-lg-4 mb-4">
-          <div className="admin-card h-100">
-            <div className="admin-card-header">👥 Partners by Role</div>
-            <div className="card-body">
-              {data.roleData.length === 0 ? (
-                <div className="text-center py-5 text-gray-500">No data yet</div>
-              ) : (
-                <>
-                  <ResponsiveContainer width="100%" height={180}>
-                    <PieChart>
-                      <Pie data={data.roleData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" nameKey="name" paddingAngle={3}>
-                        {data.roleData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
-                      </Pie>
-                      <Tooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <div className="mt-2">
-                    {data.roleData.map((r, i) => (
-                      <div key={r.name} className="d-flex justify-content-between align-items-center py-1">
-                        <div className="d-flex align-items-center gap-2">
-                          <div style={{ width:10, height:10, borderRadius:'50%', background:PIE_COLORS[i%PIE_COLORS.length], flexShrink:0 }} />
-                          <span className="text-xs text-gray-600 ml-1 text-capitalize">{r.name}</span>
-                        </div>
-                        <span className="text-xs font-weight-bold">{r.value}</span>
+        <div className="admin-card" style={{ marginBottom:0 }}>
+          <div className="admin-card-header">Partners by Role</div>
+          <div style={{ padding:'14px 16px' }}>
+            {data.roleData.length === 0 ? (
+              <div style={{ textAlign:'center', padding:'40px 0', color:'var(--muted)' }}>No data yet</div>
+            ) : (
+              <>
+                <ResponsiveContainer width="100%" height={180}>
+                  <PieChart>
+                    <Pie data={data.roleData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" nameKey="name" paddingAngle={3}>
+                      {data.roleData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
+                    </Pie>
+                    <Tooltip contentStyle={{ borderRadius:12, border:'1px solid #EDF0F5', fontSize:13 }} />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div style={{ marginTop:10 }}>
+                  {data.roleData.map((r, i) => (
+                    <div key={r.name} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'5px 0' }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:7 }}>
+                        <div style={{ width:9, height:9, borderRadius:'50%', background:PIE_COLORS[i%PIE_COLORS.length], flexShrink:0 }} />
+                        <span style={{ fontSize:12, color:'var(--ink-2)', textTransform:'capitalize' }}>{r.name}</span>
                       </div>
-                    ))}
-                    <div className="d-flex justify-content-between mt-2 pt-2 border-top">
-                      <span className="text-xs text-gray-500">Avg Rating</span>
-                      <span className="text-xs font-weight-bold text-gold">⭐ {data.avgRating}</span>
+                      <span style={{ fontSize:12, fontWeight:700, color:'var(--ink)' }}>{r.value}</span>
                     </div>
+                  ))}
+                  <div style={{ display:'flex', justifyContent:'space-between', marginTop:8, paddingTop:8, borderTop:'1px solid var(--line)' }}>
+                    <span style={{ fontSize:11.5, color:'var(--muted)' }}>Avg Rating</span>
+                    <span style={{ fontSize:12, fontWeight:700, color:'var(--gold)', display:'inline-flex', alignItems:'center', gap:4 }}><Star size={12} fill="var(--gold)" /> {data.avgRating}</span>
                   </div>
-                </>
-              )}
-            </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
 
       {/* Row 2: Bookings by Service + Job Status */}
-      <div className="row mb-4">
-        <div className="col-lg-6 mb-4">
-          <div className="admin-card h-100">
-            <div className="admin-card-header">📊 Bookings by Service</div>
-            <div className="card-body">
-              {data.serviceData.length === 0 ? (
-                <div className="text-center py-5 text-gray-500">No booking data yet</div>
-              ) : (
-                <ResponsiveContainer width="100%" height={260}>
-                  <BarChart data={data.serviceData} margin={{ top:5, right:20, left:0, bottom:5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="service" tick={{ fontSize:11 }} />
-                    <YAxis tick={{ fontSize:11 }} />
-                    <Tooltip />
-                    <Bar dataKey="count" name="Bookings" fill="#C9A020" radius={[6,6,0,0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              )}
-            </div>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:18, marginBottom:20 }}>
+        <div className="admin-card" style={{ marginBottom:0 }}>
+          <div className="admin-card-header">Bookings by Service</div>
+          <div style={{ padding:'14px 12px 10px' }}>
+            {data.serviceData.length === 0 ? (
+              <div style={{ textAlign:'center', padding:'40px 0', color:'var(--muted)' }}>No booking data yet</div>
+            ) : (
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart data={data.serviceData} margin={{ top:5, right:20, left:0, bottom:5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#EDF0F5" />
+                  <XAxis dataKey="service" tick={{ fontSize:11, fill:'#7A8699' }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize:11, fill:'#7A8699' }} tickLine={false} axisLine={false} />
+                  <Tooltip contentStyle={{ borderRadius:12, border:'1px solid #EDF0F5', fontSize:13 }} />
+                  <Bar dataKey="count" name="Bookings" fill="#C9A020" radius={[6,6,0,0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
 
-        <div className="col-lg-6 mb-4">
-          <div className="admin-card h-100">
-            <div className="admin-card-header">📋 Job Status Breakdown</div>
-            <div className="card-body">
-              {data.statusData.length === 0 ? (
-                <div className="text-center py-5 text-gray-500">No data yet</div>
-              ) : (
-                <ResponsiveContainer width="100%" height={260}>
-                  <BarChart data={data.statusData} layout="vertical" margin={{ top:5, right:20, left:70, bottom:5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis type="number" tick={{ fontSize:11 }} />
-                    <YAxis type="category" dataKey="status" tick={{ fontSize:11 }} />
-                    <Tooltip />
-                    <Bar dataKey="count" name="Jobs" fill="#4e73df" radius={[0,6,6,0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              )}
-            </div>
+        <div className="admin-card" style={{ marginBottom:0 }}>
+          <div className="admin-card-header">Job Status Breakdown</div>
+          <div style={{ padding:'14px 12px 10px' }}>
+            {data.statusData.length === 0 ? (
+              <div style={{ textAlign:'center', padding:'40px 0', color:'var(--muted)' }}>No data yet</div>
+            ) : (
+              <ResponsiveContainer width="100%" height={260}>
+                <BarChart data={data.statusData} layout="vertical" margin={{ top:5, right:20, left:70, bottom:5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#EDF0F5" />
+                  <XAxis type="number" tick={{ fontSize:11, fill:'#7A8699' }} tickLine={false} axisLine={false} />
+                  <YAxis type="category" dataKey="status" tick={{ fontSize:11, fill:'#7A8699' }} tickLine={false} axisLine={false} />
+                  <Tooltip contentStyle={{ borderRadius:12, border:'1px solid #EDF0F5', fontSize:13 }} />
+                  <Bar dataKey="count" name="Jobs" fill="#3B82F6" radius={[0,6,6,0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
       </div>
 
       {/* Row 3: Customer Growth */}
-      <div className="row">
-        <div className="col-12 mb-4">
-          <div className="admin-card">
-            <div className="admin-card-header">🧑 Customer Growth Over Time</div>
-            <div className="card-body">
-              {data.customerData.length === 0 ? (
-                <div className="text-center py-5 text-gray-500">No customer data yet</div>
-              ) : (
-                <ResponsiveContainer width="100%" height={240}>
-                  <LineChart data={data.customerData} margin={{ top:10, right:20, left:10, bottom:5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="month" tick={{ fontSize:11 }} />
-                    <YAxis tick={{ fontSize:11 }} />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="new"   name="New Customers"   stroke="#36b9cc" strokeWidth={2} dot={{ r:4 }} />
-                    <Line type="monotone" dataKey="total" name="Total Customers"  stroke="#4e73df" strokeWidth={2} dot={{ r:4 }} />
-                  </LineChart>
-                </ResponsiveContainer>
-              )}
-            </div>
-          </div>
+      <div className="admin-card">
+        <div className="admin-card-header">Customer Growth Over Time</div>
+        <div style={{ padding:'14px 12px 10px' }}>
+          {data.customerData.length === 0 ? (
+            <div style={{ textAlign:'center', padding:'40px 0', color:'var(--muted)' }}>No customer data yet</div>
+          ) : (
+            <ResponsiveContainer width="100%" height={240}>
+              <LineChart data={data.customerData} margin={{ top:10, right:20, left:10, bottom:5 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#EDF0F5" />
+                <XAxis dataKey="month" tick={{ fontSize:11, fill:'#7A8699' }} tickLine={false} axisLine={false} />
+                <YAxis tick={{ fontSize:11, fill:'#7A8699' }} tickLine={false} axisLine={false} />
+                <Tooltip contentStyle={{ borderRadius:12, border:'1px solid #EDF0F5', fontSize:13 }} />
+                <Legend />
+                <Line type="monotone" dataKey="new"   name="New Customers"   stroke="#3B82F6" strokeWidth={2} dot={{ r:4 }} />
+                <Line type="monotone" dataKey="total" name="Total Customers" stroke="#7C6CF0" strokeWidth={2} dot={{ r:4 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
     </>
