@@ -1242,25 +1242,28 @@ function UsersSection() {
   return (
     <>
       <PageHeader title="Customer Accounts" sub="All registered customers on the platform" />
-      <input value={search} onChange={e => setSearch(e.target.value)} placeholder="🔍 Search by name or email..." className="form-control form-control-sm mb-3" style={{ maxWidth:400 }} />
+      <label className="topbar-search" style={{ maxWidth:340, marginBottom:18 }}>
+        <Search size={15} />
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name or email…" />
+      </label>
       {loading ? <Spinner /> : (
         <div className="admin-card">
-          <div className="table-responsive">
+          <div style={{ overflowX:'auto' }}>
             <table className="admin-table">
               <thead><tr><th>Name</th><th>Email</th><th>City</th><th>Joined</th><th>Status</th><th>Action</th></tr></thead>
               <tbody>
                 {filtered.length === 0 ? (
-                  <tr><td colSpan={6} className="text-center text-gray-500 py-4">No customers found</td></tr>
+                  <tr><td colSpan={6} style={{ textAlign:'center', color:'var(--muted)', padding:24 }}>No customers found</td></tr>
                 ) : filtered.map(u => (
                   <tr key={u.id}>
-                    <td className="font-weight-bold text-gray-800">{u.full_name || 'Customer'}</td>
-                    <td className="text-gray-600">{u.email}</td>
-                    <td className="text-gray-600">{u.city || 'Nairobi'}</td>
-                    <td className="text-gray-600">{new Date(u.created_at).toLocaleDateString('en-KE')}</td>
+                    <td style={{ fontWeight:700, color:'var(--ink)' }}>{u.full_name || 'Customer'}</td>
+                    <td style={{ color:'var(--ink-2)' }}>{u.email}</td>
+                    <td style={{ color:'var(--ink-2)' }}>{u.city || 'Nairobi'}</td>
+                    <td style={{ color:'var(--muted)' }}>{new Date(u.created_at).toLocaleDateString('en-KE')}</td>
                     <td>{u.is_suspended ? <span className="sb-badge sb-badge-danger">Suspended</span> : <span className="sb-badge sb-badge-success">Active</span>}</td>
                     <td>{u.is_suspended
-                      ? <button onClick={() => unsuspend(u.id)} className="btn btn-sm btn-success">Reinstate</button>
-                      : <button onClick={() => suspend(u.id)}   className="btn btn-sm btn-outline-danger">🚫 Suspend</button>}</td>
+                      ? <button onClick={() => unsuspend(u.id)} style={{ padding:'6px 12px', borderRadius:8, border:'none', background:'var(--green)', color:'#fff', fontSize:11.5, fontWeight:700, cursor:'pointer' }}>Reinstate</button>
+                      : <button onClick={() => suspend(u.id)} style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'6px 12px', borderRadius:8, border:'1px solid rgba(239,68,68,.3)', background:'rgba(239,68,68,.06)', color:'var(--red)', fontSize:11.5, fontWeight:700, cursor:'pointer' }}><Lock size={11} /> Suspend</button>}</td>
                   </tr>
                 ))}
               </tbody>
@@ -1281,12 +1284,12 @@ function JobModal({ job, onClose, onUpdated }) {
   const [saved,  setSaved]  = useState(false);
 
   const STATUS_FLOW = [
-    { k:'upcoming',    label:'⏳ Upcoming'    },
-    { k:'confirmed',   label:'✅ Confirmed'   },
-    { k:'on_way',      label:'🚗 On The Way'  },
-    { k:'in_progress', label:'🔧 In Progress' },
-    { k:'completed',   label:'🎉 Completed'   },
-    { k:'cancelled',   label:'❌ Cancelled'   },
+    { k:'upcoming',    label:'Upcoming',    Icon: Clock },
+    { k:'confirmed',   label:'Confirmed',   Icon: BadgeCheck },
+    { k:'on_way',      label:'On The Way',  Icon: Navigation },
+    { k:'in_progress', label:'In Progress', Icon: Wrench },
+    { k:'completed',   label:'Completed',   Icon: CheckCircle2 },
+    { k:'cancelled',   label:'Cancelled',   Icon: X },
   ];
 
   const save = async () => {
@@ -1305,71 +1308,75 @@ function JobModal({ job, onClose, onUpdated }) {
 
   return (
     <div className="job-modal-overlay" onClick={onClose}>
-      <div className="job-modal-panel" onClick={e => e.stopPropagation()}>
-        <div className="d-flex justify-content-between align-items-center p-3 border-bottom" style={{ background:'#f8f9fc' }}>
+      <div className="job-modal-panel" onClick={e => e.stopPropagation()} style={{ background:'var(--surface)' }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:16, borderBottom:'1px solid var(--line)', background:'var(--canvas)' }}>
           <div>
-            <div className="font-weight-bold text-gray-800">Manage Booking</div>
-            <div className="text-xs text-gray-500" style={{ fontFamily:'monospace' }}>#{job.id.slice(0,8).toUpperCase()}</div>
+            <div style={{ fontWeight:800, color:'var(--ink)' }}>Manage Booking</div>
+            <div style={{ fontSize:11.5, color:'var(--muted)', fontFamily:'ui-monospace,monospace' }}>#{job.id.slice(0,8).toUpperCase()}</div>
           </div>
-          <button onClick={onClose} className="btn btn-sm btn-outline-secondary">✕</button>
+          <button onClick={onClose} style={{ background:'none', border:'none', cursor:'pointer', color:'var(--muted)', display:'flex' }}><X size={18} /></button>
         </div>
 
-        <div className="p-3 flex-grow-1">
+        <div style={{ padding:16, flex:1 }}>
           {/* Service info */}
-          <div className="admin-card mb-3">
-            <div className="card-body py-2">
-              <div className="font-weight-bold text-gray-800 mb-2">{job.sub_service || job.service || '—'}</div>
+          <div className="admin-card">
+            <div style={{ padding:14 }}>
+              <div style={{ fontWeight:700, color:'var(--ink)', marginBottom:8 }}>{job.sub_service || job.service || '—'}</div>
               {[['Address',job.address],['Date',job.booking_date||job.scheduled_date],['Time',job.booking_time||job.scheduled_time],['Notes',job.notes]]
                 .map(([l,v]) => v && <InfoRow key={l} label={l} value={v} />)}
             </div>
           </div>
 
           {/* Worker */}
-          <div className="form-group">
-            <label className="text-xs font-weight-bold text-uppercase text-gray-500" style={{ letterSpacing:'0.05rem' }}>Assigned Worker</label>
-            <input value={worker} onChange={e => setWorker(e.target.value)} placeholder="Enter worker name..." className="form-control form-control-sm" />
+          <div style={{ marginBottom:16 }}>
+            <label style={{ fontSize:10.5, fontWeight:700, textTransform:'uppercase', letterSpacing:'.4px', color:'var(--muted)', display:'block', marginBottom:6 }}>Assigned Worker</label>
+            <input value={worker} onChange={e => setWorker(e.target.value)} placeholder="Enter worker name…"
+              style={{ width:'100%', boxSizing:'border-box', fontSize:12.5, padding:'9px 12px', border:'1px solid var(--line-2)', borderRadius:9, outline:'none', fontFamily:'inherit' }} />
           </div>
 
           {/* Price */}
-          <div className="form-group">
-            <label className="text-xs font-weight-bold text-uppercase text-gray-500" style={{ letterSpacing:'0.05rem' }}>Set Job Price (KSh)</label>
-            <div className="input-group input-group-sm">
-              <div className="input-group-prepend"><span className="input-group-text">KSh</span></div>
-              <input type="number" value={price} onChange={e => setPrice(e.target.value)} placeholder="e.g. 2500" className="form-control" />
-            </div>
+          <div style={{ marginBottom:16 }}>
+            <label style={{ fontSize:10.5, fontWeight:700, textTransform:'uppercase', letterSpacing:'.4px', color:'var(--muted)', display:'block', marginBottom:6 }}>Set Job Price (KSh)</label>
+            <input type="number" value={price} onChange={e => setPrice(e.target.value)} placeholder="e.g. 2500"
+              style={{ width:'100%', boxSizing:'border-box', fontSize:12.5, padding:'9px 12px', border:'1px solid var(--line-2)', borderRadius:9, outline:'none', fontFamily:'inherit' }} />
             {price_n > 0 && (
-              <div className="mt-2 p-2 rounded" style={{ background:'#fef3cd', border:'1px solid #ffc107', fontSize:12 }}>
-                <div className="d-flex justify-content-between"><span className="text-gray-600">Total fare</span><span className="font-weight-bold">KSh {price_n.toLocaleString()}</span></div>
-                <div className="d-flex justify-content-between"><span className="text-gray-600">Fixera (15%)</span><span className="font-weight-bold text-gold">KSh {commission.toLocaleString('en-KE',{maximumFractionDigits:0})}</span></div>
-                <hr className="my-1" />
-                <div className="d-flex justify-content-between"><span className="text-gray-600">Worker earns</span><span className="font-weight-bold text-success">KSh {proEarning.toLocaleString('en-KE',{maximumFractionDigits:0})}</span></div>
+              <div style={{ marginTop:10, padding:12, borderRadius:9, background:'var(--gold-soft)', border:'1px solid var(--gold-border, #E8D48A)', fontSize:12 }}>
+                <div style={{ display:'flex', justifyContent:'space-between', marginBottom:3 }}><span style={{ color:'var(--ink-2)' }}>Total fare</span><span style={{ fontWeight:700, color:'var(--ink)' }}>KSh {price_n.toLocaleString()}</span></div>
+                <div style={{ display:'flex', justifyContent:'space-between', marginBottom:3 }}><span style={{ color:'var(--ink-2)' }}>Fixera (15%)</span><span style={{ fontWeight:700, color:'var(--gold-2)' }}>KSh {commission.toLocaleString('en-KE',{maximumFractionDigits:0})}</span></div>
+                <div style={{ height:1, background:'var(--gold-border, #E8D48A)', margin:'6px 0' }} />
+                <div style={{ display:'flex', justifyContent:'space-between' }}><span style={{ color:'var(--ink-2)' }}>Worker earns</span><span style={{ fontWeight:700, color:'var(--green)' }}>KSh {proEarning.toLocaleString('en-KE',{maximumFractionDigits:0})}</span></div>
               </div>
             )}
           </div>
 
           {/* Status */}
-          <div className="form-group">
-            <label className="text-xs font-weight-bold text-uppercase text-gray-500" style={{ letterSpacing:'0.05rem' }}>Update Status</label>
+          <div style={{ marginBottom:14 }}>
+            <label style={{ fontSize:10.5, fontWeight:700, textTransform:'uppercase', letterSpacing:'.4px', color:'var(--muted)', display:'block', marginBottom:8 }}>Update Status</label>
             {STATUS_FLOW.map(s => (
-              <div key={s.k} onClick={() => setStatus(s.k)} className="p-2 mb-1 rounded d-flex justify-content-between align-items-center" style={{
-                cursor:'pointer', border:`1px solid ${status===s.k?'#C9A020':'#e3e6f0'}`,
-                background: status===s.k ? '#fef3cd' : '#f8f9fc',
-                color: status===s.k ? '#856404' : '#6e707e',
-                fontWeight: status===s.k ? 700 : 400, fontSize: 13,
+              <div key={s.k} onClick={() => setStatus(s.k)} style={{
+                display:'flex', alignItems:'center', gap:8, padding:'9px 12px', marginBottom:6, borderRadius:9, cursor:'pointer',
+                border:`1px solid ${status===s.k?'var(--gold)':'var(--line)'}`,
+                background: status===s.k ? 'var(--gold-soft)' : 'var(--canvas)',
+                color: status===s.k ? 'var(--gold-2)' : 'var(--ink-2)',
+                fontWeight: status===s.k ? 700 : 500, fontSize: 13,
               }}>
-                {s.label}{status===s.k && <span style={{color:'#C9A020'}}>●</span>}
+                <s.Icon size={14} /> {s.label}
+                {status===s.k && <span style={{ marginLeft:'auto', color:'var(--gold)' }}>●</span>}
               </div>
             ))}
           </div>
 
           {status === 'completed' && !price && (
-            <div className="alert alert-warning text-xs py-2">⚠️ Please set a price before marking as completed.</div>
+            <div style={{ display:'flex', alignItems:'center', gap:7, background:'var(--gold-soft)', color:'#92400E', borderRadius:9, padding:'9px 12px', fontSize:11.5, fontWeight:700 }}>
+              <ShieldAlert size={13} /> Please set a price before marking as completed.
+            </div>
           )}
         </div>
 
-        <div className="p-3 border-top">
-          <button onClick={save} disabled={saving||saved} className="btn btn-block font-weight-bold" style={{ background: saved?'#1cc88a':'#C9A020', color:'#fff', border:'none' }}>
-            {saved ? '✅ Saved!' : saving ? 'Saving...' : 'Save Changes'}
+        <div style={{ padding:16, borderTop:'1px solid var(--line)' }}>
+          <button onClick={save} disabled={saving||saved}
+            style={{ width:'100%', boxSizing:'border-box', display:'flex', alignItems:'center', justifyContent:'center', gap:7, padding:'11px', borderRadius:10, border:'none', background: saved?'var(--green)':'var(--gold)', color:'#fff', fontSize:13.5, fontWeight:700, cursor:'pointer' }}>
+            {saved ? <><BadgeCheck size={16} /> Saved!</> : saving ? 'Saving…' : 'Save Changes'}
           </button>
         </div>
       </div>
@@ -2728,18 +2735,18 @@ function QuotationsSection() {
   return (
     <>
       <PageHeader title="Quotations" sub="Inspection requests and quote pipeline" />
-      <div className="row mb-3">
-        <div className="col-md-3 mb-2"><StatCard icon="🔍" label="Total Inspections"  value={inspections.length}                                            color="#4e73df"/></div>
-        <div className="col-md-3 mb-2"><StatCard icon="⏳" label="Awaiting Review"    value={inspections.filter(i=>i.status==='under_review').length}       color="#f6c23e"/></div>
-        <div className="col-md-3 mb-2"><StatCard icon="📄" label="Total Quotations"   value={quotations.length}                                             color="#C9A020"/></div>
-        <div className="col-md-3 mb-2"><StatCard icon="⏰" label="Pending Approval"   value={quotations.filter(q=>q.status==='pending_approval').length}    color="#e74a3b"/></div>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', gap:14, marginBottom:20 }}>
+        <StatCard icon="🔍" label="Total Inspections" value={inspections.length}                                        color="var(--blue)"/>
+        <StatCard icon="⏳" label="Awaiting Review"   value={inspections.filter(i=>i.status==='under_review').length}   color="var(--amber)"/>
+        <StatCard icon="📄" label="Total Quotations"  value={quotations.length}                                         color="var(--gold)"/>
+        <StatCard icon="⏰" label="Pending Approval"  value={quotations.filter(q=>q.status==='pending_approval').length}color="var(--red)"/>
       </div>
 
-      <div className="mb-3 d-flex justify-content-between align-items-center flex-wrap" style={{gap:8}}>
+      <div style={{ marginBottom:18, display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:8 }}>
         <div>
           {['inspections','quotations'].map(t => (
             <FilterPill key={t} active={tab===t} onClick={()=>{setTab(t);setStatusFilter('all');}}>
-              {t==='inspections'?'🔍 Inspections':'📄 Quotations'}
+              <span style={{ display:'inline-flex', alignItems:'center', gap:6 }}>{t==='inspections'?<><Search size={13} /> Inspections</>:<><FileText size={13} /> Quotations</>}</span>
             </FilterPill>
           ))}
         </div>
@@ -2754,59 +2761,63 @@ function QuotationsSection() {
 
       {loading ? <Spinner/> : tab === 'inspections' ? (
         filteredIns.length === 0
-          ? <div className="text-center py-5"><div style={{fontSize:48}}>🔍</div><p className="text-gray-500 mt-2">No inspections found.</p></div>
+          ? <div style={{ textAlign:'center', padding:'56px 0' }}><Search size={40} color="var(--muted)" style={{ marginBottom:10 }} /><p style={{ color:'var(--muted)', margin:0 }}>No inspections found.</p></div>
           : (
+            <div className="admin-card"><div style={{ overflowX:'auto' }}>
             <table className="admin-table">
               <thead><tr><th>Service</th><th>Address</th><th>Status</th><th>Photos</th><th>Date</th></tr></thead>
               <tbody>
                 {filteredIns.map(i => (
                   <tr key={i.id}>
-                    <td className="text-xs font-weight-bold">{i.service_type || '—'}</td>
-                    <td className="text-xs text-gray-600" style={{maxWidth:200}}>{i.address || '—'}</td>
+                    <td style={{ fontWeight:700, color:'var(--ink)' }}>{i.service_type || '—'}</td>
+                    <td style={{ color:'var(--ink-2)', maxWidth:200 }}>{i.address || '—'}</td>
                     <td><SBBadge status={i.status}/></td>
-                    <td className="text-xs">{(i.photo_urls||[]).length > 0
-                      ? <div className="d-flex gap-1" style={{gap:4}}>
+                    <td>{(i.photo_urls||[]).length > 0
+                      ? <div style={{ display:'flex', gap:5 }}>
                           {(i.photo_urls||[]).slice(0,3).map((url,idx)=>(
                             <a key={idx} href={url} target="_blank" rel="noopener noreferrer">
-                              <img src={url} alt="" style={{width:32,height:32,objectFit:'cover',borderRadius:4,border:'1px solid #e3e6f0'}}/>
+                              <img src={url} alt="" style={{ width:32, height:32, objectFit:'cover', borderRadius:6, border:'1px solid var(--line)' }}/>
                             </a>
                           ))}
-                          {(i.photo_urls||[]).length > 3 && <span className="text-gray-500">+{(i.photo_urls||[]).length-3}</span>}
+                          {(i.photo_urls||[]).length > 3 && <span style={{ color:'var(--muted)', fontSize:11 }}>+{(i.photo_urls||[]).length-3}</span>}
                         </div>
-                      : <span className="text-gray-400">None</span>}
+                      : <span style={{ color:'var(--muted)' }}>None</span>}
                     </td>
-                    <td className="text-xs text-gray-500">{new Date(i.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'})}</td>
+                    <td style={{ color:'var(--muted)' }}>{new Date(i.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'})}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            </div></div>
           )
       ) : (
         filteredQuot.length === 0
-          ? <div className="text-center py-5"><div style={{fontSize:48}}>📄</div><p className="text-gray-500 mt-2">No quotations found.</p></div>
+          ? <div style={{ textAlign:'center', padding:'56px 0' }}><FileText size={40} color="var(--muted)" style={{ marginBottom:10 }} /><p style={{ color:'var(--muted)', margin:0 }}>No quotations found.</p></div>
           : (
+            <div className="admin-card"><div style={{ overflowX:'auto' }}>
             <table className="admin-table">
               <thead><tr><th>Service</th><th>Amount</th><th>Status</th><th>Expires</th><th>Date</th></tr></thead>
               <tbody>
                 {filteredQuot.map(q => (
                   <tr key={q.id}>
-                    <td className="text-xs font-weight-bold">{q.inspections?.service_type || q.service_type || '—'}</td>
-                    <td className="text-xs font-weight-bold" style={{color:'#C9A020'}}>
+                    <td style={{ fontWeight:700, color:'var(--ink)' }}>{q.inspections?.service_type || q.service_type || '—'}</td>
+                    <td style={{ fontWeight:700, color:'var(--gold)' }}>
                       {q.amount ? `KSh ${Number(q.amount).toLocaleString()}` : q.price_range || '—'}
                     </td>
                     <td><SBBadge status={q.status}/></td>
-                    <td className="text-xs text-gray-500">
+                    <td style={{ color:'var(--muted)' }}>
                       {q.expires_at
                         ? (new Date(q.expires_at) < new Date()
-                          ? <span className="text-danger">Expired</span>
+                          ? <span style={{ color:'var(--red)' }}>Expired</span>
                           : new Date(q.expires_at).toLocaleDateString('en-KE'))
                         : '—'}
                     </td>
-                    <td className="text-xs text-gray-500">{new Date(q.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'})}</td>
+                    <td style={{ color:'var(--muted)' }}>{new Date(q.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'})}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+            </div></div>
           )
       )}
     </>
