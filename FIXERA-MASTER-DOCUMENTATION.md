@@ -1,6 +1,22 @@
 # 🏗️ FIXERA - MASTER DOCUMENTATION
 **Last Updated:** July 21, 2026  
-**Status:** Admin dashboard full redesign COMPLETE (all ~36 sections + gap-scan cleanup + Live Ops map light theme) ✅ · Data erasure + data export built (Kenya DPA 2019 rights, plan items 3.2/3.3) — **NEEDS `migrations/create_data_privacy.sql` run in Supabase before it works** ⚠️ · Fixed duplicate-logo bug on customer Sign Up page ✅ · Earlier: email system overhaul (Resend on both apps), fixera.co.ke → fixera.africa, Zoho inboxes fixed, subdomains live, Agent/Team management built · **PENDING:** run create_data_privacy.sql, migrate broadcast-announcement.js off Gmail, 8x8 phone layer, workflow automation, Phase 3 items 3.7/3.8 (SLA enforcement, both now unblocked)
+**Status:** Admin dashboard full redesign COMPLETE (all ~36 sections + gap-scan cleanup + Live Ops map light theme) ✅ · Data erasure + data export built (Kenya DPA 2019 rights, plan items 3.2/3.3) — **NEEDS `migrations/create_data_privacy.sql` run in Supabase before it works** ⚠️ · **Found + fixed a real bug: approving a refund never actually credited the customer** — now wired to `createRefund()`+`execute_refund()` ✅ · Refund + dispute SLA tracking built (plan items 3.7/3.8) — visible on each ticket/dispute card + surfaced in Alerts Feed ✅ · Fixed duplicate-logo bug on customer Sign Up page ✅ · Earlier: email system overhaul (Resend on both apps), fixera.co.ke → fixera.africa, Zoho inboxes fixed, subdomains live, Agent/Team management built · **PENDING:** run create_data_privacy.sql, migrate broadcast-announcement.js off Gmail, 8x8 phone layer, workflow automation, pg_cron auto-escalation (4.2)
+
+---
+
+## 🆕 SESSION SUMMARY (July 21, 2026 — Refund bug fix + SLA enforcement — plan items 3.7/3.8)
+
+### Real bug found: approving a refund never credited the customer
+While scoping "refund SLA enforcement" (3.7), traced the actual refund flow in `RefundManagementSection` (`AdminDashboard.jsx`) and found it only ever updated `support_tickets.refund_decision` to `'approved'` — it never touched the `refunds` table or called the `execute_refund()` DB function (both built back in Phase 1, `create_refunds.sql`) that actually credits `profiles.wallet_balance`. So an admin could click "Approve Refund," the ticket would show resolved/approved, and the customer's wallet never moved a single shilling. **Confirmed with the user before fixing** since it was a bigger scope than what was asked. Fixed: `approve()` now requires the admin to enter a KSh amount, calls `createRefund({ ticketId, customerId: ticket.user_id, amount, reason, adminId })` then immediately `executeRefund(refund.id, adminId)` (single-click flow — no separate pending/execute step), and only then marks the ticket resolved with an admin note stating the wallet was credited. Wired `createRefund`/`executeRefund` imports from `walletAdminService.js` into `AdminDashboard.jsx`.
+
+### Refund + Dispute SLA tracking (3.7 / 3.8)
+Both were "unblocked but not built" per the execution plan. Added dynamic SLA computed from `created_at` — no new DB columns needed, so this works immediately without another pending migration:
+- **Refunds** (`RefundManagementSection`): `REFUND_SLA_HOURS = 120` (5 days) — placeholder pending the lawyer's answer to open question #3 ("Required refund window under Kenya Consumer Protection Act?"). Unresolved refund tickets show a "Due …" / "SLA overdue" badge on both the list card and detail panel.
+- **Disputes** (`DisputeCenterSection`): `DISPUTE_SLA_HOURS = 7 * 24` (7 days, two-sided review needs more time than a single-party refund) — same placeholder-pending-legal-confirmation caveat. Same due/overdue badge treatment on dispute cards.
+- **Enforcement / visibility**: `AlertsFeedSection` now also queries overdue refunds and overdue disputes (in addition to its existing urgent-tickets/stuck-bookings/pending-verification feed) and surfaces them as two new alert blocks + 2 new summary `StatCard`s, each clickable to jump straight to the relevant section via the existing `fixera-nav` event. This is the "enforcement" teeth — breaches are no longer buried in a single section, they surface platform-wide on the same feed admins already check.
+- **Still open**: automated pg_cron escalation/notification when an SLA is breached (plan item 4.2) is still future work — today's change is visibility-based enforcement (badges + alerts feed), not automated paging.
+
+Execution plan (`fixera-execution-plan` memory) updated: 3.7 and 3.8 marked complete, noted the refund-crediting bug fix as a bonus finding.
 
 ---
 

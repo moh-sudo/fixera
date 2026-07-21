@@ -15,7 +15,7 @@ import { listAllReviews, moderateReview } from '../../services/reviewsService';
 import { listPromoCodes, createPromoCode, updatePromoCode, deletePromoCode, getPromoUses } from '../../services/promoService';
 import { listAllBanners, saveBanner, deleteBanner, listAllFAQs, saveFAQ, deleteFAQ, FAQ_CATEGORIES } from '../../services/contentService';
 import { listAllCategories, saveCategory, deleteCategory, listAllServices, saveService, deleteService } from '../../services/catalogService';
-import { listPartnerWallets, getWalletTransactions, getWalletAdjustments, applyWalletAdjustment, getWalletStats, getDepositTransactions, recordDepositReceived, refundDeposit, forfeitDeposit } from '../../services/walletAdminService';
+import { listPartnerWallets, getWalletTransactions, getWalletAdjustments, applyWalletAdjustment, getWalletStats, getDepositTransactions, recordDepositReceived, refundDeposit, forfeitDeposit, createRefund, executeRefund } from '../../services/walletAdminService';
 import { logAction } from '../../services/settingsService';
 import { listAgents, createAgent, updateAgentRole, revokeAgent, AGENT_ROLES, roleLabel } from '../../services/teamService';
 import {
@@ -4761,6 +4761,8 @@ function AlertsFeedSection() {
   const [urgentTickets,  setUrgentTickets]  = useState([]);
   const [stuckBookings,  setStuckBookings]  = useState([]);
   const [pendingVerify,  setPendingVerify]  = useState([]);
+  const [overdueRefunds, setOverdueRefunds] = useState([]);
+  const [overdueDisputes,setOverdueDisputes]= useState([]);
   const [loading,        setLoading]        = useState(true);
   const channelRef = useRef(null);
 
@@ -4770,9 +4772,11 @@ function AlertsFeedSection() {
   };
 
   const load = useCallback(async () => {
-    const cutoff = new Date(Date.now() - 60 * 60 * 1000).toISOString(); // 1 hour ago
+    const cutoff        = new Date(Date.now() - 60 * 60 * 1000).toISOString(); // 1 hour ago
+    const refundCutoff   = new Date(Date.now() - REFUND_SLA_HOURS * 3600000).toISOString();
+    const disputeCutoff  = new Date(Date.now() - DISPUTE_SLA_HOURS * 3600000).toISOString();
 
-    const [{ data: tickets }, { data: bookings }, { data: pending }] = await Promise.all([
+    const [{ data: tickets }, { data: bookings }, { data: pending }, { data: refunds }, { data: disputes }] = await Promise.all([
       supabase
         .from('support_tickets')
         .select('*')
@@ -4793,11 +4797,28 @@ function AlertsFeedSection() {
         .eq('verification_status', 'pending')
         .order('created_at', { ascending: false })
         .limit(10),
+      supabase
+        .from('support_tickets')
+        .select('id,subject,user_name,user_email,created_at')
+        .in('category', ['refund_request', 'payment_failed'])
+        .is('refund_decision', null)
+        .lt('created_at', refundCutoff)
+        .order('created_at', { ascending: true })
+        .limit(10),
+      supabase
+        .from('disputes')
+        .select('id,booking_ref,service,customer_name,partner_name,status,created_at')
+        .neq('status', 'resolved')
+        .lt('created_at', disputeCutoff)
+        .order('created_at', { ascending: true })
+        .limit(10),
     ]);
 
     setUrgentTickets(tickets || []);
     setStuckBookings(bookings || []);
     setPendingVerify(pending || []);
+    setOverdueRefunds(refunds || []);
+    setOverdueDisputes(disputes || []);
     setLoading(false);
   }, []);
 
@@ -4816,7 +4837,7 @@ function AlertsFeedSection() {
     };
   }, [load]);
 
-  const totalAlerts = urgentTickets.length + stuckBookings.length + pendingVerify.length;
+  const totalAlerts = urgentTickets.length + stuckBookings.length + pendingVerify.length + overdueRefunds.length + overdueDisputes.length;
 
   const timeAgo = (iso) => {
     const mins = Math.floor((Date.now() - new Date(iso)) / 60000);
@@ -4837,6 +4858,8 @@ function AlertsFeedSection() {
         <StatCard icon={<Siren size={22} color="var(--red)" />} label="Urgent Tickets" value={urgentTickets.length} color="var(--red)" />
         <StatCard icon={<Clock size={22} color="var(--amber)" />} label="Stuck Bookings (>1h)" value={stuckBookings.length} color="var(--amber)" />
         <StatCard icon={<Lock size={22} color="var(--gold)" />} label="Pending Verification" value={pendingVerify.length} color="var(--gold)" />
+        <StatCard icon={<RotateCcw size={22} color="var(--red)" />} label="Refunds Past SLA" value={overdueRefunds.length} color="var(--red)" />
+        <StatCard icon={<Scale size={22} color="var(--red)" />} label="Disputes Past SLA" value={overdueDisputes.length} color="var(--red)" />
       </div>
 
       {loading ? <Spinner /> : totalAlerts === 0 ? (
@@ -4938,6 +4961,54 @@ function AlertsFeedSection() {
                     </div>
                     <span style={{ fontSize:10, fontWeight:700, background:'var(--gold-soft)', color:'var(--gold-2)', border:'1px solid rgba(201,160,32,0.3)', borderRadius:999, padding:'3px 9px' }}>
                       Pending
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ── Refunds Past SLA ── */}
+          {overdueRefunds.length > 0 && (
+            <div style={{ marginBottom:24 }}>
+              <h6 style={{ fontWeight:800, marginBottom:12, color:'var(--red)', display:'flex', alignItems:'center', gap:8, fontSize:12.5, letterSpacing:0.3 }}>
+                <span style={{ width:8, height:8, borderRadius:'50%', background:'var(--red)', display:'inline-block' }} />
+                REFUND REQUESTS PAST THE {REFUND_SLA_HOURS/24}-DAY SLA
+              </h6>
+              {overdueRefunds.map(t => (
+                <div key={t.id} className="admin-card" style={{ borderLeft:'4px solid var(--red)', marginBottom:10, cursor:'pointer' }}
+                  onClick={() => window.dispatchEvent(new CustomEvent('fixera-nav', { detail:'refunds' }))}>
+                  <div style={{ padding:'12px 20px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                    <div>
+                      <div style={{ fontWeight:700, color:'var(--ink)' }}>{t.subject || 'Refund Request'}</div>
+                      <div style={{ fontSize:11.5, color:'var(--muted)', marginTop:4 }}>{t.user_name || t.user_email || '—'}</div>
+                    </div>
+                    <span style={{ fontSize:10, fontWeight:700, background:'rgba(239,68,68,0.12)', color:'var(--red)', border:'1px solid rgba(239,68,68,0.3)', borderRadius:999, padding:'3px 9px' }}>
+                      {timeAgo(t.created_at)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ── Disputes Past SLA ── */}
+          {overdueDisputes.length > 0 && (
+            <div style={{ marginBottom:24 }}>
+              <h6 style={{ fontWeight:800, marginBottom:12, color:'var(--red)', display:'flex', alignItems:'center', gap:8, fontSize:12.5, letterSpacing:0.3 }}>
+                <span style={{ width:8, height:8, borderRadius:'50%', background:'var(--red)', display:'inline-block' }} />
+                DISPUTES PAST THE {DISPUTE_SLA_HOURS/24}-DAY SLA
+              </h6>
+              {overdueDisputes.map(d => (
+                <div key={d.id} className="admin-card" style={{ borderLeft:'4px solid var(--red)', marginBottom:10, cursor:'pointer' }}
+                  onClick={() => window.dispatchEvent(new CustomEvent('fixera-nav', { detail:'dispute_center' }))}>
+                  <div style={{ padding:'12px 20px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                    <div>
+                      <div style={{ fontWeight:700, color:'var(--ink)' }}>{d.booking_ref || `Dispute #${d.id.slice(0,8)}`}</div>
+                      <div style={{ fontSize:11.5, color:'var(--muted)', marginTop:4 }}>{d.customer_name||'—'} vs {d.partner_name||'—'}</div>
+                    </div>
+                    <span style={{ fontSize:10, fontWeight:700, background:'rgba(239,68,68,0.12)', color:'var(--red)', border:'1px solid rgba(239,68,68,0.3)', borderRadius:999, padding:'3px 9px' }}>
+                      {timeAgo(d.created_at)}
                     </span>
                   </div>
                 </div>
@@ -5128,13 +5199,21 @@ function VerificationQueueSection() {
 }
 
 // ── SECTION: Refund Management ────────────────────────────────────
+// Refund window pending final confirmation from the lawyer on the Kenya
+// Consumer Protection Act's required refund SLA — 5 business days is a
+// reasonable placeholder default, treated here as ~120 hours.
+const REFUND_SLA_HOURS = 120;
+
 function RefundManagementSection() {
+  const { user } = useAuth();
   const [tickets,  setTickets]  = useState([]);
   const [loading,  setLoading]  = useState(true);
   const [acting,   setActing]   = useState(null);
   const [notes,    setNotes]    = useState({});
+  const [amounts,  setAmounts]  = useState({});
   const [filter,   setFilter]   = useState('open');
   const [selected, setSelected] = useState(null);
+  const [err,      setErr]      = useState('');
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -5150,19 +5229,59 @@ function RefundManagementSection() {
 
   useEffect(() => { load(); }, [load]);
 
-  const act = async (ticket, decision) => {
-    setActing(ticket.id);
+  const slaInfo = (t) => {
+    const hoursOld = (Date.now() - new Date(t.created_at)) / 3600000;
+    const overdue  = hoursOld > REFUND_SLA_HOURS;
+    const dueAt    = new Date(new Date(t.created_at).getTime() + REFUND_SLA_HOURS * 3600000);
+    return { overdue, dueAt, hoursOld };
+  };
+
+  const decline = async (ticket) => {
+    setActing(ticket.id); setErr('');
     const updates = {
       status:      'resolved',
-      admin_note:  notes[ticket.id] || (decision === 'approved' ? 'Refund approved by admin.' : 'Refund declined by admin.'),
+      admin_note:  notes[ticket.id] || 'Refund declined by admin.',
       resolved_at: new Date().toISOString(),
-      refund_decision: decision,
+      refund_decision: 'declined',
     };
     await supabase.from('support_tickets').update(updates).eq('id', ticket.id);
     sendTicketStatusUpdate({ ...ticket, admin_note: updates.admin_note }, 'resolved');
     setActing(null);
     setSelected(null);
     load();
+  };
+
+  // Approving a refund used to just flip refund_decision on the ticket
+  // without ever crediting the customer — this now actually creates the
+  // refund row and executes it (credits profiles.wallet_balance).
+  const approve = async (ticket) => {
+    const amount = Number(amounts[ticket.id]);
+    if (!amount || amount <= 0) { setErr('Enter a valid refund amount before approving.'); return; }
+    setActing(ticket.id); setErr('');
+    try {
+      const refund = await createRefund({
+        ticketId:   ticket.id,
+        customerId: ticket.user_id,
+        amount,
+        reason:     notes[ticket.id] || ticket.subject || 'Customer refund request',
+        adminId:    user.id,
+      });
+      await executeRefund(refund.id, user.id);
+
+      const updates = {
+        status:      'resolved',
+        admin_note:  `${notes[ticket.id] ? notes[ticket.id] + ' — ' : ''}Refund of KSh ${amount.toLocaleString()} credited to wallet.`,
+        resolved_at: new Date().toISOString(),
+        refund_decision: 'approved',
+      };
+      await supabase.from('support_tickets').update(updates).eq('id', ticket.id);
+      sendTicketStatusUpdate({ ...ticket, admin_note: updates.admin_note }, 'resolved');
+      auditLog('refund_approved', `ticket=${ticket.id} amount=${amount}`);
+      setSelected(null);
+      load();
+    } catch (e) {
+      setErr(e.message || 'Could not process the refund.');
+    } finally { setActing(null); }
   };
 
   const PRIORITY_COLOR = { urgent: 'var(--red)', high: 'var(--amber)', normal: 'var(--muted)' };
@@ -5183,9 +5302,9 @@ function RefundManagementSection() {
           <div>
             {tickets.length === 0
               ? <div style={{ textAlign:'center', padding:'56px 0', color:'var(--muted)' }}>No refund requests in this queue.</div>
-              : tickets.map(t => (
+              : tickets.map(t => { const sla = slaInfo(t); const showSla = !t.refund_decision; return (
                 <div key={t.id} className="admin-card" onClick={() => setSelected(t)}
-                  style={{ borderLeft:`4px solid ${PRIORITY_COLOR[t.priority]||'var(--muted)'}`, cursor:'pointer', background: selected?.id===t.id?'var(--canvas)':'var(--surface)' }}>
+                  style={{ borderLeft:`4px solid ${showSla && sla.overdue ? 'var(--red)' : PRIORITY_COLOR[t.priority]||'var(--muted)'}`, cursor:'pointer', background: selected?.id===t.id?'var(--canvas)':'var(--surface)' }}>
                   <div style={{ padding:13 }}>
                     <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:10 }}>
                       <div>
@@ -5199,11 +5318,16 @@ function RefundManagementSection() {
                             {t.refund_decision === 'approved' ? <BadgeCheck size={11} /> : <X size={11} />} {t.refund_decision === 'approved' ? 'Approved' : 'Declined'}
                           </span>
                         )}
+                        {showSla && (
+                          <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:10.5, fontWeight:700, padding:'2px 8px', borderRadius:999, background: sla.overdue?'rgba(239,68,68,.12)':'rgba(245,158,11,.12)', color: sla.overdue?'var(--red)':'var(--amber)' }}>
+                            <Clock size={11} /> {sla.overdue ? 'SLA overdue' : `Due ${sla.dueAt.toLocaleDateString('en-KE',{day:'numeric',month:'short'})}`}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
                 </div>
-              ))}
+              );})}
           </div>
 
           {/* Detail */}
@@ -5244,26 +5368,36 @@ function RefundManagementSection() {
                       <div style={{ fontSize:12.5, color:'var(--ink-2)' }}>{selected.admin_note}</div>
                     </div>
                   )}
-                  {!selected.refund_decision && (
+                  {!selected.refund_decision && (() => { const sla = slaInfo(selected); return (
                     <>
+                      <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:12, fontWeight:700, marginBottom:14, color: sla.overdue ? 'var(--red)' : 'var(--amber)' }}>
+                        <Clock size={13} /> {sla.overdue ? `SLA overdue — was due ${sla.dueAt.toLocaleDateString('en-KE',{day:'numeric',month:'short'})}` : `Due by ${sla.dueAt.toLocaleDateString('en-KE',{day:'numeric',month:'short'})} (${REFUND_SLA_HOURS/24}-day refund window)`}
+                      </div>
+                      <div style={{ marginBottom:12 }}>
+                        <label style={{ fontSize:10.5, color:'var(--muted)', fontWeight:700, textTransform:'uppercase', letterSpacing:'.4px', display:'block', marginBottom:6 }}>Refund Amount (KSh) *</label>
+                        <input type="number" min="0" placeholder="e.g. 1500" value={amounts[selected.id]||''}
+                          onChange={e => setAmounts(a => ({ ...a, [selected.id]: e.target.value }))}
+                          style={{ width:'100%', boxSizing:'border-box', fontSize:12.5, padding:'10px 12px', borderRadius:9, border:'1px solid var(--line-2)', fontFamily:'inherit' }} />
+                      </div>
                       <textarea rows={2} placeholder="Admin note (reason for approval or decline)…"
                         style={{ width:'100%', boxSizing:'border-box', fontSize:12.5, padding:'10px 12px', borderRadius:9, border:'1px solid var(--line-2)', fontFamily:'inherit', resize:'none', marginBottom:12 }}
                         value={notes[selected.id]||''} onChange={e => setNotes(n => ({ ...n, [selected.id]: e.target.value }))} />
+                      {err && <div style={{ marginBottom:12, fontSize:12, color:'var(--red)', fontWeight:600 }}>{err}</div>}
                       <div style={{ display:'flex', gap:9 }}>
-                        <button disabled={acting===selected.id} onClick={() => act(selected,'approved')}
+                        <button disabled={acting===selected.id} onClick={() => approve(selected)}
                           style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'8px 15px', borderRadius:9, border:'none', background:'var(--green)', color:'#fff', fontSize:12.5, fontWeight:700, cursor:'pointer' }}>
-                          <BadgeCheck size={14} /> Approve Refund
+                          <BadgeCheck size={14} /> {acting===selected.id ? 'Processing…' : 'Approve & Credit Wallet'}
                         </button>
-                        <button disabled={acting===selected.id} onClick={() => act(selected,'declined')}
+                        <button disabled={acting===selected.id} onClick={() => decline(selected)}
                           style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'8px 15px', borderRadius:9, border:'none', background:'var(--red)', color:'#fff', fontSize:12.5, fontWeight:700, cursor:'pointer' }}>
                           <X size={14} /> Decline
                         </button>
                       </div>
                     </>
-                  )}
+                  );})()}
                   {selected.refund_decision && (
                     <div style={{ display:'inline-flex', alignItems:'center', gap:6, fontSize:12.5, fontWeight:700, color: selected.refund_decision==='approved'?'var(--green)':'var(--red)' }}>
-                      {selected.refund_decision === 'approved' ? <BadgeCheck size={15} /> : <X size={15} />} {selected.refund_decision === 'approved' ? 'Refund was approved' : 'Refund was declined'}
+                      {selected.refund_decision === 'approved' ? <BadgeCheck size={15} /> : <X size={15} />} {selected.refund_decision === 'approved' ? 'Refund approved — credited to customer wallet' : 'Refund was declined'}
                     </div>
                   )}
                 </div>
@@ -5702,6 +5836,17 @@ const DISPUTE_STATUS_FLOW = {
   resolved:         { next: 'under_review',  btn: 'Reopen',             Icon: RotateCcw },
 };
 
+// Two-sided disputes need time for both parties to submit statements —
+// 7 days is a reasonable placeholder pending the lawyer's final answer
+// on required dispute-resolution timelines.
+const DISPUTE_SLA_HOURS = 7 * 24;
+function disputeSlaInfo(d) {
+  const hoursOld = (Date.now() - new Date(d.created_at)) / 3600000;
+  const overdue  = hoursOld > DISPUTE_SLA_HOURS;
+  const dueAt    = new Date(new Date(d.created_at).getTime() + DISPUTE_SLA_HOURS * 3600000);
+  return { overdue, dueAt, hoursOld };
+}
+
 function DisputeCenterSection() {
   const [disputes,  setDisputes]  = useState([]);
   const [loading,   setLoading]   = useState(true);
@@ -5853,9 +5998,9 @@ function DisputeCenterSection() {
           <div>
             {disputes.length === 0
               ? <div style={{ textAlign:'center', padding:'48px 0', color:'var(--muted)' }}>No disputes in this view.</div>
-              : disputes.map(d => (
+              : disputes.map(d => { const sla = disputeSlaInfo(d); const showSla = d.status !== 'resolved'; return (
                 <div key={d.id} className="admin-card" onClick={() => selectDispute(d)}
-                  style={{ borderLeft:`4px solid ${STATUS_COLOR[d.status]||'var(--muted)'}`, cursor:'pointer', background: selected?.id===d.id?'var(--gold-soft)':'var(--surface)', marginBottom:10 }}>
+                  style={{ borderLeft:`4px solid ${showSla && sla.overdue ? 'var(--red)' : STATUS_COLOR[d.status]||'var(--muted)'}`, cursor:'pointer', background: selected?.id===d.id?'var(--gold-soft)':'var(--surface)', marginBottom:10 }}>
                   <div style={{ padding:'12px 16px' }}>
                     <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
                       <div>
@@ -5872,6 +6017,11 @@ function DisputeCenterSection() {
                             {RULING_OPTIONS.find(r=>r.value===d.ruling)?.label}
                           </span>
                         )}
+                        {showSla && (
+                          <span style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:999, background: sla.overdue?'rgba(239,68,68,.12)':'rgba(245,158,11,.12)', color: sla.overdue?'var(--red)':'var(--amber)' }}>
+                            <Clock size={10} /> {sla.overdue ? 'SLA overdue' : `Due ${sla.dueAt.toLocaleDateString('en-KE',{day:'numeric',month:'short'})}`}
+                          </span>
+                        )}
                       </div>
                     </div>
                     <div style={{ display:'flex', gap:10, marginTop:8 }}>
@@ -5884,7 +6034,7 @@ function DisputeCenterSection() {
                     </div>
                   </div>
                 </div>
-              ))}
+              );})}
           </div>
 
           {/* Detail */}
