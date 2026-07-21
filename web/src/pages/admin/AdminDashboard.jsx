@@ -1396,15 +1396,15 @@ function JobsSection() {
   return (
     <>
       <PageHeader title="Monitor Jobs" sub="Click any row to manage status, price, and worker assignment" />
-      <div className="mb-3">
-        {[{k:'all',label:'All'},{k:'upcoming',label:'⏳ Upcoming'},{k:'confirmed',label:'✅ Confirmed'},
-          {k:'on_way',label:'🚗 On Way'},{k:'in_progress',label:'🔧 Active'},{k:'completed',label:'🎉 Completed'},{k:'cancelled',label:'❌ Cancelled'}]
+      <div style={{ marginBottom:18 }}>
+        {[{k:'all',label:'All'},{k:'upcoming',label:'Upcoming'},{k:'confirmed',label:'Confirmed'},
+          {k:'on_way',label:'On Way'},{k:'in_progress',label:'Active'},{k:'completed',label:'Completed'},{k:'cancelled',label:'Cancelled'}]
           .map(f => <FilterPill key={f.k} active={filter===f.k} onClick={() => setFilter(f.k)}>{f.label}</FilterPill>)}
       </div>
 
       {loading ? <Spinner /> : (
         <div className="admin-card">
-          <div className="table-responsive">
+          <div style={{ overflowX:'auto' }}>
             <table className="admin-table">
               <thead>
                 <tr>
@@ -1414,22 +1414,22 @@ function JobsSection() {
               </thead>
               <tbody>
                 {jobs.length === 0 ? (
-                  <tr><td colSpan={9} className="text-center text-gray-500 py-4">No jobs found</td></tr>
+                  <tr><td colSpan={9} style={{ textAlign:'center', color:'var(--muted)', padding:24 }}>No jobs found</td></tr>
                 ) : jobs.map(j => {
                   const price   = Number(j.price || 0);
                   const comm    = Number(j.commission_amount || price * 0.15);
                   const proEarn = Number(j.professional_earning || price * 0.85);
                   return (
                     <tr key={j.id} style={{ cursor:'pointer' }} onClick={() => setSelected(j)}>
-                      <td style={{ fontFamily:'monospace', color:'#858796' }}>#{j.id.slice(0,8).toUpperCase()}</td>
-                      <td className="font-weight-bold text-gray-800">{j.sub_service || j.service || '—'}</td>
-                      <td className="text-gray-600">{j.booking_date || '—'}</td>
-                      <td className="text-gray-600">{j.worker_name || <span className="sb-badge sb-badge-danger">Unassigned</span>}</td>
-                      <td className="font-weight-bold">{price > 0 ? `KSh ${price.toLocaleString()}` : <span className="text-gray-500">— Set price</span>}</td>
-                      <td className="font-weight-bold text-gold">{comm > 0 ? `KSh ${comm.toLocaleString('en-KE',{maximumFractionDigits:0})}` : '—'}</td>
-                      <td className="font-weight-bold text-success">{proEarn > 0 ? `KSh ${proEarn.toLocaleString('en-KE',{maximumFractionDigits:0})}` : '—'}</td>
+                      <td style={{ fontFamily:'ui-monospace,monospace', color:'var(--muted)' }}>#{j.id.slice(0,8).toUpperCase()}</td>
+                      <td style={{ fontWeight:700, color:'var(--ink)' }}>{j.sub_service || j.service || '—'}</td>
+                      <td style={{ color:'var(--ink-2)' }}>{j.booking_date || '—'}</td>
+                      <td style={{ color:'var(--ink-2)' }}>{j.worker_name || <span className="sb-badge sb-badge-danger">Unassigned</span>}</td>
+                      <td style={{ fontWeight:700, color:'var(--ink)' }}>{price > 0 ? `KSh ${price.toLocaleString()}` : <span style={{ color:'var(--muted)' }}>— Set price</span>}</td>
+                      <td style={{ fontWeight:700, color:'var(--gold)' }}>{comm > 0 ? `KSh ${comm.toLocaleString('en-KE',{maximumFractionDigits:0})}` : '—'}</td>
+                      <td style={{ fontWeight:700, color:'var(--green)' }}>{proEarn > 0 ? `KSh ${proEarn.toLocaleString('en-KE',{maximumFractionDigits:0})}` : '—'}</td>
                       <td><SBBadge status={j.status} /></td>
-                      <td className="text-xs font-weight-bold text-gold">Manage →</td>
+                      <td style={{ fontSize:12, fontWeight:700, color:'var(--gold)' }}>Manage →</td>
                     </tr>
                   );
                 })}
@@ -1979,49 +1979,50 @@ function ProductApprovalsSection() {
   return (
     <>
       <PageHeader title="Product Approvals" sub="New products & price changes from suppliers" />
-      <div className="mb-3">
-        {[{k:'pending',label:`🆕 New (${pending.length})`},{k:'price',label:`💲 Price Changes (${priceChange.length})`},{k:'all',label:'All'}]
-          .map(f => <FilterPill key={f.k} active={tab===f.k} onClick={() => setTab(f.k)}>{f.label}</FilterPill>)}
+      <div style={{ marginBottom:18 }}>
+        {[{k:'pending',label:`New (${pending.length})`,Icon:Tag},{k:'price',label:`Price Changes (${priceChange.length})`,Icon:Receipt},{k:'all',label:'All'}]
+          .map(f => <FilterPill key={f.k} active={tab===f.k} onClick={() => setTab(f.k)}><span style={{ display:'inline-flex', alignItems:'center', gap:6 }}>{f.Icon && <f.Icon size={13} />}{f.label}</span></FilterPill>)}
       </div>
 
       {loading ? <Spinner /> : list.length === 0 ? (
-        <div className="text-center py-5"><div style={{fontSize:48}}>🏷️</div><p className="text-gray-500 mt-2">Nothing to review.</p></div>
+        <div style={{ textAlign:'center', padding:'56px 0' }}><Tag size={40} color="var(--muted)" style={{ marginBottom:10 }} /><p style={{ color:'var(--muted)', margin:0 }}>Nothing to review.</p></div>
       ) : list.map(r => (
-        <div key={r.id} className="admin-card mb-3">
-          <div className="card-body">
-            <div className="d-flex justify-content-between align-items-start mb-2">
+        <div key={r.id} className="admin-card">
+          <div style={{ padding:16 }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:9, gap:10 }}>
               <div>
-                <div className="font-weight-bold text-gray-800">{r.name}</div>
-                <div className="text-xs text-gray-500 mt-1">
+                <div style={{ fontWeight:700, color:'var(--ink)' }}>{r.name}</div>
+                <div style={{ fontSize:11.5, color:'var(--muted)', marginTop:4 }}>
                   {r.supplier?.business_name || r.supplier?.full_name || 'Supplier'} · {r.category || '—'}
                 </div>
               </div>
-              <span className="sb-badge" style={{ background: r.status==='pending'?'#F6AD5522':r.status==='rejected'?'#e74a3b22':'#1cc88a22', color: r.status==='pending'?'#F6AD55':r.status==='rejected'?'#e74a3b':'#1cc88a' }}>
+              <span className="sb-badge" style={{ background: r.status==='pending'?'rgba(245,158,11,.12)':r.status==='rejected'?'rgba(239,68,68,.12)':'rgba(22,163,74,.12)', color: r.status==='pending'?'var(--amber)':r.status==='rejected'?'var(--red)':'var(--green)' }}>
                 {r.status}
               </span>
             </div>
-            {r.description && <div className="text-xs text-gray-600 mb-2">{r.description}</div>}
-            <div className="d-flex align-items-center mb-3" style={{ gap: 8 }}>
+            {r.description && <div style={{ fontSize:12, color:'var(--ink-2)', marginBottom:10 }}>{r.description}</div>}
+            <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:14 }}>
               {r.pending_price != null ? (
-                <span style={{ fontSize: 14, fontWeight: 700 }}>
-                  <span style={{ color:'#9ca3af', textDecoration:'line-through' }}>KSh {r.price?.toLocaleString()}</span>
+                <span style={{ fontSize:14, fontWeight:700 }}>
+                  <span style={{ color:'var(--muted)', textDecoration:'line-through' }}>KSh {r.price?.toLocaleString()}</span>
                   {' → '}
-                  <span style={{ color:'#1cc88a' }}>KSh {Number(r.pending_price).toLocaleString()}</span>
-                  <span className="text-xs text-gray-500"> {r.unit ? `/ ${r.unit}` : ''}</span>
+                  <span style={{ color:'var(--green)' }}>KSh {Number(r.pending_price).toLocaleString()}</span>
+                  <span style={{ fontSize:11.5, color:'var(--muted)' }}> {r.unit ? `/ ${r.unit}` : ''}</span>
                 </span>
               ) : (
-                <span style={{ fontSize: 14, fontWeight: 700, color:'#C9A020' }}>KSh {r.price?.toLocaleString()} {r.unit ? `/ ${r.unit}` : ''}</span>
+                <span style={{ fontSize:14, fontWeight:700, color:'var(--gold)' }}>KSh {r.price?.toLocaleString()} {r.unit ? `/ ${r.unit}` : ''}</span>
               )}
             </div>
             {(r.status === 'pending' || r.pending_price != null) && (
-              <div className="d-flex" style={{ gap: 8 }}>
-                <input value={note[r.id]||''} onChange={e => setNote(n=>({...n,[r.id]:e.target.value}))} placeholder="Rejection reason (optional)" className="form-control form-control-sm" />
-                <button onClick={() => approve(r)} className="btn btn-success btn-sm" style={{ whiteSpace:'nowrap' }}>✅ Approve</button>
-                <button onClick={() => reject(r)} className="btn btn-outline-danger btn-sm" style={{ whiteSpace:'nowrap' }}>Reject</button>
+              <div style={{ display:'flex', gap:8 }}>
+                <input value={note[r.id]||''} onChange={e => setNote(n=>({...n,[r.id]:e.target.value}))} placeholder="Rejection reason (optional)"
+                  style={{ flex:1, fontSize:12.5, padding:'8px 12px', border:'1px solid var(--line-2)', borderRadius:9, outline:'none', fontFamily:'inherit' }} />
+                <button onClick={() => approve(r)} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'8px 14px', borderRadius:9, border:'none', background:'var(--green)', color:'#fff', fontSize:12, fontWeight:700, cursor:'pointer', whiteSpace:'nowrap' }}><BadgeCheck size={13} /> Approve</button>
+                <button onClick={() => reject(r)} style={{ display:'inline-flex', alignItems:'center', gap:6, padding:'8px 14px', borderRadius:9, border:'1px solid rgba(239,68,68,.3)', background:'rgba(239,68,68,.06)', color:'var(--red)', fontSize:12, fontWeight:700, cursor:'pointer', whiteSpace:'nowrap' }}>Reject</button>
               </div>
             )}
             {r.status === 'rejected' && r.rejection_reason && (
-              <div className="alert alert-danger py-2 text-xs mb-0">Rejected: {r.rejection_reason}</div>
+              <div style={{ background:'rgba(239,68,68,.08)', color:'var(--red)', borderRadius:9, padding:'8px 12px', fontSize:12, marginTop:10 }}>Rejected: {r.rejection_reason}</div>
             )}
           </div>
         </div>
@@ -4065,36 +4066,41 @@ function ReviewsSection() {
     setSaving(null); load();
   };
 
-  const STARS = (n) => '⭐'.repeat(n) + '☆'.repeat(5-n);
+  const Stars = ({ n }) => (
+    <span style={{ display:'inline-flex', gap:1 }}>
+      {[1,2,3,4,5].map(i => <Star key={i} size={15} color={i<=n?'var(--gold)':'var(--line-2)'} fill={i<=n?'var(--gold)':'none'} />)}
+    </span>
+  );
+  const actBtn = (color) => ({ display:'inline-flex', alignItems:'center', gap:5, padding:'6px 12px', borderRadius:8, border:`1px solid ${color}40`, background:`${color}10`, color, fontSize:11.5, fontWeight:700, cursor:'pointer' });
 
   return (
     <>
       <PageHeader title="Reviews & Ratings" sub="Moderate customer reviews across all partner types" />
-      <div className="mb-3">
+      <div style={{ marginBottom:18 }}>
         {['all','published','flagged','removed'].map(f=>(
           <FilterPill key={f} active={filter===f} onClick={()=>setFilter(f)}>{f.charAt(0).toUpperCase()+f.slice(1)}</FilterPill>
         ))}
       </div>
       {loading ? <Spinner/> : reviews.length === 0 ? (
-        <div className="text-center py-5"><div style={{fontSize:48}}>⭐</div><p className="text-gray-500 mt-2">No reviews yet.</p></div>
+        <div style={{ textAlign:'center', padding:'56px 0' }}><Star size={40} color="var(--muted)" style={{ marginBottom:10 }} /><p style={{ color:'var(--muted)', margin:0 }}>No reviews yet.</p></div>
       ) : reviews.map(r => (
-        <div key={r.id} className="admin-card mb-3" style={{borderLeft:`4px solid ${r.status==='flagged'?'#f6c23e':r.status==='removed'?'#e74a3b':'#1cc88a'}`}}>
-          <div className="card-body">
-            <div className="d-flex justify-content-between align-items-start">
-              <div style={{flex:1}}>
-                <div className="d-flex align-items-center gap-2 mb-1" style={{gap:10}}>
-                  <span style={{fontSize:18}}>{STARS(r.rating)}</span>
-                  <span className="sb-badge" style={{background:ROLE_COLOR[r.reviewee_type]||'#888',color:'#fff'}}>{ROLE_ICON[r.reviewee_type]} {r.reviewee_type}</span>
+        <div key={r.id} className="admin-card" style={{ borderLeft:`4px solid ${r.status==='flagged'?'var(--amber)':r.status==='removed'?'var(--red)':'var(--green)'}` }}>
+          <div style={{ padding:16 }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12 }}>
+              <div style={{ flex:1 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:7, flexWrap:'wrap' }}>
+                  <Stars n={r.rating} />
+                  <span className="sb-badge" style={{ background:ROLE_COLOR[r.reviewee_type]||'#888', color:'#fff', display:'inline-flex', alignItems:'center', gap:5 }}><RoleIcon role={r.reviewee_type} size={11} color="#fff" /> {r.reviewee_type}</span>
                   <SBBadge status={r.status}/>
                 </div>
-                <p className="text-sm text-gray-700 mb-1" style={{maxWidth:500}}>{r.comment||<em className="text-gray-400">No comment</em>}</p>
-                <div className="text-xs text-gray-500">{new Date(r.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'})}</div>
-                {r.admin_note && <div className="text-xs text-warning mt-1">Admin note: {r.admin_note}</div>}
+                <p style={{ fontSize:13, color:'var(--ink-2)', marginBottom:6, maxWidth:500 }}>{r.comment||<em style={{ color:'var(--muted)' }}>No comment</em>}</p>
+                <div style={{ fontSize:11.5, color:'var(--muted)' }}>{new Date(r.created_at).toLocaleDateString('en-KE',{day:'numeric',month:'short',year:'numeric'})}</div>
+                {r.admin_note && <div style={{ fontSize:11.5, color:'var(--amber)', marginTop:5 }}>Admin note: {r.admin_note}</div>}
               </div>
-              <div className="d-flex gap-2" style={{gap:6,flexShrink:0}}>
-                {r.status !== 'published' && <button className="btn btn-sm btn-outline-success" disabled={saving===r.id} onClick={()=>act(r.id,'published',null)}>✓ Publish</button>}
-                {r.status !== 'flagged'   && <button className="btn btn-sm btn-outline-warning" disabled={saving===r.id} onClick={()=>act(r.id,'flagged',null)}>🚩 Flag</button>}
-                {r.status !== 'removed'   && <button className="btn btn-sm btn-outline-danger"  disabled={saving===r.id} onClick={()=>{const n=prompt('Reason for removal:');if(n!==null)act(r.id,'removed',n);}}>🗑️ Remove</button>}
+              <div style={{ display:'flex', gap:6, flexShrink:0, flexWrap:'wrap' }}>
+                {r.status !== 'published' && <button style={actBtn('var(--green)')} disabled={saving===r.id} onClick={()=>act(r.id,'published',null)}><BadgeCheck size={12} /> Publish</button>}
+                {r.status !== 'flagged'   && <button style={actBtn('var(--amber)')} disabled={saving===r.id} onClick={()=>act(r.id,'flagged',null)}><Flag size={12} /> Flag</button>}
+                {r.status !== 'removed'   && <button style={actBtn('var(--red)')}  disabled={saving===r.id} onClick={()=>{const n=prompt('Reason for removal:');if(n!==null)act(r.id,'removed',n);}}><X size={12} /> Remove</button>}
               </div>
             </div>
           </div>
@@ -4145,16 +4151,14 @@ function MarketingSection() {
 
   return (
     <>
-      <PageHeader title="Marketing" sub="Promo codes and discount campaigns" />
-      {toast && <div className="alert alert-success py-2">{toast}</div>}
-      <div className="mb-4 d-flex justify-content-end">
-        <button className="btn btn-warning font-weight-bold" style={{background:'#C9A020',border:'none',color:'#0A0E1A'}} onClick={()=>setForm({...BLANK_PROMO})}>+ New Promo Code</button>
-      </div>
+      <PageHeader title="Marketing" sub="Promo codes and discount campaigns"
+        action={<button className="btn-navy" onClick={()=>setForm({...BLANK_PROMO})}><Plus size={15} /> New Promo Code</button>} />
+      {toast && <div style={{ display:'flex', alignItems:'center', gap:8, background:'rgba(22,163,74,.1)', color:'var(--green)', borderRadius:9, padding:'9px 14px', marginBottom:16, fontSize:12.5, fontWeight:700 }}><BadgeCheck size={15} /> {toast}</div>}
 
       {form && (
-        <div className="admin-card mb-4" style={{borderLeft:'4px solid #C9A020'}}>
-          <div className="card-body">
-            <h6 className="font-weight-bold mb-3">{form.id?'Edit Promo Code':'New Promo Code'}</h6>
+        <div className="admin-card" style={{ borderLeft:'4px solid var(--gold)' }}>
+          <div style={{ padding:18 }}>
+            <div style={{ fontSize:14.5, fontWeight:800, color:'var(--ink)', marginBottom:14 }}>{form.id?'Edit Promo Code':'New Promo Code'}</div>
             <div className="row">
               <div className="col-md-4 mb-3"><label className="text-xs font-weight-bold text-uppercase text-gray-600" style={{letterSpacing:'0.05rem'}}>Code *</label><input className="form-control" value={form.code} onChange={e=>set('code',e.target.value.toUpperCase())} placeholder="e.g. SAVE20" /></div>
               <div className="col-md-4 mb-3"><label className="text-xs font-weight-bold text-uppercase text-gray-600" style={{letterSpacing:'0.05rem'}}>Discount Type</label><select className="form-control" value={form.discount_type} onChange={e=>set('discount_type',e.target.value)}><option value="percent">Percentage (%)</option><option value="fixed">Fixed (KSh)</option></select></div>
@@ -4167,47 +4171,50 @@ function MarketingSection() {
               <div className="col-md-4 mb-3"><label className="text-xs font-weight-bold text-uppercase text-gray-600" style={{letterSpacing:'0.05rem'}}>Target Service</label><input className="form-control" value={form.target_service} onChange={e=>set('target_service',e.target.value)} placeholder="Leave blank = all services" /></div>
               <div className="col-md-4 mb-3"><label className="text-xs font-weight-bold text-uppercase text-gray-600" style={{letterSpacing:'0.05rem'}}>Description</label><input className="form-control" value={form.description} onChange={e=>set('description',e.target.value)} placeholder="Internal note" /></div>
               <div className="col-md-4 mb-3 d-flex align-items-end"><div className="form-check mb-2"><input className="form-check-input" type="checkbox" id="active-check" checked={form.is_active} onChange={e=>set('is_active',e.target.checked)}/><label className="form-check-label text-sm font-weight-bold" htmlFor="active-check">Active</label></div></div>
-              <div className="col-12 d-flex gap-2"><button className="btn btn-warning font-weight-bold" style={{background:'#C9A020',border:'none',color:'#0A0E1A'}} disabled={saving} onClick={save}>{saving?'Saving…':form.id?'Update':'Create Code'}</button><button className="btn btn-outline-secondary" onClick={()=>setForm(null)}>Cancel</button></div>
+              <div className="col-12" style={{ display:'flex', gap:8 }}>
+                <button className="btn-navy" style={{ background:'var(--gold)' }} disabled={saving} onClick={save}>{saving?'Saving…':form.id?'Update':'Create Code'}</button>
+                <button onClick={()=>setForm(null)} style={{ padding:'9px 16px', borderRadius:10, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--ink-2)', fontSize:13, fontWeight:700, cursor:'pointer' }}>Cancel</button>
+              </div>
             </div>
           </div>
         </div>
       )}
 
       {loading ? <Spinner/> : codes.length === 0 ? (
-        <div className="text-center py-5"><div style={{fontSize:48}}>🎯</div><p className="text-gray-500 mt-2">No promo codes yet.</p></div>
+        <div style={{ textAlign:'center', padding:'56px 0' }}><Tag size={40} color="var(--muted)" style={{ marginBottom:10 }} /><p style={{ color:'var(--muted)', margin:0 }}>No promo codes yet.</p></div>
       ) : codes.map(c=>(
-        <div key={c.id} className="admin-card mb-3" style={{borderLeft:`4px solid ${c.is_active&&!isExpired(c)&&!isMaxed(c)?'#1cc88a':'#aaa'}`}}>
-          <div className="card-body">
-            <div className="d-flex justify-content-between align-items-start">
-              <div style={{flex:1}}>
-                <div className="d-flex align-items-center gap-2 mb-1" style={{gap:8,flexWrap:'wrap'}}>
-                  <code style={{fontSize:18,fontWeight:900,color:'#C9A020',background:'#fffbeb',padding:'2px 10px',borderRadius:8,border:'1px solid #f6c23e'}}>{c.code}</code>
-                  <span className="sb-badge" style={{background:c.discount_type==='percent'?'#EBF4FF':'#F0FFF4',color:c.discount_type==='percent'?'#4A90D9':'#1cc88a',fontWeight:700}}>{c.discount_type==='percent'?`${c.discount_value}% OFF`:`KSh ${c.discount_value} OFF`}</span>
+        <div key={c.id} className="admin-card" style={{ borderLeft:`4px solid ${c.is_active&&!isExpired(c)&&!isMaxed(c)?'var(--green)':'var(--line-2)'}` }}>
+          <div style={{ padding:16 }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12 }}>
+              <div style={{ flex:1 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:7, flexWrap:'wrap' }}>
+                  <code style={{ fontSize:17, fontWeight:800, color:'var(--gold-2)', background:'var(--gold-soft)', padding:'3px 11px', borderRadius:8, border:'1px solid var(--gold-border, #E8D48A)' }}>{c.code}</code>
+                  <span className="sb-badge" style={{ background:c.discount_type==='percent'?'rgba(59,130,246,.12)':'rgba(22,163,74,.12)', color:c.discount_type==='percent'?'var(--blue)':'var(--green)' }}>{c.discount_type==='percent'?`${c.discount_value}% OFF`:`KSh ${c.discount_value} OFF`}</span>
                   {!c.is_active && <span className="sb-badge sb-badge-secondary">Inactive</span>}
                   {isExpired(c) && <span className="sb-badge sb-badge-danger">Expired</span>}
                   {isMaxed(c) && <span className="sb-badge sb-badge-warning">Maxed Out</span>}
-                  {c.is_active && !isExpired(c) && !isMaxed(c) && <span className="sb-badge sb-badge-success">🟢 Active</span>}
+                  {c.is_active && !isExpired(c) && !isMaxed(c) && <span className="sb-badge sb-badge-success">Active</span>}
                 </div>
-                <div className="text-xs text-gray-600 mb-1">{c.description||'—'}</div>
-                <div className="d-flex gap-3 text-xs text-gray-500" style={{gap:12,flexWrap:'wrap'}}>
-                  <span>📊 Used: {c.used_count}{c.max_uses?` / ${c.max_uses}`:' / ∞'}</span>
+                <div style={{ fontSize:12, color:'var(--ink-2)', marginBottom:7 }}>{c.description||'—'}</div>
+                <div style={{ display:'flex', gap:12, fontSize:11.5, color:'var(--muted)', flexWrap:'wrap' }}>
+                  <span>Used: {c.used_count}{c.max_uses?` / ${c.max_uses}`:' / ∞'}</span>
                   {c.min_order>0 && <span>Min: KSh {c.min_order.toLocaleString()}</span>}
-                  {c.target_service && <span>🎯 {c.target_service}</span>}
-                  {c.valid_until && <span>⏰ Expires {new Date(c.valid_until).toLocaleDateString('en-KE')}</span>}
+                  {c.target_service && <span>{c.target_service}</span>}
+                  {c.valid_until && <span>Expires {new Date(c.valid_until).toLocaleDateString('en-KE')}</span>}
                 </div>
               </div>
-              <div className="d-flex gap-2" style={{gap:6,flexShrink:0}}>
-                <button className="btn btn-sm btn-outline-info" onClick={()=>loadUses(c.id)}>📊 Uses</button>
-                <button className="btn btn-sm btn-outline-warning" onClick={()=>setForm({...c,valid_from:c.valid_from?.slice(0,16)||'',valid_until:c.valid_until?.slice(0,16)||''})}>✏️</button>
-                <button className="btn btn-sm btn-outline-secondary" onClick={async()=>{await updatePromoCode(c.id,{is_active:!c.is_active});load();}}>{c.is_active?'Pause':'Resume'}</button>
-                <button className="btn btn-sm btn-outline-danger" onClick={async()=>{if(confirm('Delete?')){await deletePromoCode(c.id);load();}}}>🗑️</button>
+              <div style={{ display:'flex', gap:6, flexShrink:0, flexWrap:'wrap' }}>
+                <button onClick={()=>loadUses(c.id)} style={{ padding:'6px 11px', borderRadius:8, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--ink-2)', fontSize:11, fontWeight:700, cursor:'pointer' }}>Uses</button>
+                <button onClick={()=>setForm({...c,valid_from:c.valid_from?.slice(0,16)||'',valid_until:c.valid_until?.slice(0,16)||''})} style={{ padding:'6px 9px', borderRadius:8, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--ink-2)', cursor:'pointer', display:'flex' }}><FileText size={13} /></button>
+                <button onClick={async()=>{await updatePromoCode(c.id,{is_active:!c.is_active});load();}} style={{ padding:'6px 11px', borderRadius:8, border:'1px solid var(--line-2)', background:'var(--surface)', color:'var(--ink-2)', fontSize:11, fontWeight:700, cursor:'pointer' }}>{c.is_active?'Pause':'Resume'}</button>
+                <button onClick={async()=>{if(confirm('Delete?')){await deletePromoCode(c.id);load();}}} style={{ padding:'6px 9px', borderRadius:8, border:'1px solid rgba(239,68,68,.3)', background:'rgba(239,68,68,.06)', color:'var(--red)', cursor:'pointer', display:'flex' }}><X size={13} /></button>
               </div>
             </div>
             {uses[c.id] && (
-              <div className="mt-3 pt-3" style={{borderTop:'1px solid #e3e6f0'}}>
-                <div className="text-xs font-weight-bold text-gray-700 mb-2">Recent Uses ({uses[c.id].length})</div>
-                {uses[c.id].length===0 ? <p className="text-xs text-gray-500">No uses yet.</p> : uses[c.id].slice(0,5).map(u=>(
-                  <div key={u.id} className="text-xs text-gray-600 mb-1">• KSh {u.discount_applied} saved — {new Date(u.used_at).toLocaleDateString('en-KE')}</div>
+              <div style={{ marginTop:14, paddingTop:14, borderTop:'1px solid var(--line)' }}>
+                <div style={{ fontSize:11.5, fontWeight:800, color:'var(--ink-2)', marginBottom:8 }}>Recent Uses ({uses[c.id].length})</div>
+                {uses[c.id].length===0 ? <p style={{ fontSize:12, color:'var(--muted)' }}>No uses yet.</p> : uses[c.id].slice(0,5).map(u=>(
+                  <div key={u.id} style={{ fontSize:12, color:'var(--ink-2)', marginBottom:4 }}>· KSh {u.discount_applied} saved — {new Date(u.used_at).toLocaleDateString('en-KE')}</div>
                 ))}
               </div>
             )}
