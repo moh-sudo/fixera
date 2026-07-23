@@ -60,7 +60,8 @@ const ROLE_STEPS = {
     { id:'payment',    label:'PAYMENT',    icon:'03' },
     { id:'business',   label:'BUSINESS',   icon:'04' },
     { id:'operations', label:'OPERATIONS', icon:'05' },
-    { id:'agreement',  label:'AGREEMENT',  icon:'06' },
+    { id:'compliance', label:'COMPLIANCE', icon:'06' },
+    { id:'agreement',  label:'AGREEMENT',  icon:'07' },
   ],
   supplier: [
     { id:'general',    label:'GENERAL',    icon:'01' },
@@ -68,7 +69,8 @@ const ROLE_STEPS = {
     { id:'payment',    label:'PAYMENT',    icon:'03' },
     { id:'business',   label:'BUSINESS',   icon:'04' },
     { id:'products',   label:'PRODUCTS',   icon:'05' },
-    { id:'agreement',  label:'AGREEMENT',  icon:'06' },
+    { id:'compliance', label:'COMPLIANCE', icon:'06' },
+    { id:'agreement',  label:'AGREEMENT',  icon:'07' },
   ],
   mover: [
     { id:'general',    label:'GENERAL',    icon:'01' },
@@ -259,6 +261,34 @@ function FileUpload({ label, hint, value, onChange, required }) {
   );
 }
 
+function isStaleCert(dateStr) {
+  if (!dateStr) return false;
+  const sixMonthsAgo = new Date();
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+  return new Date(dateStr) < sixMonthsAgo;
+}
+
+function BackgroundCheckField({ urlValue, onUrlChange, dateValue, onDateChange, hint }) {
+  return (
+    <>
+      <FileUpload label="Background Check Clearance" required
+        hint={hint || 'DCI Certificate of Good Conduct — apply at goodconduct.go.ke'}
+        value={urlValue} onChange={onUrlChange} />
+      <Field label="Certificate Issue Date" required hint="Must be dated within the last 6 months — Fixera does not accept older clearances">
+        <input type="date" value={dateValue} onChange={e => onDateChange(e.target.value)} style={inputSt}
+          onFocus={e => e.target.style.borderColor = CL.gold}
+          onBlur={e => e.target.style.borderColor = CL.border} />
+      </Field>
+      {isStaleCert(dateValue) && (
+        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', background: CL.redSoft, border: '1px solid #FECACA', borderRadius: 10, padding: '10px 14px', marginBottom: 18, marginTop: -8 }}>
+          <AlertTriangle size={14} color={CL.red} style={{ flexShrink: 0, marginTop: 2 }} />
+          <span style={{ color: CL.red, fontSize: 12, fontWeight: 600 }}>This certificate is older than 6 months. Please upload a current one — Fixera requires background checks issued within the last 6 months.</span>
+        </div>
+      )}
+    </>
+  );
+}
+
 function SectionTitle({ Icon, title, subtitle, color = CL.gold }) {
   return (
     <div style={{ marginBottom: 24 }}>
@@ -358,6 +388,12 @@ export default function OnboardingPage() {
     idNumber:       '',
     idPhotoFront:   '',
     idPhotoBack:    '',
+    riderDob:                  '',
+    riderProofOfResidenceUrl:  '',
+    riderBgCheckUrl:           '',
+    riderBgCheckDate:          '',
+    shaNumber:                 '',
+    shaComplianceUrl:          '',
     taxPin:         profile?.tax_pin || '',
     profilePhoto:   '',
     termsAccepted:  false,
@@ -368,6 +404,8 @@ export default function OnboardingPage() {
     plumbAreas:           [],
     plumbPortfolioUrl:    '',
     plumbCriminalDecl:    false,
+    plumbBgCheckUrl:      '',
+    plumbBgCheckDate:     '',
     elecErbNumber:        '',
     elecErbCertUrl:       '',
     elecEpraCompliant:    false,
@@ -376,13 +414,18 @@ export default function OnboardingPage() {
     elecSafetyTraining:   '',
     elecExperience:       '',
     elecCriminalDecl:     false,
+    elecBgCheckUrl:       '',
+    elecBgCheckDate:      '',
     paintPortfolioUrl:    '',
     paintExperience:      '',
     paintSpecialty:       [],
     paintTeamSize:        '1',
     paintEquipment:       [],
     paintCriminalDecl:    false,
+    paintBgCheckUrl:      '',
+    paintBgCheckDate:     '',
     cleanBgCheckUrl:      '',
+    cleanBgCheckDate:     '',
     cleanCriminalDecl:    false,
     cleanAvailability:    [],
     cleanPreference:      '',
@@ -411,13 +454,64 @@ export default function OnboardingPage() {
     bizPriceSmall:        '',
     bizPriceMedium:       '',
     bizPriceLarge:        '',
-    supplierBizRegUrl:    '',
-    supplierBizRegNumber: '',
+    bizKraPinCertUrl:        '',
+    bizTaxComplianceCertUrl: '',
+    bizLicenseUrl:           '',
+    bizAddressProofUrl:      '',
+    bizWebsiteUrl:           '',
+    vendorInsuranceCertUrl:         '',
+    vendorInsuranceProvider:        '',
+    vendorInsurancePolicyNumber:    '',
+    vendorInsuranceExpiryDate:      '',
     supplierBrands:       '',
     supplierBrandAuthUrl: '',
     supplierBulkPricing:  '',
     supplierDelivery:     '',
     supplierPromoAccept:  false,
+    supplierInsuranceCertUrl:      '',
+    supplierInsuranceProvider:     '',
+    supplierInsurancePolicyNumber: '',
+    supplierInsuranceExpiryDate:   '',
+    supplierSupplyChainDocUrl:     '',
+    yearsExperience:      '',
+    crewMembers:          [],
+    fleetVehicleType:     '',
+    fleetPlateNumber:     '',
+    fleetCapacity:        '',
+    fleetPhotoFront:      '',
+    fleetPhotoBack:       '',
+    fleetPhotoLeft:       '',
+    fleetPhotoRight:      '',
+    fleetInsuranceUrl:    '',
+    fleetLogbookUrl:      '',
+    insuranceCertUrl:         '',
+    insuranceProvider:        '',
+    insurancePolicyNumber:    '',
+    insuranceExpiryDate:      '',
+    insuranceGoodsInTransit:  false,
+    moverBusinessLicenseUrl:  '',
+    moverPortfolioUrl:        '',
+    moverSafetyEquipmentDecl: false,
+    moverGpsTrackingDecl:     false,
+    references: [
+      { name: '', phone: '', company: '' },
+      { name: '', phone: '', company: '' },
+      { name: '', phone: '', company: '' },
+      { name: '', phone: '', company: '' },
+      { name: '', phone: '', company: '' },
+    ],
+    waterQualityCertUrl:      '',
+    waterSourceDocUrl:        '',
+    waterContainerPhotoUrl:   '',
+    waterEquipmentPhotoUrl:   '',
+    waterHygieneDecl:         false,
+    waterHealthCertUrl:       '',
+    waterBgCheckUrl:          '',
+    policyPartnerAgreement:            false,
+    policyCodeOfConduct:               false,
+    policyDamageLiability:             false,
+    policyCustomerPropertyProtection:  false,
+    policyCancellation:                false,
   });
 
   const set = (k, v) => setData(d => ({ ...d, [k]: v }));
@@ -449,18 +543,73 @@ export default function OnboardingPage() {
       emergencyContact: { name: data.emergencyName, phone: data.emergencyPhone, relation: data.emergencyRel },
       payment: { method: data.paymentMethod, mpesa: data.mpesaNumber, bank: data.bankName, bankAccount: data.bankAccount },
       identity: { type: data.idType, number: data.idNumber, frontUrl: data.idPhotoFront, backUrl: data.idPhotoBack },
+      sha: { number: data.shaNumber, complianceUrl: data.shaComplianceUrl },
       termsAccepted: data.termsAccepted,
+    };
+    const policies = {
+      partnerAgreement:           data.policyPartnerAgreement,
+      codeOfConduct:              data.policyCodeOfConduct,
+      damageLiability:            data.policyDamageLiability,
+      customerPropertyProtection: data.policyCustomerPropertyProtection,
+      cancellation:               data.policyCancellation,
     };
     if (role === 'worker') {
       const svc = data.service;
-      if (svc?.includes('Plumbing'))   return { ...base, service: 'Plumbing',   plumbing:   { certUrl: data.plumbCertUrl, experience: data.plumbExperience, tools: data.plumbTools, areas: data.plumbAreas, portfolioUrl: data.plumbPortfolioUrl, criminalDecl: data.plumbCriminalDecl } };
-      if (svc?.includes('Electrical')) return { ...base, service: 'Electrical', electrical: { erbNumber: data.elecErbNumber, erbCertUrl: data.elecErbCertUrl, epraCompliant: data.elecEpraCompliant, insuranceUrl: data.elecInsuranceUrl, insuranceNumber: data.elecInsuranceNumber, safetyTraining: data.elecSafetyTraining, experience: data.elecExperience, criminalDecl: data.elecCriminalDecl } };
-      if (svc?.includes('Painting'))   return { ...base, service: 'Painting',   painting:   { portfolioUrl: data.paintPortfolioUrl, experience: data.paintExperience, specialty: data.paintSpecialty, teamSize: data.paintTeamSize, equipment: data.paintEquipment, criminalDecl: data.paintCriminalDecl } };
-      if (svc?.includes('Cleaning'))   return { ...base, service: 'Cleaning',   cleaning:   { bgCheckUrl: data.cleanBgCheckUrl, criminalDecl: data.cleanCriminalDecl, availability: data.cleanAvailability, preference: data.cleanPreference, specialties: data.cleanSpecialties, teamStatus: data.cleanTeamStatus } };
+      if (svc?.includes('Plumbing'))   return { ...base, policies, service: 'Plumbing',   plumbing:   { certUrl: data.plumbCertUrl, experience: data.plumbExperience, tools: data.plumbTools, areas: data.plumbAreas, portfolioUrl: data.plumbPortfolioUrl, criminalDecl: data.plumbCriminalDecl, backgroundCheckUrl: data.plumbBgCheckUrl, backgroundCheckDate: data.plumbBgCheckDate } };
+      if (svc?.includes('Electrical')) return { ...base, policies, service: 'Electrical', electrical: { erbNumber: data.elecErbNumber, erbCertUrl: data.elecErbCertUrl, epraCompliant: data.elecEpraCompliant, insuranceUrl: data.elecInsuranceUrl, insuranceNumber: data.elecInsuranceNumber, safetyTraining: data.elecSafetyTraining, experience: data.elecExperience, criminalDecl: data.elecCriminalDecl, backgroundCheckUrl: data.elecBgCheckUrl, backgroundCheckDate: data.elecBgCheckDate } };
+      if (svc?.includes('Painting'))   return { ...base, policies, service: 'Painting',   painting:   { portfolioUrl: data.paintPortfolioUrl, experience: data.paintExperience, specialty: data.paintSpecialty, teamSize: data.paintTeamSize, equipment: data.paintEquipment, criminalDecl: data.paintCriminalDecl, backgroundCheckUrl: data.paintBgCheckUrl, backgroundCheckDate: data.paintBgCheckDate } };
+      if (svc?.includes('Cleaning'))   return { ...base, policies, service: 'Cleaning',   cleaning:   { bgCheckUrl: data.cleanBgCheckUrl, bgCheckDate: data.cleanBgCheckDate, criminalDecl: data.cleanCriminalDecl, availability: data.cleanAvailability, preference: data.cleanPreference, specialties: data.cleanSpecialties, teamStatus: data.cleanTeamStatus } };
     }
-    if (role === 'rider')    return { ...base, license: { url: data.drivingLicenseUrl, number: data.drivingLicenseNumber, class: data.drivingLicenseClass }, vehicle: { make: data.vehicleMake, model: data.vehicleModel, plate: data.vehiclePlate, regUrl: data.vehicleRegUrl, insuranceUrl: data.vehicleInsuranceUrl }, gpsConsent: data.gpsConsent };
-    if (role === 'vendor')   return { ...base, business: { regUrl: data.bizRegUrl, regNumber: data.bizRegNumber, location: data.bizLocation, area: data.bizArea, hours: `${data.bizHoursOpen}–${data.bizHoursClose}`, days: data.bizDays, machineCapacity: data.bizMachineCapacity, pickupAgreement: data.bizPickupAgreement, coverageRadius: data.bizCoverageRadius, turnaround: data.bizTurnaround, pricing: { small: data.bizPriceSmall, medium: data.bizPriceMedium, large: data.bizPriceLarge } } };
-    if (role === 'supplier') return { ...base, business: { regUrl: data.supplierBizRegUrl, regNumber: data.supplierBizRegNumber, brands: data.supplierBrands, brandAuthUrl: data.supplierBrandAuthUrl, bulkPricing: data.supplierBulkPricing, delivery: data.supplierDelivery, promoAccept: data.supplierPromoAccept } };
+    if (role === 'rider')    return { ...base, policies, dob: data.riderDob, proofOfResidenceUrl: data.riderProofOfResidenceUrl, backgroundCheckUrl: data.riderBgCheckUrl, backgroundCheckDate: data.riderBgCheckDate, license: { url: data.drivingLicenseUrl, number: data.drivingLicenseNumber, class: data.drivingLicenseClass }, vehicle: { make: data.vehicleMake, model: data.vehicleModel, plate: data.vehiclePlate, regUrl: data.vehicleRegUrl, insuranceUrl: data.vehicleInsuranceUrl }, gpsConsent: data.gpsConsent };
+    const bizDocs = {
+      kraPinCertUrl: data.bizKraPinCertUrl, taxComplianceCertUrl: data.bizTaxComplianceCertUrl,
+      licenseUrl: data.bizLicenseUrl, addressProofUrl: data.bizAddressProofUrl, websiteUrl: data.bizWebsiteUrl,
+    };
+    if (role === 'vendor')   return { ...base, policies, business: { regUrl: data.bizRegUrl, regNumber: data.bizRegNumber, location: data.bizLocation, area: data.bizArea, hours: `${data.bizHoursOpen}–${data.bizHoursClose}`, days: data.bizDays, machineCapacity: data.bizMachineCapacity, pickupAgreement: data.bizPickupAgreement, coverageRadius: data.bizCoverageRadius, turnaround: data.bizTurnaround, pricing: { small: data.bizPriceSmall, medium: data.bizPriceMedium, large: data.bizPriceLarge }, docs: bizDocs }, insurance: { certUrl: data.vendorInsuranceCertUrl, provider: data.vendorInsuranceProvider, policyNumber: data.vendorInsurancePolicyNumber, expiryDate: data.vendorInsuranceExpiryDate }, references: data.references };
+    if (role === 'supplier') return { ...base, policies, business: { regUrl: data.bizRegUrl, regNumber: data.bizRegNumber, location: data.bizLocation, area: data.bizArea, brands: data.supplierBrands, brandAuthUrl: data.supplierBrandAuthUrl, bulkPricing: data.supplierBulkPricing, delivery: data.supplierDelivery, promoAccept: data.supplierPromoAccept, docs: bizDocs }, insurance: { certUrl: data.supplierInsuranceCertUrl, provider: data.supplierInsuranceProvider, policyNumber: data.supplierInsurancePolicyNumber, expiryDate: data.supplierInsuranceExpiryDate }, supplyChainDocUrl: data.supplierSupplyChainDocUrl, references: data.references };
+    if (role === 'mover' || role === 'water_carrier') {
+      const shared = {
+        business: { regUrl: data.bizRegUrl, regNumber: data.bizRegNumber, location: data.bizLocation, area: data.bizArea },
+        yearsExperience: data.yearsExperience,
+        crew: data.crewMembers,
+        policies: {
+          partnerAgreement:           data.policyPartnerAgreement,
+          codeOfConduct:              data.policyCodeOfConduct,
+          damageLiability:            data.policyDamageLiability,
+          customerPropertyProtection: data.policyCustomerPropertyProtection,
+          cancellation:               data.policyCancellation,
+        },
+      };
+      if (role === 'mover') {
+        return {
+          ...base, ...shared,
+          fleet: {
+            vehicleType: data.fleetVehicleType, plateNumber: data.fleetPlateNumber, capacity: data.fleetCapacity,
+            photoFront: data.fleetPhotoFront, photoBack: data.fleetPhotoBack, photoLeft: data.fleetPhotoLeft, photoRight: data.fleetPhotoRight,
+            insuranceUrl: data.fleetInsuranceUrl, logbookUrl: data.fleetLogbookUrl,
+            gpsTrackingDecl: data.moverGpsTrackingDecl, safetyEquipmentDecl: data.moverSafetyEquipmentDecl,
+          },
+          insurance: {
+            certUrl: data.insuranceCertUrl, provider: data.insuranceProvider, policyNumber: data.insurancePolicyNumber,
+            expiryDate: data.insuranceExpiryDate, goodsInTransit: data.insuranceGoodsInTransit,
+          },
+          businessLicenseUrl: data.moverBusinessLicenseUrl,
+          portfolioUrl: data.moverPortfolioUrl,
+          references: data.references,
+        };
+      }
+      // water_carrier
+      return {
+        ...base, ...shared,
+        waterQuality: {
+          certUrl: data.waterQualityCertUrl, sourceDocUrl: data.waterSourceDocUrl,
+          containerPhotoUrl: data.waterContainerPhotoUrl, equipmentPhotoUrl: data.waterEquipmentPhotoUrl,
+          hygieneDecl: data.waterHygieneDecl,
+        },
+        healthCertUrl: data.waterHealthCertUrl,
+        backgroundCheckUrl: data.waterBgCheckUrl,
+      };
+    }
     return base;
   }
 
@@ -662,6 +811,15 @@ export default function OnboardingPage() {
                 value={data.idPhotoBack} onChange={v => set('idPhotoBack', v)} />
             </div>
 
+            {role === 'rider' && (
+              <Field label="Date of Birth" required hint="Riders must be 18 years of age or older">
+                <input type="date" value={data.riderDob} onChange={e => set('riderDob', e.target.value)}
+                  style={inputSt}
+                  onFocus={e => e.target.style.borderColor = CL.gold}
+                  onBlur={e => e.target.style.borderColor = CL.border} />
+              </Field>
+            )}
+
             <InfoBox color={CL.blue} label="WHY WE NEED THIS">
               <div style={{ color: CL.muted, fontSize: 12, lineHeight: 1.6 }}>
                 Your ID is used solely for identity verification. It is encrypted and stored securely. Fixera complies with Kenya's Data Protection Act 2019.
@@ -714,6 +872,21 @@ export default function OnboardingPage() {
                 </div>
               ))}
             </InfoBox>
+
+            {(role === 'worker' || role === 'rider') && (
+              <div style={{ background: CL.surface, border: `1px solid ${CL.border}`, borderRadius: 14, padding: '18px 20px', marginTop: 18 }}>
+                <div style={{ color: CL.green, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14 }}>SHA (Social Health Authority) Compliance</div>
+                <Field label="SHA Number" hint="Your Social Health Authority registration number (optional)">
+                  <input value={data.shaNumber} onChange={e => set('shaNumber', e.target.value)}
+                    placeholder="e.g. SHA-XXXXXXXX" style={inputSt}
+                    onFocus={e => e.target.style.borderColor = CL.gold}
+                    onBlur={e => e.target.style.borderColor = CL.border} />
+                </Field>
+                <FileUpload label="SHA Compliance Certificate"
+                  hint="Proof of active SHA registration/contribution status (optional)"
+                  value={data.shaComplianceUrl} onChange={v => set('shaComplianceUrl', v)} />
+              </div>
+            )}
           </motion.div>
         )}
 
@@ -825,6 +998,9 @@ export default function OnboardingPage() {
                 <PhotoUpload label="Portfolio / Past Work Photo" required
                   hint="Upload a photo of a completed plumbing job — this builds trust with customers"
                   value={data.plumbPortfolioUrl} onChange={v => set('plumbPortfolioUrl', v)} />
+                <BackgroundCheckField
+                  urlValue={data.plumbBgCheckUrl} onUrlChange={v => set('plumbBgCheckUrl', v)}
+                  dateValue={data.plumbBgCheckDate} onDateChange={v => set('plumbBgCheckDate', v)} />
                 <div style={{ background: CL.redSoft, border: `1px solid #FECACA`, borderRadius: 12, padding: '16px 18px', marginBottom: 18 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
                     <AlertTriangle size={14} color={CL.red} />
@@ -890,6 +1066,11 @@ export default function OnboardingPage() {
                     label="I confirm I am EPRA (Energy & Petroleum Regulatory Authority) compliant and all my electrical work meets Kenya's wiring regulations (IEE Wiring Regulations as adopted by KEBS)." />
                 </div>
 
+                <BackgroundCheckField
+                  urlValue={data.elecBgCheckUrl} onUrlChange={v => set('elecBgCheckUrl', v)}
+                  dateValue={data.elecBgCheckDate} onDateChange={v => set('elecBgCheckDate', v)}
+                  hint="DCI Certificate of Good Conduct — apply at goodconduct.go.ke" />
+
                 <div style={{ background: CL.redSoft, border: '1px solid #FECACA', borderRadius: 12, padding: '16px 18px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
                     <AlertTriangle size={14} color={CL.red} />
@@ -925,6 +1106,9 @@ export default function OnboardingPage() {
                   <ChipSelect multi options={['Rollers & brushes','Spray machine','Scaffolding','Drop cloths','Pressure washer','Mixing equipment','Ladders']}
                     value={data.paintEquipment} onChange={v => set('paintEquipment', v)} />
                 </Field>
+                <BackgroundCheckField
+                  urlValue={data.paintBgCheckUrl} onUrlChange={v => set('paintBgCheckUrl', v)}
+                  dateValue={data.paintBgCheckDate} onDateChange={v => set('paintBgCheckDate', v)} />
                 <div style={{ background: CL.redSoft, border: '1px solid #FECACA', borderRadius: 12, padding: '16px 18px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
                     <AlertTriangle size={14} color={CL.red} />
@@ -941,9 +1125,10 @@ export default function OnboardingPage() {
               <div>
                 <SectionTitle Icon={Sparkles} title="Cleaning Professional Requirements"
                   subtitle="Cleaning workers enter customers' homes and offices. Background checks are mandatory." />
-                <FileUpload label="Background Check Certificate" required
-                  hint="DCI (Directorate of Criminal Investigations) certificate of good conduct — apply at goodconduct.go.ke"
-                  value={data.cleanBgCheckUrl} onChange={v => set('cleanBgCheckUrl', v)} />
+                <BackgroundCheckField
+                  urlValue={data.cleanBgCheckUrl} onUrlChange={v => set('cleanBgCheckUrl', v)}
+                  dateValue={data.cleanBgCheckDate} onDateChange={v => set('cleanBgCheckDate', v)}
+                  hint="DCI (Directorate of Criminal Investigations) certificate of good conduct — apply at goodconduct.go.ke" />
                 <Field label="Availability Schedule" required>
                   <ChipSelect multi options={['Weekdays (Mon–Fri)','Weekends (Sat–Sun)','Morning (6am–12pm)','Afternoon (12pm–6pm)','Evening (6pm–10pm)']}
                     value={data.cleanAvailability} onChange={v => set('cleanAvailability', v)} />
@@ -972,6 +1157,25 @@ export default function OnboardingPage() {
             )}
 
             <CommissionCard role={role} />
+
+            <div style={{ marginTop: 8 }}>
+              <div style={{ color: CL.text, fontSize: 12, fontWeight: 700, marginBottom: 10 }}>
+                Before activation, you must agree to the following policies:
+              </div>
+              {[
+                { key: 'policyPartnerAgreement',           label: 'Partner Agreement' },
+                { key: 'policyCodeOfConduct',               label: 'Code of Conduct' },
+                { key: 'policyDamageLiability',              label: 'Damage & Liability Policy' },
+                { key: 'policyCustomerPropertyProtection',   label: 'Customer Property Protection Policy' },
+                { key: 'policyCancellation',                 label: 'Cancellation Policy' },
+              ].map(policy => (
+                <div key={policy.key}
+                  style={{ background: CL.surface, border: `1px solid ${CL.border}`, borderRadius: 12, padding: '14px 16px', marginBottom: 10 }}>
+                  <Checkbox checked={data[policy.key]} onChange={() => set(policy.key, !data[policy.key])}
+                    label={`I have read and accept the Fixera ${policy.label}`} />
+                </div>
+              ))}
+            </div>
           </motion.div>
         )}
 
@@ -1024,18 +1228,29 @@ export default function OnboardingPage() {
             <FileUpload label="Vehicle Registration Certificate (Logbook)" required
               hint="Upload a photo of the vehicle logbook"
               value={data.vehicleRegUrl} onChange={v => set('vehicleRegUrl', v)} />
-            <FileUpload label="Vehicle Insurance Certificate"
-              hint="Upload insurance certificate if applicable"
+            <FileUpload label="Vehicle Insurance Certificate" required
+              hint="Third-party liability insurance, minimum"
               value={data.vehicleInsuranceUrl} onChange={v => set('vehicleInsuranceUrl', v)} />
+
+            {role === 'rider' && (
+              <FileUpload label="Proof of Residence" required
+                hint="Recent utility bill or lease agreement showing your current address"
+                value={data.riderProofOfResidenceUrl} onChange={v => set('riderProofOfResidenceUrl', v)} />
+            )}
           </motion.div>
         )}
 
         {/* ════════════════════════════════════════════════
-            COMPLIANCE STEP — RIDERS
+            COMPLIANCE STEP — RIDERS / VENDORS / SUPPLIERS
         ════════════════════════════════════════════════ */}
-        {currentStep.id === 'compliance' && (
+        {currentStep.id === 'compliance' && role === 'rider' && (
           <motion.div custom={0} variants={fadeUp} initial="hidden" animate="show">
             <SectionTitle Icon={ClipboardList} title="Rider Compliance & Agreements" color={CL.green} />
+
+            <BackgroundCheckField
+              urlValue={data.riderBgCheckUrl} onUrlChange={v => set('riderBgCheckUrl', v)}
+              dateValue={data.riderBgCheckDate} onDateChange={v => set('riderBgCheckDate', v)}
+              hint="DCI Certificate of Good Conduct — apply at goodconduct.go.ke. Riders handle customer items and enter delivery premises, so this is mandatory." />
 
             <div style={{ background: CL.greenSoft, border: `1px solid ${CL.greenBorder}`, borderRadius: 12, padding: '16px 18px', marginBottom: 20 }}>
               <div style={{ color: CL.green, fontSize: 12, fontWeight: 700, marginBottom: 10, letterSpacing: '0.04em', textTransform: 'uppercase' }}>Live GPS Tracking</div>
@@ -1058,6 +1273,78 @@ export default function OnboardingPage() {
                 <span style={{ color: CL.muted, fontSize: 12 }}>{item}</span>
               </div>
             ))}
+          </motion.div>
+        )}
+
+        {currentStep.id === 'compliance' && (role === 'vendor' || role === 'supplier') && (
+          <motion.div custom={0} variants={fadeUp} initial="hidden" animate="show">
+            <SectionTitle Icon={ShieldCheck} title="Insurance & References"
+              subtitle={role === 'vendor'
+                ? 'Vendors must carry public liability insurance (minimum KSh 5,000,000) and provide professional references.'
+                : 'Suppliers must carry product liability insurance and provide professional references and supply chain documentation.'}
+              color={CL.blue} />
+
+            <FileUpload label={role === 'vendor' ? 'Public Liability Insurance Certificate (≥ KSh 5M)' : 'Product Liability Insurance Certificate'} required
+              value={role === 'vendor' ? data.vendorInsuranceCertUrl : data.supplierInsuranceCertUrl}
+              onChange={v => set(role === 'vendor' ? 'vendorInsuranceCertUrl' : 'supplierInsuranceCertUrl', v)} />
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+              <Field label="Insurance Provider" required>
+                <input value={role === 'vendor' ? data.vendorInsuranceProvider : data.supplierInsuranceProvider}
+                  onChange={e => set(role === 'vendor' ? 'vendorInsuranceProvider' : 'supplierInsuranceProvider', e.target.value)}
+                  placeholder="e.g. Jubilee Insurance" style={inputSt}
+                  onFocus={e => e.target.style.borderColor = CL.gold}
+                  onBlur={e => e.target.style.borderColor = CL.border} />
+              </Field>
+              <Field label="Policy Number" required>
+                <input value={role === 'vendor' ? data.vendorInsurancePolicyNumber : data.supplierInsurancePolicyNumber}
+                  onChange={e => set(role === 'vendor' ? 'vendorInsurancePolicyNumber' : 'supplierInsurancePolicyNumber', e.target.value)}
+                  placeholder="Policy number" style={inputSt}
+                  onFocus={e => e.target.style.borderColor = CL.gold}
+                  onBlur={e => e.target.style.borderColor = CL.border} />
+              </Field>
+            </div>
+
+            <Field label="Coverage Expiry Date" required>
+              <input type="date" value={role === 'vendor' ? data.vendorInsuranceExpiryDate : data.supplierInsuranceExpiryDate}
+                onChange={e => set(role === 'vendor' ? 'vendorInsuranceExpiryDate' : 'supplierInsuranceExpiryDate', e.target.value)}
+                style={inputSt}
+                onFocus={e => e.target.style.borderColor = CL.gold}
+                onBlur={e => e.target.style.borderColor = CL.border} />
+            </Field>
+
+            {role === 'supplier' && (
+              <FileUpload label="Supply Chain Documentation" required
+                hint="Documentation showing your supply source(s) and fulfillment capacity"
+                value={data.supplierSupplyChainDocUrl} onChange={v => set('supplierSupplyChainDocUrl', v)} />
+            )}
+
+            <div style={{ marginTop: 8 }}>
+              <div style={{ color: CL.text, fontSize: 11, fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
+                Professional References ({role === 'vendor' ? '3–5' : '3+'} minimum)
+              </div>
+              {data.references.map((ref, i) => (
+                <div key={i} style={{ border: `1px solid ${CL.border}`, borderRadius: 12, padding: '14px 16px', marginBottom: 10 }}>
+                  <div style={{ color: CL.muted, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
+                    Reference {i + 1}{i >= 3 ? ' (optional)' : ''}
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+                    <input value={ref.name} onChange={e => {
+                        const next = [...data.references]; next[i] = { ...next[i], name: e.target.value }; set('references', next);
+                      }}
+                      placeholder="Name" style={inputSt} />
+                    <input value={ref.phone} onChange={e => {
+                        const next = [...data.references]; next[i] = { ...next[i], phone: e.target.value }; set('references', next);
+                      }}
+                      placeholder="Phone number" style={inputSt} />
+                  </div>
+                  <input value={ref.company} onChange={e => {
+                      const next = [...data.references]; next[i] = { ...next[i], company: e.target.value }; set('references', next);
+                    }}
+                    placeholder="Company / relationship" style={inputSt} />
+                </div>
+              ))}
+            </div>
           </motion.div>
         )}
 
@@ -1093,6 +1380,76 @@ export default function OnboardingPage() {
                   onBlur={e => e.target.style.borderColor = CL.border} />
               </Field>
             </div>
+
+            {(role === 'vendor' || role === 'supplier') && (
+              <div style={{ background: CL.surface, border: `1px solid ${CL.border}`, borderRadius: 14, padding: '18px 20px', marginBottom: 18 }}>
+                <div style={{ color: CL.blue, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14 }}>Tax &amp; Licensing Documents</div>
+                <FileUpload label="KRA PIN Certificate" required
+                  hint="Current KRA PIN certificate for the business"
+                  value={data.bizKraPinCertUrl} onChange={v => set('bizKraPinCertUrl', v)} />
+                <FileUpload label="Tax Compliance Certificate" required
+                  hint="Current tax compliance certificate from KRA"
+                  value={data.bizTaxComplianceCertUrl} onChange={v => set('bizTaxComplianceCertUrl', v)} />
+                <FileUpload label={role === 'supplier' ? 'Trading License' : 'Business Operating License'} required
+                  value={data.bizLicenseUrl} onChange={v => set('bizLicenseUrl', v)} />
+                <FileUpload label="Business Address Proof" required
+                  hint="Rental agreement or proof of ownership for your business premises"
+                  value={data.bizAddressProofUrl} onChange={v => set('bizAddressProofUrl', v)} />
+                <Field label="Company Website / Online Presence" hint="Optional, but preferred">
+                  <input value={data.bizWebsiteUrl} onChange={e => set('bizWebsiteUrl', e.target.value)}
+                    placeholder="https://..." style={inputSt}
+                    onFocus={e => e.target.style.borderColor = CL.gold}
+                    onBlur={e => e.target.style.borderColor = CL.border} />
+                </Field>
+              </div>
+            )}
+
+            {(role === 'mover' || role === 'water_carrier') && (
+              <div style={{ background: CL.surface, border: `1px solid ${CL.border}`, borderRadius: 14, padding: '18px 20px', marginBottom: 18 }}>
+                <div style={{ color: CL.blue, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14 }}>Team &amp; Experience</div>
+
+                <Field label="Years of Experience" required>
+                  <input type="number" min="0" value={data.yearsExperience} onChange={e => set('yearsExperience', e.target.value)}
+                    placeholder="e.g. 3" style={inputSt}
+                    onFocus={e => e.target.style.borderColor = CL.gold}
+                    onBlur={e => e.target.style.borderColor = CL.border} />
+                </Field>
+
+                <Field label={role === 'water_carrier' ? 'Staff Member(s)' : 'Crew / Staff Members'} required
+                  hint={role === 'water_carrier'
+                    ? 'A single owner-operator is fine — add yourself or your one staff member below.'
+                    : 'Add each crew member who will be physically moving customer items.'}>
+                  {data.crewMembers.map((member, i) => (
+                    <div key={i} style={{ border: `1px solid ${CL.border}`, borderRadius: 12, padding: '14px 16px', marginBottom: 10, position: 'relative' }}>
+                      <button type="button" onClick={() => set('crewMembers', data.crewMembers.filter((_, j) => j !== i))}
+                        style={{ position: 'absolute', top: 10, right: 10, background: 'none', border: 'none', color: CL.red, cursor: 'pointer', fontSize: 13, fontWeight: 700 }}>×</button>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+                        <input value={member.name} onChange={e => {
+                            const next = [...data.crewMembers]; next[i] = { ...next[i], name: e.target.value }; set('crewMembers', next);
+                          }}
+                          placeholder="Full name" style={inputSt} />
+                        <input value={member.phone} onChange={e => {
+                            const next = [...data.crewMembers]; next[i] = { ...next[i], phone: e.target.value }; set('crewMembers', next);
+                          }}
+                          placeholder="Phone number" style={inputSt} />
+                      </div>
+                      <input value={member.idNumber} onChange={e => {
+                          const next = [...data.crewMembers]; next[i] = { ...next[i], idNumber: e.target.value }; set('crewMembers', next);
+                        }}
+                        placeholder="National ID number" style={{ ...inputSt, marginBottom: 10 }} />
+                      <PhotoUpload label="ID Photo" required
+                        value={member.idPhotoUrl}
+                        onChange={v => { const next = [...data.crewMembers]; next[i] = { ...next[i], idPhotoUrl: v }; set('crewMembers', next); }} />
+                    </div>
+                  ))}
+                  <button type="button"
+                    onClick={() => set('crewMembers', [...data.crewMembers, { name: '', phone: '', idNumber: '', idPhotoUrl: '' }])}
+                    style={{ width: '100%', padding: '12px', borderRadius: 11, border: `1px dashed ${CL.gold}`, background: CL.goldSoft, color: CL.gold, fontSize: 13, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit' }}>
+                    + Add {data.crewMembers.length === 0 ? 'a' : 'another'} team member
+                  </button>
+                </Field>
+              </div>
+            )}
 
             {role === 'vendor' && (
               <>
@@ -1205,23 +1562,53 @@ export default function OnboardingPage() {
 
             <CommissionCard role={role} />
 
-            {[
-              `I agree to Fixera's ${role} commission structure (${COMMISSION_RATES[role]?.rate || '10%'} platform fee on each completed job)`,
-              'I will maintain accurate pricing and product/service listings',
-              'I agree to respond to customer orders within 2 hours during operating hours',
-              'I understand that consistent poor ratings may result in suspension',
-              'I agree to participate in Fixera promotional campaigns when applicable',
-              'I consent to Fixera displaying my business/products on the customer platform',
-            ].map((item, i) => (
-              <div key={i} style={{ display: 'flex', gap: 10, padding: '12px 0', borderBottom: `1px solid ${CL.border}` }}>
+            {(role === 'mover' || role === 'water_carrier') ? (
+              <div style={{ display: 'flex', gap: 10, padding: '12px 0', borderBottom: `1px solid ${CL.border}` }}>
                 <CheckCircle2 size={13} color={CL.green} strokeWidth={2} style={{ flexShrink: 0, marginTop: 2 }} />
-                <span style={{ color: CL.muted, fontSize: 12, lineHeight: 1.5 }}>{item}</span>
+                <span style={{ color: CL.muted, fontSize: 12, lineHeight: 1.5 }}>
+                  I agree to Fixera's {role} commission structure ({COMMISSION_RATES[role]?.rate || '12%'} platform fee on each completed job)
+                </span>
               </div>
-            ))}
+            ) : (
+              <>
+                {[
+                  `I agree to Fixera's ${role} commission structure (${COMMISSION_RATES[role]?.rate || '10%'} platform fee on each completed job)`,
+                  'I will maintain accurate pricing and product/service listings',
+                  'I agree to respond to customer orders within 2 hours during operating hours',
+                  'I understand that consistent poor ratings may result in suspension',
+                  'I agree to participate in Fixera promotional campaigns when applicable',
+                  'I consent to Fixera displaying my business/products on the customer platform',
+                ].map((item, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 10, padding: '12px 0', borderBottom: `1px solid ${CL.border}` }}>
+                    <CheckCircle2 size={13} color={CL.green} strokeWidth={2} style={{ flexShrink: 0, marginTop: 2 }} />
+                    <span style={{ color: CL.muted, fontSize: 12, lineHeight: 1.5 }}>{item}</span>
+                  </div>
+                ))}
 
-            <div style={{ background: CL.goldSoft, border: `1px solid ${CL.goldBorder}`, borderRadius: 12, padding: '16px', marginTop: 20 }}>
-              <Checkbox checked={data.supplierPromoAccept} onChange={() => set('supplierPromoAccept', !data.supplierPromoAccept)}
-                label="I accept the Fixera Partner Agreement and Promotion & Advertising terms" />
+                <div style={{ background: CL.goldSoft, border: `1px solid ${CL.goldBorder}`, borderRadius: 12, padding: '16px', marginTop: 20 }}>
+                  <Checkbox checked={data.supplierPromoAccept} onChange={() => set('supplierPromoAccept', !data.supplierPromoAccept)}
+                    label="I accept the Fixera Partner Agreement and Promotion & Advertising terms" />
+                </div>
+              </>
+            )}
+
+            <div style={{ marginTop: 18 }}>
+              <div style={{ color: CL.text, fontSize: 12, fontWeight: 700, marginBottom: 10 }}>
+                Before activation, you must agree to the following policies:
+              </div>
+              {[
+                { key: 'policyPartnerAgreement',           label: 'Partner Agreement' },
+                { key: 'policyCodeOfConduct',               label: 'Code of Conduct' },
+                { key: 'policyDamageLiability',              label: 'Damage & Liability Policy' },
+                { key: 'policyCustomerPropertyProtection',   label: 'Customer Property Protection Policy' },
+                { key: 'policyCancellation',                 label: 'Cancellation Policy' },
+              ].map(policy => (
+                <div key={policy.key}
+                  style={{ background: CL.surface, border: `1px solid ${CL.border}`, borderRadius: 12, padding: '14px 16px', marginBottom: 10 }}>
+                  <Checkbox checked={data[policy.key]} onChange={() => set(policy.key, !data[policy.key])}
+                    label={`I have read and accept the Fixera ${policy.label}`} />
+                </div>
+              ))}
             </div>
           </motion.div>
         )}
@@ -1232,18 +1619,64 @@ export default function OnboardingPage() {
         {currentStep.id === 'fleet' && (
           <motion.div custom={0} variants={fadeUp} initial="hidden" animate="show">
             <SectionTitle Icon={Truck} title="Fleet Registration"
-              subtitle="Register each vehicle in your fleet. Fixera will verify all vehicle documents before going live." color="#8B5CF6" />
-            <InfoBox color="#8B5CF6" label="What to upload per vehicle (Phase 2)">
-              <ul style={{ margin: '0', paddingLeft: 18, color: CL.muted, fontSize: 12, lineHeight: 1.8 }}>
-                <li>Vehicle type — Pickup / Van / 3-Ton / 5-Ton / 10-Ton Truck</li>
-                <li>Plate number</li>
-                <li>Carrying capacity</li>
-                <li>Vehicle photos (4 sides)</li>
-                <li>Current insurance certificate</li>
-                <li>Logbook / vehicle registration document</li>
-              </ul>
-              <div style={{ marginTop: 10, fontStyle: 'italic', color: CL.muted, fontSize: 11 }}>
-                After signup approval you'll add vehicles via the Fleet page. Required before accepting jobs.
+              subtitle="Register your primary vehicle now. Additional vehicles can be added later via the Fleet page." color="#8B5CF6" />
+
+            <Field label="Vehicle Type" required>
+              <ChipSelect options={['Pickup', 'Van', '3-Ton Truck', '5-Ton Truck', '10-Ton Truck']}
+                value={data.fleetVehicleType} onChange={v => set('fleetVehicleType', v)} color="#8B5CF6" />
+            </Field>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+              <Field label="Plate Number" required>
+                <input value={data.fleetPlateNumber} onChange={e => set('fleetPlateNumber', e.target.value.toUpperCase())}
+                  placeholder="e.g. KDA 123A" style={inputSt}
+                  onFocus={e => e.target.style.borderColor = CL.gold}
+                  onBlur={e => e.target.style.borderColor = CL.border} />
+              </Field>
+              <Field label="Carrying Capacity" required>
+                <input value={data.fleetCapacity} onChange={e => set('fleetCapacity', e.target.value)}
+                  placeholder="e.g. 3 tonnes" style={inputSt}
+                  onFocus={e => e.target.style.borderColor = CL.gold}
+                  onBlur={e => e.target.style.borderColor = CL.border} />
+              </Field>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <PhotoUpload label="Vehicle Photo — Front" required value={data.fleetPhotoFront} onChange={v => set('fleetPhotoFront', v)} />
+              <PhotoUpload label="Vehicle Photo — Back" required value={data.fleetPhotoBack} onChange={v => set('fleetPhotoBack', v)} />
+              <PhotoUpload label="Vehicle Photo — Left Side" required value={data.fleetPhotoLeft} onChange={v => set('fleetPhotoLeft', v)} />
+              <PhotoUpload label="Vehicle Photo — Right Side" required value={data.fleetPhotoRight} onChange={v => set('fleetPhotoRight', v)} />
+            </div>
+
+            <FileUpload label="Current Insurance Certificate" required
+              value={data.fleetInsuranceUrl} onChange={v => set('fleetInsuranceUrl', v)} />
+            <FileUpload label="Logbook / Vehicle Registration Document" required
+              value={data.fleetLogbookUrl} onChange={v => set('fleetLogbookUrl', v)} />
+
+            <div style={{ background: CL.surface, border: `1px solid ${CL.border}`, borderRadius: 14, padding: '18px 20px', marginTop: 4, marginBottom: 18 }}>
+              <div style={{ color: '#8B5CF6', fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 14 }}>Business & Safety Compliance</div>
+              <FileUpload label="Business Operating License" required
+                hint="Trading/business license for moving services (separate from your registration certificate)"
+                value={data.moverBusinessLicenseUrl} onChange={v => set('moverBusinessLicenseUrl', v)} />
+              <Field label="Company Website / Portfolio" hint="Link to your website, Google Business listing, or a portfolio of past moves (recommended, not required)">
+                <input value={data.moverPortfolioUrl} onChange={e => set('moverPortfolioUrl', e.target.value)}
+                  placeholder="https://..." style={inputSt}
+                  onFocus={e => e.target.style.borderColor = CL.gold}
+                  onBlur={e => e.target.style.borderColor = CL.border} />
+              </Field>
+              <div style={{ marginTop: 4 }}>
+                <Checkbox checked={data.moverSafetyEquipmentDecl} onChange={() => set('moverSafetyEquipmentDecl', !data.moverSafetyEquipmentDecl)}
+                  label="My crew carries proper safety equipment (helmets, gloves, safety shoes), packing materials, moving equipment (dollies, straps, padding), and a first aid kit in every vehicle." />
+              </div>
+              <div style={{ marginTop: 12 }}>
+                <Checkbox checked={data.moverGpsTrackingDecl} onChange={() => set('moverGpsTrackingDecl', !data.moverGpsTrackingDecl)}
+                  label="My vehicle(s) have GPS/tracking capability and I consent to sharing live location during active jobs." />
+              </div>
+            </div>
+
+            <InfoBox color="#8B5CF6" label="NOTE">
+              <div style={{ color: CL.muted, fontSize: 12, lineHeight: 1.6 }}>
+                After signup approval you can add further vehicles via the Fleet page.
               </div>
             </InfoBox>
           </motion.div>
@@ -1256,15 +1689,39 @@ export default function OnboardingPage() {
           <motion.div custom={0} variants={fadeUp} initial="hidden" animate="show">
             <SectionTitle Icon={ShieldCheck} title="Liability Insurance"
               subtitle="Movers must carry liability insurance — minimum KSh 10,000,000 coverage." color="#8B5CF6" />
-            <InfoBox color="#8B5CF6" label="What to upload (Phase 2)">
-              <ul style={{ margin: '0', paddingLeft: 18, color: CL.muted, fontSize: 12, lineHeight: 1.8 }}>
-                <li>Liability insurance certificate (≥ KSh 10M)</li>
-                <li>Insurance provider name</li>
-                <li>Policy number</li>
-                <li>Coverage expiry date</li>
-                <li>Goods-in-transit insurance (recommended above KSh 50K quote value)</li>
-              </ul>
-              <div style={{ marginTop: 10, fontStyle: 'italic', color: CL.muted, fontSize: 11 }}>
+
+            <FileUpload label="Liability Insurance Certificate (≥ KSh 10M)" required
+              value={data.insuranceCertUrl} onChange={v => set('insuranceCertUrl', v)} />
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+              <Field label="Insurance Provider" required>
+                <input value={data.insuranceProvider} onChange={e => set('insuranceProvider', e.target.value)}
+                  placeholder="e.g. Jubilee Insurance" style={inputSt}
+                  onFocus={e => e.target.style.borderColor = CL.gold}
+                  onBlur={e => e.target.style.borderColor = CL.border} />
+              </Field>
+              <Field label="Policy Number" required>
+                <input value={data.insurancePolicyNumber} onChange={e => set('insurancePolicyNumber', e.target.value)}
+                  placeholder="Policy number" style={inputSt}
+                  onFocus={e => e.target.style.borderColor = CL.gold}
+                  onBlur={e => e.target.style.borderColor = CL.border} />
+              </Field>
+            </div>
+
+            <Field label="Coverage Expiry Date" required>
+              <input type="date" value={data.insuranceExpiryDate} onChange={e => set('insuranceExpiryDate', e.target.value)}
+                style={inputSt}
+                onFocus={e => e.target.style.borderColor = CL.gold}
+                onBlur={e => e.target.style.borderColor = CL.border} />
+            </Field>
+
+            <div style={{ background: CL.surface, border: `1px solid ${CL.border}`, borderRadius: 14, padding: '16px 20px', marginTop: 4 }}>
+              <Checkbox checked={data.insuranceGoodsInTransit} onChange={() => set('insuranceGoodsInTransit', !data.insuranceGoodsInTransit)}
+                label="I carry (or will obtain) goods-in-transit insurance — recommended for quotes above KSh 50,000." />
+            </div>
+
+            <InfoBox color="#8B5CF6" label="IMPORTANT">
+              <div style={{ color: CL.muted, fontSize: 12, lineHeight: 1.6 }}>
                 Insurance lapse = immediate account suspension until renewed (legal §1081).
               </div>
             </InfoBox>
@@ -1277,17 +1734,34 @@ export default function OnboardingPage() {
         {currentStep.id === 'references' && (
           <motion.div custom={0} variants={fadeUp} initial="hidden" animate="show">
             <SectionTitle Icon={Star} title="Professional References"
-              subtitle="Provide 5+ professional references — past clients or business contacts." color="#8B5CF6" />
-            <InfoBox color="#8B5CF6" label="What to provide (Phase 2)">
-              <ul style={{ margin: '0', paddingLeft: 18, color: CL.muted, fontSize: 12, lineHeight: 1.8 }}>
-                <li>Reference 1 — name, phone, company / relationship</li>
-                <li>Reference 2 — name, phone, company / relationship</li>
-                <li>Reference 3 — name, phone, company / relationship</li>
-                <li>Reference 4 — name, phone, company / relationship</li>
-                <li>Reference 5 — name, phone, company / relationship</li>
-                <li>(Optional) Portfolio link / company website</li>
-                <li>(Optional) Customer testimonials</li>
-              </ul>
+              subtitle="Provide 5 professional references — past clients or business contacts." color="#8B5CF6" />
+
+            {data.references.map((ref, i) => (
+              <div key={i} style={{ border: `1px solid ${CL.border}`, borderRadius: 12, padding: '14px 16px', marginBottom: 10 }}>
+                <div style={{ color: CL.muted, fontSize: 11, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
+                  Reference {i + 1}{i >= 2 ? ' (optional)' : ''}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 10 }}>
+                  <input value={ref.name} onChange={e => {
+                      const next = [...data.references]; next[i] = { ...next[i], name: e.target.value }; set('references', next);
+                    }}
+                    placeholder="Name" style={inputSt} />
+                  <input value={ref.phone} onChange={e => {
+                      const next = [...data.references]; next[i] = { ...next[i], phone: e.target.value }; set('references', next);
+                    }}
+                    placeholder="Phone number" style={inputSt} />
+                </div>
+                <input value={ref.company} onChange={e => {
+                    const next = [...data.references]; next[i] = { ...next[i], company: e.target.value }; set('references', next);
+                  }}
+                  placeholder="Company / relationship" style={inputSt} />
+              </div>
+            ))}
+
+            <InfoBox color="#8B5CF6" label="NOTE">
+              <div style={{ color: CL.muted, fontSize: 12, lineHeight: 1.6 }}>
+                The first 2 references are required; the remaining 3 are strongly recommended but optional.
+              </div>
             </InfoBox>
           </motion.div>
         )}
@@ -1299,16 +1773,34 @@ export default function OnboardingPage() {
           <motion.div custom={0} variants={fadeUp} initial="hidden" animate="show">
             <SectionTitle Icon={Droplets} title="Water Quality & Equipment"
               subtitle="Water carriers must prove clean, food-grade delivery throughout the supply chain." color="#06B6D4" />
-            <InfoBox color="#06B6D4" label="What to upload (Phase 2)">
-              <ul style={{ margin: '0', paddingLeft: 18, color: CL.muted, fontSize: 12, lineHeight: 1.8 }}>
-                <li>Water quality test certificate (lab analysis)</li>
-                <li>Source documentation (borehole permit / council supply contract)</li>
-                <li>Food-grade jerrycan / container photos</li>
-                <li>Spill prevention equipment photos</li>
-                <li>Vehicle cleanliness procedures</li>
-                <li>Hygiene & handling standards declaration</li>
-              </ul>
-              <div style={{ marginTop: 10, fontStyle: 'italic', color: CL.muted, fontSize: 11 }}>
+
+            <FileUpload label="Water Quality Test Certificate (lab analysis)" required
+              value={data.waterQualityCertUrl} onChange={v => set('waterQualityCertUrl', v)} />
+            <FileUpload label="Source Documentation" required
+              hint="Borehole permit / council supply contract"
+              value={data.waterSourceDocUrl} onChange={v => set('waterSourceDocUrl', v)} />
+            <FileUpload label="Health / Fitness Certification" required
+              hint="Current health certificate proving fitness to handle food-grade water — renewed monthly per Fixera policy"
+              value={data.waterHealthCertUrl} onChange={v => set('waterHealthCertUrl', v)} />
+            <FileUpload label="Background Check Clearance" required
+              hint="DCI Certificate of Good Conduct — apply at goodconduct.go.ke"
+              value={data.waterBgCheckUrl} onChange={v => set('waterBgCheckUrl', v)} />
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <PhotoUpload label="Food-Grade Container Photo" required
+                hint="Jerrycan / delivery container"
+                value={data.waterContainerPhotoUrl} onChange={v => set('waterContainerPhotoUrl', v)} />
+              <PhotoUpload label="Spill Prevention Equipment Photo" required
+                value={data.waterEquipmentPhotoUrl} onChange={v => set('waterEquipmentPhotoUrl', v)} />
+            </div>
+
+            <div style={{ background: CL.surface, border: `1px solid ${CL.border}`, borderRadius: 14, padding: '16px 20px', marginTop: 4 }}>
+              <Checkbox checked={data.waterHygieneDecl} onChange={() => set('waterHygieneDecl', !data.waterHygieneDecl)}
+                label="I declare that I follow proper vehicle cleanliness procedures and hygiene & handling standards for food-grade water delivery." />
+            </div>
+
+            <InfoBox color="#06B6D4" label="IMPORTANT">
+              <div style={{ color: CL.muted, fontSize: 12, lineHeight: 1.6 }}>
                 Contaminated delivery = 30-day suspension + full refund (legal §1156).
               </div>
             </InfoBox>
