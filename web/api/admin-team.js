@@ -6,7 +6,10 @@
 // ============================================================
 import { requireAdmin } from './_auth.js';
 
-const VALID_ROLES = ['super_admin', 'support', 'finance', 'operations', 'verification', 'trust_safety'];
+const VALID_ROLES = [
+  'super_admin', 'support', 'partner_support', 'finance', 'operations', 'verification', 'trust_safety',
+  'service_delivery', 'platform_governance', 'marketplace_intelligence',
+];
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

@@ -146,9 +146,16 @@ const NAV_GROUPS = [
 
 // Sections each admin_role is allowed to see (super_admin sees all)
 const ROLE_ACCESS = {
+  // Customer-facing tickets only — the 'support' ticket queue is row-scoped
+  // to user_type='customer' inside DisputesSection, see audienceLock there.
   support:    new Set([
     'overview','users','orders','quotations','support','dispute_center',
     'notifications','announcements',
+  ]),
+  // Partner-facing tickets only (split out of 'support') — same 'support'
+  // section, but row-scoped to user_type != 'customer' via audienceLock.
+  partner_support: new Set([
+    'overview','support','notifications',
   ]),
   finance:    new Set([
     'overview','payments','payouts','wallets','refunds','reconciliation',
@@ -167,6 +174,19 @@ const ROLE_ACCESS = {
   // Handles safety incidents & disputes — sees only support/dispute tooling
   trust_safety: new Set([
     'overview','support','dispute_center','alerts','fraud',
+  ]),
+  // Booking lifecycle, live jobs, dispatch, partner ops (split out of 'operations')
+  service_delivery: new Set([
+    'overview','live_ops','dispatch','alerts',
+    'partners','vendors','suppliers','movers','riders','water','workforce',
+  ]),
+  // Config integrity, security, team & role management (split out of 'operations')
+  platform_governance: new Set([
+    'overview','settings','security','team','service_areas',
+  ]),
+  // Demand forecasting, utilization, pricing recommendations (split out of 'operations')
+  marketplace_intelligence: new Set([
+    'overview','analytics','heatmap','revenue_forecast','availability','performance',
   ]),
 };
 
@@ -1942,19 +1962,29 @@ function DisputesSection() {
     return null;
   };
 
+  // Customer & Partner Support are now two separate agents (support = customer
+  // tickets only, partner_support = partner tickets only) — lock the query to
+  // the logged-in agent's audience instead of relying on the manual filter pill.
+  // trust_safety / super_admin stay unrestricted (safety visibility spans both).
+  const audienceLock = profile?.admin_role === 'support'         ? 'customer'
+                      : profile?.admin_role === 'partner_support' ? 'partner'
+                      : null;
+
   const load = useCallback(() => {
     setLoading(true);
     let q = supabase.from('support_tickets').select('*').order('created_at', { ascending: false });
     if (filter !== 'all')        q = q.eq('status', filter);
     if (deptFilter !== 'all')    q = q.eq('department', deptFilter);
-    if (roleTixFilter !== 'all') q = q.eq('user_type', roleTixFilter);
+    if (audienceLock === 'customer')      q = q.eq('user_type', 'customer');
+    else if (audienceLock === 'partner')  q = q.neq('user_type', 'customer');
+    else if (roleTixFilter !== 'all')     q = q.eq('user_type', roleTixFilter);
     q.then(({ data }) => {
       const order  = { urgent: 0, high: 1, normal: 2 };
       const sorted = (data || []).sort((a, b) => (order[a.priority] ?? 2) - (order[b.priority] ?? 2));
       setDisputes(sorted);
       setLoading(false);
     });
-  }, [filter, deptFilter, roleTixFilter]);
+  }, [filter, deptFilter, roleTixFilter, audienceLock]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -2017,9 +2047,13 @@ function DisputesSection() {
         ))}
       </div>
 
-      {/* User type filter */}
+      {/* User type filter — locked for Customer Support / Partner Support agents */}
       <div style={{ marginBottom:16 }}>
-        {ROLE_FILTERS.map(f => (
+        {audienceLock ? (
+          <span style={{ fontSize:11.5, fontWeight:700, color:'var(--gold-2)', background:'var(--gold-soft)', padding:'5px 12px', borderRadius:20 }}>
+            Scoped to {audienceLock === 'customer' ? 'Customer' : 'Partner'} tickets only
+          </span>
+        ) : ROLE_FILTERS.map(f => (
           <FilterPill key={f.k} active={roleTixFilter === f.k} onClick={() => setRoleTix(f.k)}>
             <span style={{ display:'inline-flex', alignItems:'center', gap:6 }}>{f.Icon && <f.Icon size={12.5} />}{f.label}</span>
           </FilterPill>

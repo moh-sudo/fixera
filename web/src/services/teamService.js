@@ -24,11 +24,14 @@ export const revokeAgent = (id)                                => call('revoke',
 
 // Department roles an agent can hold (label + description for the UI)
 export const AGENT_ROLES = [
-  { value: 'support',      label: 'Customer & Partner Support', desc: 'Handles complaints, tickets & disputes intake' },
+  { value: 'support',         label: 'Customer Support',  desc: 'Customer-facing tickets & complaints only' },
+  { value: 'partner_support', label: 'Partner Support',   desc: 'Partner-facing tickets & complaints only' },
   { value: 'finance',      label: 'Finance & Payments',         desc: 'Payouts, refunds, invoices, reconciliation' },
-  { value: 'operations',   label: 'Operations / Dispatch',      desc: 'Live jobs, dispatch, partner ops' },
   { value: 'verification', label: 'Verification / HR',          desc: 'Vets & approves partner credentials' },
   { value: 'trust_safety', label: 'Trust & Safety',             desc: 'Safety incidents, damage & urgent disputes' },
+  { value: 'service_delivery',         label: 'Service Delivery',          desc: 'Booking lifecycle, live jobs, dispatch, partner ops' },
+  { value: 'platform_governance',      label: 'Platform Governance',       desc: 'Config integrity, security, team & roles' },
+  { value: 'marketplace_intelligence', label: 'Marketplace Intelligence',  desc: 'Demand forecasting, utilization, pricing recommendations' },
   { value: 'super_admin',  label: 'Super Admin (full access)',  desc: 'Sees & controls everything — grant sparingly' },
 ];
 
