@@ -274,7 +274,7 @@ export default function ProfilePage() {
         <div style={{ color: CL.light, fontSize: 11, textAlign: 'center', paddingBottom: 8 }}>Fixera v1.0.0 · Nairobi, Kenya</div>
       </div>
 
-      <style>{`.prof-row:hover{ background:#FAFBFC; }`}</style>
+      <style>{`.prof-row:hover{ background:${CL.bg}; }`}</style>
 
       {showEdit && <EditProfileDrawer profile={profile} onClose={() => setShowEdit(false)} onSave={updateProfile} />}
       {showDelete && <DeleteAccountModal onClose={() => setShowDelete(false)} onDeleted={handleAccountDeleted} />}

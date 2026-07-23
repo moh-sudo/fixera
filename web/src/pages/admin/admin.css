@@ -67,6 +67,7 @@ body, .admin-root {
 .admin-shell[data-theme="dark"] .sidebar-nav-link:hover{ background: #20242F; }
 .admin-shell[data-theme="dark"] .sidebar-profile       { background: #1F232E; }
 .admin-shell[data-theme="dark"] .admin-table th        { background: #1F232E; }
+.admin-shell[data-theme="dark"] .admin-table tr:hover td { background: #20242F; }
 .admin-shell[data-theme="dark"] .admin-card-header     { background: transparent; }
 .admin-shell[data-theme="dark"] .sb-badge-success   { background: #0D2E1B; color: #4ADE80; }
 .admin-shell[data-theme="dark"] .sb-badge-warning   { background: #2E2308; color: #FBBF24; }
